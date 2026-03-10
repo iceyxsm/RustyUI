@@ -7,6 +7,9 @@ pub mod traits;
 #[cfg(feature = "egui-adapter")]
 pub mod egui_adapter;
 
+#[cfg(feature = "egui-adapter")]
+pub mod egui_components;
+
 #[cfg(feature = "iced-adapter")]
 pub mod iced_adapter;
 
@@ -16,10 +19,21 @@ pub mod slint_adapter;
 #[cfg(feature = "tauri-adapter")]
 pub mod tauri_adapter;
 
-pub use traits::{UIFrameworkAdapter, RenderContext, FrameworkState};
+pub use traits::{
+    UIFrameworkAdapter, RenderContext, UIComponent, AdapterFactory,
+    FrameworkState, RuntimeUpdate, UpdateType, FrameworkConfig,
+    ComponentStyle, Rect, RenderFeature, LayoutType, FrameworkMetrics,
+    AdapterResult, AdapterError, Padding, Margin, Border, BorderStyle,
+};
+
+#[cfg(feature = "dev-ui")]
+pub use traits::{InterpretationHint, HotReloadMetrics};
 
 #[cfg(feature = "egui-adapter")]
 pub use egui_adapter::EguiAdapter;
+
+#[cfg(feature = "egui-adapter")]
+pub use egui_components::{EguiButton, EguiText, EguiInput, EguiLayout, LayoutDirection};
 
 #[cfg(feature = "iced-adapter")]
 pub use iced_adapter::IcedAdapter;

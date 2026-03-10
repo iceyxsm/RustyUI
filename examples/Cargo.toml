@@ -28,9 +28,17 @@ name = "state_preservation_demo"
 path = "state_preservation_demo.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "egui_component_integration"
+path = "egui_component_integration.rs"
+required-features = ["dev-ui", "egui-adapter"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
+rustyui-adapters = { path = "../crates/rustyui-adapters" }
+serde_json = "1.0"
 
 [features]
 default = []
-dev-ui = ["rustyui-core/dev-ui"]
+dev-ui = ["rustyui-core/dev-ui", "rustyui-adapters/dev-ui"]
+egui-adapter = ["rustyui-adapters/egui-adapter"]

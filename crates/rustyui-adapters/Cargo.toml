@@ -17,18 +17,18 @@ serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
 
-# UI framework dependencies (optional)
-egui = { version = "0.24", optional = true }
-eframe = { version = "0.24", optional = true }
-iced = { version = "0.10", optional = true }
-slint = { version = "1.3", optional = true }
-tauri = { version = "1.5", optional = true }
+# UI framework dependencies (optional) - commented out for Phase 1
+# egui = { version = "0.24", optional = true }
+# eframe = { version = "0.24", optional = true }
+# iced = { version = "0.10", optional = true }
+# slint = { version = "1.3", optional = true }
+# tauri = { version = "1.5", optional = true }
 
 [features]
 default = []
 dev-ui = []
-egui-adapter = ["egui", "eframe"]
-iced-adapter = ["iced"]
-slint-adapter = ["slint"]
-tauri-adapter = ["tauri"]
+egui-adapter = [] # ["egui", "eframe"] - disabled for Phase 1
+iced-adapter = [] # ["iced"] - disabled for Phase 1
+slint-adapter = [] # ["slint"] - disabled for Phase 1
+tauri-adapter = [] # ["tauri"] - disabled for Phase 1
 all-adapters = ["egui-adapter", "iced-adapter", "slint-adapter", "tauri-adapter"]
