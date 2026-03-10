@@ -4,7 +4,8 @@ members = [
     "crates/rustyui-interpreter", 
     "crates/rustyui-adapters",
     "crates/rustyui-cli",
-    "crates/rustyui-macros"
+    "crates/rustyui-macros",
+    "examples"
 ]
 resolver = "2"
 
@@ -27,24 +28,15 @@ anyhow = "1.0"
 thiserror = "1.0"
 tokio = { version = "1.0", features = ["full"] }
 
-# Development-only dependencies (conditionally compiled)
-rhai = { version = "1.16", optional = true }
-syn = { version = "2.0", features = ["full"], optional = true }
-cranelift-jit = { version = "0.101", optional = true }
-wasmtime = { version = "13.0", optional = true }
-notify = { version = "6.0", optional = true }
-
-# UI framework dependencies (optional)
-egui = { version = "0.24", optional = true }
-eframe = { version = "0.24", optional = true }
-iced = { version = "0.10", optional = true }
-slint = { version = "1.3", optional = true }
-tauri = { version = "1.5", optional = true }
-
 # CLI dependencies
 clap = { version = "4.4", features = ["derive"] }
 console = "0.15"
 indicatif = "0.17"
+toml = "0.8"
+
+# Macro dependencies
+quote = "1.0"
+proc-macro2 = "1.0"
 
 # Testing dependencies
 proptest = "1.4"

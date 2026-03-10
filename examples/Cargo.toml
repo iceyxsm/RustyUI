@@ -1,0 +1,16 @@
+[package]
+name = "rustyui-examples"
+version = "0.1.0"
+edition = "2021"
+
+[[example]]
+name = "basic_interpretation"
+path = "basic_interpretation.rs"
+required-features = ["dev-ui"]
+
+[dependencies]
+rustyui-core = { path = "../crates/rustyui-core" }
+
+[features]
+default = []
+dev-ui = ["rustyui-core/dev-ui"]
