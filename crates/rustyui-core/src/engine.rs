@@ -127,6 +127,22 @@ impl DualModeEngine {
         overhead
     }
     
+    /// Get file watching performance statistics (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_file_watching_stats(&self) -> Option<crate::change_monitor::PerformanceStats> {
+        self.change_monitor.as_ref().map(|monitor| monitor.get_performance_stats())
+    }
+    
+    /// Process pending file changes (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn process_file_changes(&mut self) -> Result<Vec<crate::change_monitor::FileChange>> {
+        if let Some(ref mut monitor) = self.change_monitor {
+            Ok(monitor.check_changes())
+        } else {
+            Ok(Vec::new())
+        }
+    }
+    
     /// Get memory overhead in bytes (always 0 in production)
     #[cfg(not(feature = "dev-ui"))]
     pub fn memory_overhead(&self) -> usize {

@@ -8,6 +8,11 @@ name = "basic_interpretation"
 path = "basic_interpretation.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "file_watching_demo"
+path = "file_watching_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 
