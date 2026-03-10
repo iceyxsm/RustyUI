@@ -33,3 +33,6 @@ dev-ui = [
     "notify-debouncer-mini",
     "rustyui-interpreter/dev-ui"
 ]
+[dev-dependencies]
+proptest = "1.0"
+tempfile = "3.0"

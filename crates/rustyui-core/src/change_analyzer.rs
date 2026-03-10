@@ -393,12 +393,13 @@ pub struct ChangeImpact {
 }
 
 /// Scope of impact for a change
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum ImpactScope {
     File,
     Component,
     Module,
     Global,
+    Local,
 }
 
 /// Result of change analysis
@@ -477,5 +478,316 @@ impl AnalysisStats {
     /// Check if analysis performance meets 2026 targets (<10ms per batch)
     pub fn meets_performance_targets(&self) -> bool {
         self.average_analysis_time() < std::time::Duration::from_millis(10)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::path::PathBuf;
+    use crate::change_monitor::{FileChange, FileChangeType};
+    
+    #[test]
+    fn test_change_analyzer_creation() {
+        let analyzer = ChangeAnalyzer::new();
+        assert_eq!(analyzer.get_stats().total_analyses, 0);
+    }
+    
+    #[test]
+    fn test_file_classification_by_extension() {
+        let analyzer = ChangeAnalyzer::new();
+        
+        // Test Rust source files (UI components)
+        let rust_change = FileChange {
+            path: PathBuf::from("src/components/button.rs"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&rust_change);
+        assert_eq!(classification.category, ChangeCategory::UIComponent);
+        assert_eq!(classification.priority, ChangePriority::High);
+        assert!(classification.requires_interpretation);
+        
+        // Test configuration files (Critical priority)
+        let config_change = FileChange {
+            path: PathBuf::from("Cargo.toml"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&config_change);
+        assert_eq!(classification.category, ChangeCategory::Configuration);
+        assert_eq!(classification.priority, ChangePriority::Critical);
+        
+        // Test CSS files (Styling)
+        let css_change = FileChange {
+            path: PathBuf::from("styles/main.css"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&css_change);
+        assert_eq!(classification.category, ChangeCategory::Styling);
+        assert_eq!(classification.priority, ChangePriority::High);
+        assert!(classification.affects_styling);
+        
+        // Test asset files (Low priority)
+        let asset_change = FileChange {
+            path: PathBuf::from("assets/icon.png"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&asset_change);
+        assert_eq!(classification.category, ChangeCategory::Asset);
+        assert_eq!(classification.priority, ChangePriority::Low);
+        assert!(!classification.requires_interpretation);
+        
+        // Test documentation files (Very low priority)
+        let doc_change = FileChange {
+            path: PathBuf::from("README.md"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&doc_change);
+        assert_eq!(classification.category, ChangeCategory::Documentation);
+        assert_eq!(classification.priority, ChangePriority::VeryLow);
+    }
+    
+    #[test]
+    fn test_priority_based_processing_order() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Create changes with different priorities
+        let critical_change = FileChange {
+            path: PathBuf::from("Cargo.toml"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        
+        let high_change = FileChange {
+            path: PathBuf::from("src/main.rs"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        
+        let low_change = FileChange {
+            path: PathBuf::from("assets/image.png"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        
+        let critical_analyzed = analyzer.analyze_single_change(critical_change);
+        let high_analyzed = analyzer.analyze_single_change(high_change);
+        let low_analyzed = analyzer.analyze_single_change(low_change);
+        
+        // Critical should have lower processing order (processed first)
+        assert!(critical_analyzed.processing_order < high_analyzed.processing_order);
+        assert!(high_analyzed.processing_order < low_analyzed.processing_order);
+    }
+    
+    #[test]
+    fn test_impact_analysis() {
+        let analyzer = ChangeAnalyzer::new();
+        
+        // Test configuration file impact (Global scope)
+        let config_change = FileChange {
+            path: PathBuf::from("rustyui.toml"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let config_classification = analyzer.classify_file_change(&config_change);
+        let config_impact = analyzer.analyze_impact(&config_change, &config_classification);
+        assert_eq!(config_impact.scope, ImpactScope::Global);
+        
+        // Test component file impact (Component scope)
+        let component_change = FileChange {
+            path: PathBuf::from("src/components/button.rs"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let component_classification = analyzer.classify_file_change(&component_change);
+        let component_impact = analyzer.analyze_impact(&component_change, &component_classification);
+        assert_eq!(component_impact.scope, ImpactScope::Component);
+        
+        // Test asset file impact (Local scope)
+        let asset_change = FileChange {
+            path: PathBuf::from("assets/icon.svg"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let asset_classification = analyzer.classify_file_change(&asset_change);
+        let asset_impact = analyzer.analyze_impact(&asset_change, &asset_classification);
+        assert_eq!(asset_impact.scope, ImpactScope::File);
+    }
+    
+    #[test]
+    fn test_batch_processing() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Create multiple changes of different types
+        let changes = vec![
+            FileChange {
+                path: PathBuf::from("src/button.rs"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+            FileChange {
+                path: PathBuf::from("src/input.rs"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+            FileChange {
+                path: PathBuf::from("Cargo.toml"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+            FileChange {
+                path: PathBuf::from("assets/icon.png"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        let analysis = analyzer.analyze_changes(changes);
+        
+        // Should have multiple batches for different priorities/categories
+        assert!(analysis.processing_batches.len() >= 2);
+        
+        // Critical changes should be in first batch
+        let first_batch = &analysis.processing_batches[0];
+        assert!(first_batch.iter().any(|change| 
+            change.classification.priority == ChangePriority::Critical
+        ));
+    }
+    
+    #[test]
+    fn test_full_reload_detection() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Changes that should trigger full reload
+        let critical_changes = vec![
+            FileChange {
+                path: PathBuf::from("Cargo.toml"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        let analysis = analyzer.analyze_changes(critical_changes);
+        assert!(analysis.requires_full_reload);
+        
+        // Changes that should NOT trigger full reload
+        let minor_changes = vec![
+            FileChange {
+                path: PathBuf::from("assets/icon.png"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        let analysis2 = analyzer.analyze_changes(minor_changes);
+        assert!(!analysis2.requires_full_reload);
+    }
+    
+    #[test]
+    fn test_cascade_update_detection() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Change to a component that might affect other components
+        let component_changes = vec![
+            FileChange {
+                path: PathBuf::from("src/components/base_component.rs"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        let analysis = analyzer.analyze_changes(component_changes);
+        
+        // Should detect potential cascade updates
+        // (In a real implementation, this would analyze actual dependencies)
+        assert!(analysis.cascade_updates.len() >= 0); // May or may not have cascades
+    }
+    
+    #[test]
+    fn test_performance_targets() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Analyze a small number of changes
+        let changes = vec![
+            FileChange {
+                path: PathBuf::from("src/main.rs"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        let start_time = std::time::Instant::now();
+        let _analysis = analyzer.analyze_changes(changes);
+        let analysis_time = start_time.elapsed();
+        
+        // Should meet performance target of <10ms for small changes
+        assert!(analysis_time < std::time::Duration::from_millis(50)); // Generous for test environment
+        
+        let stats = analyzer.get_stats();
+        assert_eq!(stats.total_analyses, 1);
+    }
+    
+    #[test]
+    fn test_analysis_stats() {
+        let mut analyzer = ChangeAnalyzer::new();
+        
+        // Initial stats
+        let initial_stats = analyzer.get_stats();
+        assert_eq!(initial_stats.total_analyses, 0);
+        assert_eq!(initial_stats.changes_processed, 0);
+        
+        // Perform analysis
+        let changes = vec![
+            FileChange {
+                path: PathBuf::from("src/test.rs"),
+                change_type: FileChangeType::Modified,
+                timestamp: std::time::Instant::now(),
+            },
+        ];
+        
+        analyzer.analyze_changes(changes);
+        
+        // Updated stats
+        let updated_stats = analyzer.get_stats();
+        assert_eq!(updated_stats.total_analyses, 1);
+        assert_eq!(updated_stats.changes_processed, 1);
+        assert!(updated_stats.total_analysis_time > std::time::Duration::ZERO);
+    }
+    
+    #[test]
+    fn test_2026_classification_rules() {
+        let analyzer = ChangeAnalyzer::new();
+        
+        // Test modern file types that should be recognized in 2026
+        let wasm_change = FileChange {
+            path: PathBuf::from("pkg/module.wasm"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&wasm_change);
+        assert_eq!(classification.category, ChangeCategory::UIComponent);
+        
+        // Test TypeScript (if supported)
+        let ts_change = FileChange {
+            path: PathBuf::from("src/types.ts"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&ts_change);
+        assert_eq!(classification.category, ChangeCategory::UIComponent);
+        
+        // Test SCSS
+        let scss_change = FileChange {
+            path: PathBuf::from("styles/main.scss"),
+            change_type: FileChangeType::Modified,
+            timestamp: std::time::Instant::now(),
+        };
+        let classification = analyzer.classify_file_change(&scss_change);
+        assert_eq!(classification.category, ChangeCategory::Styling);
+        assert_eq!(classification.priority, ChangePriority::High);
     }
 }

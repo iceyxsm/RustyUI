@@ -88,4 +88,20 @@ impl RustyUIError {
             message: message.into(),
         }
     }
+    
+    /// Create a file watching error (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn file_watching(message: impl Into<String>) -> Self {
+        Self::Generic {
+            message: format!("File watching error: {}", message.into()),
+        }
+    }
+    
+    /// Create a file watching error (no-op in production)
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn file_watching(message: impl Into<String>) -> Self {
+        Self::Generic {
+            message: message.into(),
+        }
+    }
 }
