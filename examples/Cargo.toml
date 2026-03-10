@@ -18,6 +18,11 @@ name = "intelligent_analysis_demo"
 path = "intelligent_analysis_demo.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "ui_interpretation_demo"
+path = "ui_interpretation_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 

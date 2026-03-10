@@ -58,30 +58,88 @@ impl RhaiInterpreter {
     
     /// Register UI-specific functions in the Rhai engine
     fn register_ui_functions(engine: &mut Engine) {
-        // Register basic UI functions
+        // Register basic UI component functions
         engine.register_fn("button", |text: &str| {
-            format!("Button({})", text)
+            format!("Button(text: \"{}\")", text)
         });
         
         engine.register_fn("text", |content: &str| {
-            format!("Text({})", content)
+            format!("Text(content: \"{}\")", content)
         });
         
-        engine.register_fn("layout_vertical", || {
+        engine.register_fn("input", |placeholder: &str| {
+            format!("Input(placeholder: \"{}\")", placeholder)
+        });
+        
+        engine.register_fn("checkbox", |label: &str, checked: bool| {
+            format!("Checkbox(label: \"{}\", checked: {})", label, checked)
+        });
+        
+        // Register layout functions
+        engine.register_fn("vertical_layout", || {
             "VerticalLayout".to_string()
         });
         
-        engine.register_fn("layout_horizontal", || {
+        engine.register_fn("horizontal_layout", || {
             "HorizontalLayout".to_string()
+        });
+        
+        engine.register_fn("grid_layout", |rows: i64, cols: i64| {
+            format!("GridLayout(rows: {}, cols: {})", rows, cols)
+        });
+        
+        // Register styling functions
+        engine.register_fn("style", |property: &str, value: &str| {
+            format!("Style({}: {})", property, value)
+        });
+        
+        engine.register_fn("color", |r: i64, g: i64, b: i64| {
+            format!("Color(r: {}, g: {}, b: {})", r, g, b)
+        });
+        
+        engine.register_fn("padding", |value: i64| {
+            format!("Padding({})", value)
+        });
+        
+        engine.register_fn("margin", |value: i64| {
+            format!("Margin({})", value)
         });
         
         // Register state management functions
         engine.register_fn("get_state", |key: &str| {
-            format!("get_state({})", key)
+            format!("get_state(\"{}\")", key)
         });
         
         engine.register_fn("set_state", |key: &str, value: rhai::Dynamic| {
-            format!("set_state({}, {:?})", key, value)
+            format!("set_state(\"{}\", {:?})", key, value)
+        });
+        
+        engine.register_fn("update_component", |id: &str, property: &str, value: rhai::Dynamic| {
+            format!("update_component(\"{}\", \"{}\", {:?})", id, property, value)
+        });
+        
+        // Register event handling functions
+        engine.register_fn("on_click", |handler: &str| {
+            format!("on_click({})", handler)
+        });
+        
+        engine.register_fn("on_change", |handler: &str| {
+            format!("on_change({})", handler)
+        });
+        
+        engine.register_fn("on_hover", |handler: &str| {
+            format!("on_hover({})", handler)
+        });
+        
+        // Register utility functions
+        engine.register_fn("log", |message: &str| {
+            println!("UI Log: {}", message);
+            format!("log(\"{}\")", message)
+        });
+        
+        engine.register_fn("debug", |value: rhai::Dynamic| {
+            println!("UI Debug: {:?}", value);
+            format!("debug({:?})", value)
         });
     }
     
