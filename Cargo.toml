@@ -1,0 +1,63 @@
+[workspace]
+members = [
+    "crates/rustyui-core",
+    "crates/rustyui-interpreter", 
+    "crates/rustyui-adapters",
+    "crates/rustyui-cli",
+    "crates/rustyui-macros"
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/iceyxsm/Rustyui"
+homepage = "https://github.com/iceyxsm/Rustyui"
+authors = ["RustyUI Contributors"]
+keywords = ["ui", "gui", "hot-reload", "development", "runtime"]
+categories = ["gui", "development-tools", "game-development"]
+description = "Revolutionary dual-mode UI development system for Rust with instant feedback and zero production overhead"
+
+[workspace.dependencies]
+# Core dependencies
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+thiserror = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+
+# Development-only dependencies (conditionally compiled)
+rhai = { version = "1.16", optional = true }
+syn = { version = "2.0", features = ["full"], optional = true }
+cranelift-jit = { version = "0.101", optional = true }
+wasmtime = { version = "13.0", optional = true }
+notify = { version = "6.0", optional = true }
+
+# UI framework dependencies (optional)
+egui = { version = "0.24", optional = true }
+eframe = { version = "0.24", optional = true }
+iced = { version = "0.10", optional = true }
+slint = { version = "1.3", optional = true }
+tauri = { version = "1.5", optional = true }
+
+# CLI dependencies
+clap = { version = "4.4", features = ["derive"] }
+console = "0.15"
+indicatif = "0.17"
+
+# Testing dependencies
+proptest = "1.4"
+criterion = "0.5"
+
+[profile.dev]
+opt-level = 0
+debug = true
+incremental = true
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
