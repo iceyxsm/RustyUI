@@ -129,8 +129,8 @@ impl DualModeEngine {
     
     /// Get file watching performance statistics (development only)
     #[cfg(feature = "dev-ui")]
-    pub fn get_file_watching_stats(&self) -> Option<crate::change_monitor::PerformanceStats> {
-        self.change_monitor.as_ref().map(|monitor| monitor.get_performance_stats())
+    pub fn get_file_watching_stats(&self) -> Option<&crate::change_monitor::ChangeStats> {
+        self.change_monitor.as_ref().map(|monitor| monitor.get_stats())
     }
     
     /// Process pending file changes (development only)
