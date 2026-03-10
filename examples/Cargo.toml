@@ -9,13 +9,13 @@ path = "basic_interpretation.rs"
 required-features = ["dev-ui"]
 
 [[example]]
-name = "file_watching_2026"
+name = "file_watching_demo"
 path = "file_watching_demo.rs"
 required-features = ["dev-ui"]
 
 [[example]]
-name = "file_watching_demo"
-path = "file_watching_demo.rs"
+name = "change_analysis_demo"
+path = "intelligent_analysis_demo.rs"
 required-features = ["dev-ui"]
 
 [dependencies]

@@ -3,7 +3,7 @@
 use crate::{config::DualModeConfig, error::{Result, RustyUIError}};
 
 #[cfg(feature = "dev-ui")]
-use crate::{ChangeMonitor, StatePreservor};
+use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor};
 
 #[cfg(feature = "dev-ui")]
 use rustyui_interpreter::InterpretationResult;
@@ -26,6 +26,10 @@ pub struct DualModeEngine {
     #[cfg(feature = "dev-ui")]
     change_monitor: Option<ChangeMonitor>,
     
+    /// Intelligent change analyzer for 2026 classification (development only)
+    #[cfg(feature = "dev-ui")]
+    change_analyzer: Option<ChangeAnalyzer>,
+    
     /// State preservation system (development only)
     #[cfg(feature = "dev-ui")]
     state_preservor: Option<StatePreservor>,
@@ -42,6 +46,8 @@ impl DualModeEngine {
             #[cfg(feature = "dev-ui")]
             change_monitor: None,
             #[cfg(feature = "dev-ui")]
+            change_analyzer: None,
+            #[cfg(feature = "dev-ui")]
             state_preservor: None,
             initialized: false,
         })
@@ -53,6 +59,7 @@ impl DualModeEngine {
         {
             // Initialize development-only components
             self.change_monitor = Some(ChangeMonitor::new(&self.config.watch_paths)?);
+            self.change_analyzer = Some(ChangeAnalyzer::new());
             self.state_preservor = Some(StatePreservor::new());
         }
         
@@ -133,7 +140,13 @@ impl DualModeEngine {
         self.change_monitor.as_ref().map(|monitor| monitor.get_stats())
     }
     
-    /// Process pending file changes (development only)
+    /// Get change analysis performance statistics (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_analysis_stats(&self) -> Option<&crate::change_analyzer::AnalysisStats> {
+        self.change_analyzer.as_ref().map(|analyzer| analyzer.get_stats())
+    }
+    
+    /// Process pending file changes with intelligent analysis (development only)
     #[cfg(feature = "dev-ui")]
     pub fn process_file_changes(&mut self) -> Result<Vec<crate::change_monitor::FileChange>> {
         if let Some(ref mut monitor) = self.change_monitor {
@@ -141,6 +154,35 @@ impl DualModeEngine {
         } else {
             Ok(Vec::new())
         }
+    }
+    
+    /// Process and analyze file changes with 2026 intelligent classification (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn process_and_analyze_changes(&mut self) -> Result<Option<crate::change_analyzer::AnalysisResult>> {
+        if let (Some(ref mut monitor), Some(ref mut analyzer)) = 
+            (&mut self.change_monitor, &mut self.change_analyzer) {
+            
+            let changes = monitor.check_changes();
+            if !changes.is_empty() {
+                println!("🔍 Analyzing {} file changes with 2026 intelligent classification", changes.len());
+                let analysis = analyzer.analyze_changes(changes);
+                
+                // Log analysis results
+                println!("📊 Analysis completed in {:?}", analysis.analysis_time);
+                println!("  Priority changes: {}", 
+                    analysis.analyzed_changes.iter()
+                        .filter(|c| matches!(c.classification.priority, 
+                            crate::change_analyzer::ChangePriority::Critical | 
+                            crate::change_analyzer::ChangePriority::High))
+                        .count()
+                );
+                println!("  Requires full reload: {}", analysis.requires_full_reload);
+                println!("  Cascade updates: {}", analysis.cascade_updates.len());
+                
+                return Ok(Some(analysis));
+            }
+        }
+        Ok(None)
     }
     
     /// Get memory overhead in bytes (always 0 in production)

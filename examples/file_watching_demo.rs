@@ -5,7 +5,7 @@ use std::time::Duration;
 use std::thread;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔭 RustyUI File Watching Demo - 2026 Architecture");
+    println!(" RustyUI File Watching Demo - 2026 Architecture");
     println!("Using notify 9.0 with modular debouncing for sub-50ms response times\n");
     
     // Create dual-mode configuration
@@ -15,17 +15,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut engine = DualModeEngine::new(config)?;
     engine.initialize()?;
     
-    println!("✅ Engine initialized successfully");
+    println!(" Engine initialized successfully");
     
     #[cfg(feature = "dev-ui")]
     {
         // Start development mode with file watching
         engine.start_development_mode()?;
         
-        println!("🚀 Development mode started with file watching");
-        println!("📁 Watching paths: {:?}", engine.config().watch_paths);
-        println!("⏱️  Debounce delay: 50ms (2026 optimized)");
-        println!("\n📝 Try editing a .rs file in the src/ directory to see instant detection!");
+        println!(" Development mode started with file watching");
+        println!(" Watching paths: {:?}", engine.config().watch_paths);
+        println!("  Debounce delay: 50ms (2026 optimized)");
+        println!("\n Try editing a .rs file in the src/ directory to see instant detection!");
         println!("Press Ctrl+C to exit\n");
         
         // Monitor file changes for 30 seconds
@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if let Ok(changes) = engine.process_file_changes() {
                 for change in changes {
                     change_count += 1;
-                    println!("🔄 Change #{}: {:?} - {:?}", 
+                    println!(" Change #{}: {:?} - {:?}", 
                         change_count, 
                         change.change_type, 
                         change.path.file_name().unwrap_or_default()
@@ -57,10 +57,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     
                     match engine.interpret_ui_change(&ui_code, Some("file_change_ui".to_string())) {
                         Ok(result) => {
-                            println!("  ✅ UI interpreted in {:?} (target: <100ms)", result.execution_time);
+                            println!("   UI interpreted in {:?} (target: <100ms)", result.execution_time);
                         }
                         Err(e) => {
-                            println!("  ❌ UI interpretation failed: {}", e);
+                            println!("   UI interpretation failed: {}", e);
                         }
                     }
                 }

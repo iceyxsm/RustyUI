@@ -12,6 +12,9 @@ pub mod build_config;
 pub mod change_monitor;
 
 #[cfg(feature = "dev-ui")]
+pub mod change_analyzer;
+
+#[cfg(feature = "dev-ui")]
 pub mod state_preservor;
 
 pub use config::DualModeConfig;
@@ -21,6 +24,9 @@ pub use build_config::{BuildConfig, BuildInfo, OptimizationLevel};
 
 #[cfg(feature = "dev-ui")]
 pub use change_monitor::ChangeMonitor;
+
+#[cfg(feature = "dev-ui")]
+pub use change_analyzer::ChangeAnalyzer;
 
 #[cfg(feature = "dev-ui")]
 pub use state_preservor::StatePreservor;
