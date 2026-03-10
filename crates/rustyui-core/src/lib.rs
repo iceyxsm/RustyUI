@@ -7,6 +7,7 @@ pub mod config;
 pub mod engine;
 pub mod error;
 pub mod build_config;
+pub mod ui_component;
 
 #[cfg(feature = "dev-ui")]
 pub mod change_monitor;
@@ -21,6 +22,7 @@ pub use config::DualModeConfig;
 pub use engine::DualModeEngine;
 pub use error::{RustyUIError, Result};
 pub use build_config::{BuildConfig, BuildInfo, OptimizationLevel};
+pub use ui_component::{UIComponent, UIComponentExt, UIComponentDyn, ComponentStateManager};
 
 #[cfg(feature = "dev-ui")]
 pub use change_monitor::ChangeMonitor;
@@ -30,24 +32,6 @@ pub use change_analyzer::ChangeAnalyzer;
 
 #[cfg(feature = "dev-ui")]
 pub use state_preservor::StatePreservor;
-
-/// Core trait for UI components that support hot reload
-pub trait UIComponent: Send + Sync {
-    /// Render the component using the provided render context
-    fn render(&mut self, ctx: &mut dyn RenderContext);
-    
-    /// Save the component's state for hot reload (development only)
-    #[cfg(feature = "dev-ui")]
-    fn hot_reload_state(&self) -> serde_json::Value {
-        serde_json::Value::Null
-    }
-    
-    /// Restore the component's state after hot reload (development only)
-    #[cfg(feature = "dev-ui")]
-    fn restore_state(&mut self, _state: serde_json::Value) {
-        // Default implementation does nothing
-    }
-}
 
 /// Trait for framework-agnostic rendering context
 pub trait RenderContext {
