@@ -14,7 +14,7 @@ path = "file_watching_demo.rs"
 required-features = ["dev-ui"]
 
 [[example]]
-name = "change_analysis_demo"
+name = "intelligent_analysis_demo"
 path = "intelligent_analysis_demo.rs"
 required-features = ["dev-ui"]
 
