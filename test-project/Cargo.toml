@@ -1,0 +1,15 @@
+[package]
+name = "test-project"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rustyui-core = { path = "../crates/rustyui-core" }
+rustyui-adapters = { path = "../crates/rustyui-adapters" }
+
+[features]
+default = []
+dev-ui = [
+    "rustyui-core/dev-ui",
+    "rustyui-adapters/dev-ui",
+]

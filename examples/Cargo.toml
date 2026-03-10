@@ -33,6 +33,11 @@ name = "egui_component_integration"
 path = "egui_component_integration.rs"
 required-features = ["dev-ui", "egui-adapter"]
 
+[[example]]
+name = "dev_mode_demo"
+path = "dev_mode_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 rustyui-adapters = { path = "../crates/rustyui-adapters" }

@@ -14,6 +14,10 @@ description = "Command-line interface for RustyUI project initialization and dev
 name = "rustyui"
 path = "src/main.rs"
 
+[lib]
+name = "rustyui_cli"
+path = "src/lib.rs"
+
 [dependencies]
 # Core dependencies
 serde = { workspace = true }
@@ -27,10 +31,20 @@ clap = { workspace = true }
 console = { workspace = true }
 indicatif = { workspace = true }
 toml = { workspace = true }
+ctrlc = "3.4"
 
 # Internal dependencies
 rustyui-core = { path = "../rustyui-core" }
+rustyui-adapters = { path = "../rustyui-adapters", optional = true }
+rustyui-macros = { path = "../rustyui-macros", optional = true }
 
 [features]
 default = []
-dev-ui = ["rustyui-core/dev-ui"]
+dev-ui = [
+    "rustyui-core/dev-ui",
+    "rustyui-adapters",
+    "rustyui-macros",
+]
+
+[dev-dependencies]
+tempfile = "3.8"
