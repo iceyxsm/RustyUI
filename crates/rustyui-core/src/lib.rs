@@ -8,6 +8,7 @@ pub mod engine;
 pub mod error;
 pub mod build_config;
 pub mod ui_component;
+pub mod platform;
 
 #[cfg(feature = "dev-ui")]
 pub mod change_monitor;
@@ -18,11 +19,21 @@ pub mod change_analyzer;
 #[cfg(feature = "dev-ui")]
 pub mod state_preservor;
 
+#[cfg(feature = "dev-ui")]
+pub mod error_recovery;
+
+#[cfg(feature = "dev-ui")]
+pub mod error_reporting;
+
+#[cfg(all(test, feature = "dev-ui"))]
+mod error_recovery_test;
+
 pub use config::DualModeConfig;
 pub use engine::DualModeEngine;
 pub use error::{RustyUIError, Result};
 pub use build_config::{BuildConfig, BuildInfo, OptimizationLevel};
 pub use ui_component::{UIComponent, UIComponentExt, UIComponentDyn, ComponentStateManager};
+pub use platform::{Platform, PlatformConfig, PlatformCapabilities, FileWatcherBackend, JITCapabilities};
 
 #[cfg(feature = "dev-ui")]
 pub use change_monitor::ChangeMonitor;
@@ -32,6 +43,12 @@ pub use change_analyzer::ChangeAnalyzer;
 
 #[cfg(feature = "dev-ui")]
 pub use state_preservor::StatePreservor;
+
+#[cfg(feature = "dev-ui")]
+pub use error_recovery::{ErrorRecoveryManager, RecoveryResult, ErrorContext, Operation, HealthStatus};
+
+#[cfg(feature = "dev-ui")]
+pub use error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation, ErrorSeverity};
 
 /// Trait for framework-agnostic rendering context
 pub trait RenderContext {

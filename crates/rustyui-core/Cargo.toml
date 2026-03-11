@@ -16,11 +16,23 @@ serde = { workspace = true }
 serde_json = { workspace = true }
 anyhow = { workspace = true }
 thiserror = { workspace = true }
+log = "0.4"
 
 # Development-only dependencies (conditionally compiled)
 rhai = { version = "1.16", optional = true }
 notify = { version = "6.1", optional = true }
 notify-debouncer-mini = { version = "0.4", optional = true }
+
+# Cross-platform system dependencies
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winuser", "processthreadsapi", "handleapi"], optional = true }
+
+[target.'cfg(unix)'.dependencies]
+libc = { version = "0.2", optional = true }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation = { version = "0.9", optional = true }
+core-services = { version = "0.2", optional = true }
 
 # Internal dependencies
 rustyui-interpreter = { path = "../rustyui-interpreter", optional = true }
@@ -31,8 +43,17 @@ dev-ui = [
     "rhai",
     "notify",
     "notify-debouncer-mini",
+    "rustyui-interpreter",
     "rustyui-interpreter/dev-ui"
 ]
+
+# Platform-specific features
+windows-native = ["winapi"]
+unix-native = ["libc"] 
+macos-native = ["core-foundation", "core-services"]
+
+# Cross-platform feature bundle
+cross-platform = ["windows-native", "unix-native", "macos-native"]
 [dev-dependencies]
 proptest = "1.0"
 tempfile = "3.0"

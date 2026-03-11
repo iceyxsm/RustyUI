@@ -38,6 +38,15 @@ name = "dev_mode_demo"
 path = "dev_mode_demo.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "cross_platform_demo"
+path = "cross_platform_demo.rs"
+
+[[example]]
+name = "error_recovery_demo"
+path = "error_recovery_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 rustyui-adapters = { path = "../crates/rustyui-adapters" }

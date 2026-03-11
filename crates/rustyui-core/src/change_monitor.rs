@@ -1,6 +1,7 @@
-//! File system change monitoring with intelligent debouncing
+//! File system change monitoring with intelligent debouncing and cross-platform optimization
 
 use crate::error::{Result, RustyUIError};
+use crate::platform::{Platform, PlatformConfig, FileWatcherBackend};
 use notify::{Config, Event, EventKind, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
@@ -69,7 +70,7 @@ impl ChangeStats {
     }
 }
 
-/// File system change monitor with intelligent debouncing
+/// File system change monitor with intelligent debouncing and cross-platform optimization
 pub struct ChangeMonitor {
     /// File system watcher
     watcher: Option<RecommendedWatcher>,
@@ -81,18 +82,24 @@ pub struct ChangeMonitor {
     watch_paths: Vec<PathBuf>,
     /// Debouncing state for file changes
     debounce_map: HashMap<PathBuf, Instant>,
-    /// Debounce timeout (50ms target)
+    /// Debounce timeout (platform-optimized)
     debounce_timeout: Duration,
     /// Pending changes waiting for debounce
     pending_changes: Vec<FileChange>,
     /// Performance statistics
     stats: ChangeStats,
+    /// Platform-specific configuration
+    platform_config: PlatformConfig,
 }
 
 impl ChangeMonitor {
-    /// Create a new change monitor for the given paths
+    /// Create a new change monitor for the given paths with platform optimization
     pub fn new(watch_paths: &[PathBuf]) -> Result<Self> {
         let (sender, receiver) = mpsc::channel();
+        let platform_config = PlatformConfig::auto_detect();
+        
+        // Use platform-specific debounce timeout
+        let debounce_timeout = Self::calculate_optimal_debounce_timeout(&platform_config);
         
         Ok(Self {
             watcher: None,
@@ -100,19 +107,54 @@ impl ChangeMonitor {
             _sender: sender,
             watch_paths: watch_paths.to_vec(),
             debounce_map: HashMap::new(),
-            debounce_timeout: Duration::from_millis(50), // 50ms target
+            debounce_timeout,
             pending_changes: Vec::new(),
             stats: ChangeStats::new(),
+            platform_config,
         })
     }
     
-    /// Start watching for file system changes
+    /// Create a new change monitor with custom platform configuration
+    pub fn with_platform_config(watch_paths: &[PathBuf], platform_config: PlatformConfig) -> Result<Self> {
+        let (sender, receiver) = mpsc::channel();
+        let debounce_timeout = Self::calculate_optimal_debounce_timeout(&platform_config);
+        
+        Ok(Self {
+            watcher: None,
+            receiver,
+            _sender: sender,
+            watch_paths: watch_paths.to_vec(),
+            debounce_map: HashMap::new(),
+            debounce_timeout,
+            pending_changes: Vec::new(),
+            stats: ChangeStats::new(),
+            platform_config,
+        })
+    }
+    
+    /// Calculate optimal debounce timeout based on platform capabilities
+    fn calculate_optimal_debounce_timeout(platform_config: &PlatformConfig) -> Duration {
+        let watcher_perf = platform_config.file_watcher_backend.performance_characteristics();
+        
+        // Base timeout on platform latency characteristics
+        let base_timeout = Duration::from_millis(watcher_perf.latency_ms.max(10));
+        
+        // Adjust based on platform optimizations
+        if platform_config.use_native_apis {
+            // Native APIs are faster, can use shorter timeout
+            base_timeout / 2
+        } else {
+            // Fallback implementations need more time
+            base_timeout * 2
+        }
+    }
+    
+    /// Start watching for file system changes with platform-specific optimization
     pub fn start_watching(&mut self) -> Result<()> {
         let (sender, receiver) = mpsc::channel();
         
-        let config = Config::default()
-            .with_poll_interval(Duration::from_millis(10))
-            .with_compare_contents(false);
+        // Configure watcher based on platform capabilities
+        let config = self.create_platform_optimized_config();
             
         let mut watcher = RecommendedWatcher::new(sender, config)
             .map_err(|e| RustyUIError::file_watching(format!("Failed to create watcher: {}", e)))?;
@@ -120,7 +162,14 @@ impl ChangeMonitor {
         // Watch all configured paths
         for path in &self.watch_paths {
             if path.exists() {
-                watcher.watch(path, RecursiveMode::Recursive)
+                let recursive_mode = if self.platform_config.file_watcher_backend
+                    .performance_characteristics().supports_recursive {
+                    RecursiveMode::Recursive
+                } else {
+                    RecursiveMode::NonRecursive
+                };
+                
+                watcher.watch(path, recursive_mode)
                     .map_err(|e| RustyUIError::file_watching(format!("Failed to watch path {:?}: {}", path, e)))?;
             }
         }
@@ -129,6 +178,37 @@ impl ChangeMonitor {
         self.receiver = receiver;
         
         Ok(())
+    }
+    
+    /// Create platform-optimized watcher configuration
+    fn create_platform_optimized_config(&self) -> Config {
+        let watcher_perf = self.platform_config.file_watcher_backend.performance_characteristics();
+        
+        let mut config = Config::default();
+        
+        // Set poll interval based on platform latency characteristics
+        let poll_interval = Duration::from_millis(watcher_perf.latency_ms.min(100));
+        config = config.with_poll_interval(poll_interval);
+        
+        // Disable content comparison for better performance on most platforms
+        config = config.with_compare_contents(false);
+        
+        // Platform-specific optimizations
+        match self.platform_config.platform {
+            Platform::Windows => {
+                // Windows-specific optimizations
+                config
+            }
+            Platform::MacOS => {
+                // macOS-specific optimizations
+                config
+            }
+            Platform::Linux => {
+                // Linux-specific optimizations
+                config
+            }
+            _ => config,
+        }
     }
     
     /// Check for pending file changes with debouncing
@@ -268,6 +348,41 @@ impl ChangeMonitor {
     pub fn watch_paths(&self) -> &[PathBuf] {
         &self.watch_paths
     }
+    
+    /// Get the platform configuration
+    pub fn platform_config(&self) -> &PlatformConfig {
+        &self.platform_config
+    }
+    
+    /// Check if the monitor is using platform-native file watching
+    pub fn is_using_native_watching(&self) -> bool {
+        self.platform_config.use_native_apis
+    }
+    
+    /// Get expected performance characteristics for the current platform
+    pub fn expected_performance(&self) -> notify::WatcherKind {
+        match self.platform_config.file_watcher_backend {
+            FileWatcherBackend::ReadDirectoryChanges => {
+                #[cfg(target_os = "windows")]
+                return notify::WatcherKind::ReadDirectoryChangesWatcher;
+                #[cfg(not(target_os = "windows"))]
+                return notify::WatcherKind::PollWatcher;
+            }
+            FileWatcherBackend::FSEvents => {
+                #[cfg(target_os = "macos")]
+                return notify::WatcherKind::Fsevent;
+                #[cfg(not(target_os = "macos"))]
+                return notify::WatcherKind::PollWatcher;
+            }
+            FileWatcherBackend::INotify => {
+                #[cfg(target_os = "linux")]
+                return notify::WatcherKind::Inotify;
+                #[cfg(not(target_os = "linux"))]
+                return notify::WatcherKind::PollWatcher;
+            }
+            FileWatcherBackend::Poll => notify::WatcherKind::PollWatcher,
+        }
+    }
 }
 
 #[cfg(test)]
@@ -285,6 +400,27 @@ mod tests {
         let monitor = ChangeMonitor::new(&watch_paths).unwrap();
         assert_eq!(monitor.watch_paths(), &watch_paths);
         assert_eq!(monitor.get_stats().total_events, 0);
+        assert!(monitor.platform_config().validate().is_ok());
+    }
+    
+    #[test]
+    fn test_platform_optimized_creation() {
+        let temp_dir = TempDir::new().unwrap();
+        let watch_paths = vec![temp_dir.path().to_path_buf()];
+        let platform_config = PlatformConfig::auto_detect();
+        
+        let monitor = ChangeMonitor::with_platform_config(&watch_paths, platform_config.clone()).unwrap();
+        assert_eq!(monitor.platform_config().platform, platform_config.platform);
+    }
+    
+    #[test]
+    fn test_debounce_timeout_calculation() {
+        let platform_config = PlatformConfig::auto_detect();
+        let timeout = ChangeMonitor::calculate_optimal_debounce_timeout(&platform_config);
+        
+        // Timeout should be reasonable (between 5ms and 1000ms)
+        assert!(timeout >= Duration::from_millis(5));
+        assert!(timeout <= Duration::from_millis(1000));
     }
     
     #[test]

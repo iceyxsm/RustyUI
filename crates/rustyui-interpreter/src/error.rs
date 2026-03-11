@@ -23,6 +23,16 @@ pub enum InterpreterError {
     #[error("JIT compilation error: {0}")]
     JIT(String),
     
+    /// Recovery error - when fallback mechanisms fail
+    #[cfg(feature = "dev-ui")]
+    #[error("Recovery error: {0}")]
+    Recovery(String),
+    
+    /// Unsupported feature error
+    #[cfg(feature = "dev-ui")]
+    #[error("Unsupported feature: {0}")]
+    UnsupportedFeature(String),
+    
     /// Generic interpretation errors
     #[error("Interpretation error: {0}")]
     Generic(String),
@@ -50,5 +60,51 @@ impl InterpreterError {
     #[cfg(feature = "dev-ui")]
     pub fn jit(msg: impl Into<String>) -> Self {
         Self::JIT(msg.into())
+    }
+    
+    /// Create a new recovery error (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn recovery(msg: impl Into<String>) -> Self {
+        Self::Recovery(msg.into())
+    }
+    
+    /// Create a new unsupported feature error (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn unsupported_feature(msg: impl Into<String>) -> Self {
+        Self::UnsupportedFeature(msg.into())
+    }
+    
+    /// Check if this error is recoverable
+    pub fn is_recoverable(&self) -> bool {
+        match self {
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::Rhai(_) => true,  // Can fallback to AST
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::AST(_) => true,   // Can fallback to Rhai
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::JIT(_) => true,   // Can fallback to AST
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::UnsupportedFeature(_) => true, // Can disable feature
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::Recovery(_) => false, // Recovery itself failed
+            InterpreterError::Generic(_) => true,   // Can try isolation
+        }
+    }
+    
+    /// Get suggested recovery strategy name
+    pub fn suggested_recovery_strategy(&self) -> &'static str {
+        match self {
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::Rhai(_) => "FallbackToAST",
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::AST(_) => "FallbackToRhai",
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::JIT(_) => "FallbackToAST",
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::UnsupportedFeature(_) => "DisableFeature",
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::Recovery(_) => "IsolateAndContinue",
+            InterpreterError::Generic(_) => "IsolateAndContinue",
+        }
     }
 }

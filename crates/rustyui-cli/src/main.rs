@@ -119,6 +119,9 @@ fn main() -> CliResult<()> {
     // Set up logging based on verbosity
     setup_logging(cli.verbose, cli.quiet)?;
     
+    // Check platform compatibility
+    check_platform_compatibility(cli.verbose)?;
+    
     match cli.command {
         Commands::Init { framework, path, force, yes } => {
             let mut cmd = InitCommand::new(framework, path, force, yes);
@@ -157,6 +160,51 @@ fn setup_logging(verbose: bool, quiet: bool) -> CliResult<()> {
     Ok(())
 }
 
+/// Check platform compatibility and display information
+fn check_platform_compatibility(verbose: bool) -> CliResult<()> {
+    use rustyui_core::{Platform, PlatformCapabilities, PlatformConfig};
+    
+    let platform = Platform::current();
+    
+    if verbose {
+        println!("{} Detected platform: {}", style("ℹ").blue(), style(platform.to_string()).cyan());
+    }
+    
+    // Check minimum requirements
+    if let Err(e) = PlatformCapabilities::check_minimum_requirements() {
+        eprintln!("{} Platform compatibility issue: {}", style("⚠").yellow(), e);
+        eprintln!("  RustyUI may not work optimally on this platform.");
+    }
+    
+    // Show platform capabilities if verbose
+    if verbose {
+        let config = PlatformConfig::auto_detect();
+        let jit_caps = platform.jit_capabilities();
+        let watcher_backend = platform.file_watcher_backend();
+        let watcher_perf = watcher_backend.performance_characteristics();
+        
+        println!("{} Platform capabilities:", style("🔧").green());
+        println!("  File watcher: {} ({}ms latency)", 
+            match watcher_backend {
+                rustyui_core::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
+                rustyui_core::FileWatcherBackend::FSEvents => "FSEvents",
+                rustyui_core::FileWatcherBackend::INotify => "inotify", 
+                rustyui_core::FileWatcherBackend::Poll => "polling",
+            },
+            watcher_perf.latency_ms
+        );
+        println!("  JIT compilation: {}", 
+            if jit_caps.supports_cranelift { "supported" } else { "not supported" }
+        );
+        println!("  Native APIs: {}", 
+            if config.use_native_apis { "enabled" } else { "disabled" }
+        );
+        println!("  Thread count: {}", config.thread_count);
+    }
+    
+    Ok(())
+}
+
 /// Build project for production
 fn build_project(path: &PathBuf, release: bool) -> CliResult<()> {
     use crate::project::ProjectManager;
@@ -172,17 +220,36 @@ fn build_project(path: &PathBuf, release: bool) -> CliResult<()> {
 /// Show current project configuration
 fn show_config(path: &PathBuf) -> CliResult<()> {
     use crate::config::ConfigManager;
+    use rustyui_core::{Platform, PlatformConfig};
     
     let config_manager = ConfigManager::new(path.clone())?;
     let config = config_manager.load_config()?;
+    let platform = Platform::current();
+    let platform_config = PlatformConfig::auto_detect();
     
     println!("{}", style("RustyUI Configuration:").bold());
     println!("  Framework: {}", style(&format!("{:?}", config.framework)).cyan());
     println!("  Watch paths: {:?}", config.watch_paths);
     
+    println!("\n{}", style("Platform Information:").bold());
+    println!("  Platform: {}", style(platform.to_string()).cyan());
+    println!("  File watcher: {}", match platform_config.file_watcher_backend {
+        rustyui_core::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
+        rustyui_core::FileWatcherBackend::FSEvents => "FSEvents",
+        rustyui_core::FileWatcherBackend::INotify => "inotify",
+        rustyui_core::FileWatcherBackend::Poll => "polling",
+    });
+    println!("  JIT compilation: {}", 
+        if platform_config.use_jit_compilation { "enabled" } else { "disabled" }
+    );
+    println!("  Native optimizations: {}", 
+        if platform_config.use_native_apis { "enabled" } else { "disabled" }
+    );
+    println!("  Thread count: {}", platform_config.thread_count);
+    
     #[cfg(feature = "dev-ui")]
     {
-        println!("  Development settings:");
+        println!("\n{}", style("Development Settings:").bold());
         println!("    Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
         println!("    JIT threshold: {}ms", config.development_settings.jit_compilation_threshold);
         println!("    State preservation: {}", config.development_settings.state_preservation);
@@ -190,7 +257,7 @@ fn show_config(path: &PathBuf) -> CliResult<()> {
         println!("    Change detection delay: {}ms", config.development_settings.change_detection_delay_ms);
     }
     
-    println!("  Production settings:");
+    println!("\n{}", style("Production Settings:").bold());
     println!("    Strip dev features: {}", config.production_settings.strip_dev_features);
     println!("    Optimization level: {:?}", config.production_settings.optimization_level);
     println!("    Binary size optimization: {}", config.production_settings.binary_size_optimization);

@@ -42,6 +42,9 @@ proc-macro2 = "1.0"
 proptest = "1.4"
 criterion = "0.5"
 
+# Cross-platform dependencies
+num_cpus = "1.16"
+
 [profile.dev]
 opt-level = 0
 debug = true

@@ -41,7 +41,7 @@ pub trait UIComponent {
     
     /// Validate that a state is compatible with this component
     #[cfg(feature = "dev-ui")]
-    fn validate_state(&self, state: &Self::State) -> Result<()> {
+    fn validate_state(&self, _state: &Self::State) -> Result<()> {
         // Default implementation - always valid
         Ok(())
     }

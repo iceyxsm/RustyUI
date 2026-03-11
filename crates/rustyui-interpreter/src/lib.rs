@@ -53,24 +53,14 @@ impl RuntimeInterpreter {
         })
     }
     
-    /// Interpret a UI code change
+    /// Interpret a UI code change with error recovery
     pub fn interpret_change(&mut self, change: &UIChange) -> Result<InterpretationResult> {
         let start_time = std::time::Instant::now();
         
         // Choose interpretation strategy based on code complexity and configuration
         let strategy = self.choose_strategy(change);
         
-        let result = match strategy {
-            InterpretationStrategy::Rhai => {
-                self.rhai_interpreter.interpret(&change.content)
-            }
-            InterpretationStrategy::AST => {
-                self.ast_interpreter.interpret(&change.content)
-            }
-            InterpretationStrategy::JIT => {
-                self.jit_compiler.compile_and_execute(&change.content)
-            }
-        };
+        let result = self.try_interpret_with_fallback(change, strategy);
         
         // Cache successful interpretations
         if let Ok(ref interpretation_result) = result {
@@ -87,6 +77,62 @@ impl RuntimeInterpreter {
         }
         
         result
+    }
+    
+    /// Try interpretation with automatic fallback on errors
+    fn try_interpret_with_fallback(&mut self, change: &UIChange, mut strategy: InterpretationStrategy) -> Result<InterpretationResult> {
+        let mut attempts = 0;
+        let max_attempts = 3;
+        
+        loop {
+            attempts += 1;
+            
+            let result = match strategy {
+                InterpretationStrategy::Rhai => {
+                    self.rhai_interpreter.interpret(&change.content)
+                }
+                InterpretationStrategy::AST => {
+                    self.ast_interpreter.interpret(&change.content)
+                }
+                InterpretationStrategy::JIT => {
+                    self.jit_compiler.compile_and_execute(&change.content)
+                }
+            };
+            
+            match result {
+                Ok(interpretation_result) => {
+                    if attempts > 1 {
+                        println!("✅ Interpretation succeeded after {} attempts using {:?}", attempts, strategy);
+                    }
+                    return Ok(interpretation_result);
+                }
+                Err(error) if attempts < max_attempts => {
+                    println!("⚠️ Interpretation failed with {:?}, attempting fallback: {}", strategy, error);
+                    
+                    // Try fallback strategy
+                    strategy = match strategy {
+                        InterpretationStrategy::JIT => InterpretationStrategy::AST,
+                        InterpretationStrategy::AST => InterpretationStrategy::Rhai,
+                        InterpretationStrategy::Rhai => {
+                            // Last resort: return error with graceful degradation
+                            return Ok(InterpretationResult {
+                                execution_time: std::time::Instant::now().duration_since(std::time::Instant::now()),
+                                success: false,
+                                error_message: Some(format!("All interpretation strategies failed: {}", error)),
+                            });
+                        }
+                    };
+                }
+                Err(error) => {
+                    println!("❌ All interpretation strategies failed after {} attempts", attempts);
+                    return Ok(InterpretationResult {
+                        execution_time: std::time::Instant::now().duration_since(std::time::Instant::now()),
+                        success: false,
+                        error_message: Some(format!("Interpretation failed: {}", error)),
+                    });
+                }
+            }
+        }
     }
     
     /// Choose the best interpretation strategy for the given change
@@ -209,16 +255,75 @@ pub struct CacheStats {
 }
 #[cfg(feature = "dev-ui")]
 impl RuntimeInterpreter {
-    /// Interpret UI component updates with enhanced parsing
+    /// Interpret UI component updates with enhanced parsing and error recovery
     pub fn interpret_ui_change(&mut self, code: &str, component_id: Option<String>) -> Result<InterpretationResult> {
         let change = UIChange {
             content: code.to_string(),
             interpretation_strategy: None, // Auto-select
-            component_id,
+            component_id: component_id.clone(),
             change_type: ChangeType::ComponentUpdate,
         };
         
-        self.interpret_change(&change)
+        // Try interpretation with error isolation
+        match self.interpret_change(&change) {
+            Ok(result) => Ok(result),
+            Err(error) => {
+                // Isolate error and provide graceful degradation
+                println!("🛡️ Error isolated for component {:?}: {}", component_id, error);
+                
+                Ok(InterpretationResult {
+                    execution_time: std::time::Duration::from_millis(0),
+                    success: false,
+                    error_message: Some(format!("Isolated error: {}", error)),
+                })
+            }
+        }
+    }
+    
+    /// Interpret with error isolation to prevent crashes
+    pub fn interpret_with_isolation(&mut self, change: &UIChange) -> InterpretationResult {
+        match self.interpret_change(change) {
+            Ok(result) => result,
+            Err(error) => {
+                println!("🛡️ Error isolated during interpretation: {}", error);
+                
+                // Return safe fallback result
+                InterpretationResult {
+                    execution_time: std::time::Duration::from_millis(0),
+                    success: false,
+                    error_message: Some(format!("Isolated error: {}", error)),
+                }
+            }
+        }
+    }
+    
+    /// Check if a feature is supported and safe to use
+    pub fn is_feature_supported(&self, feature: &str) -> bool {
+        match feature {
+            "rhai" => true,
+            "ast" => true,
+            "jit" => {
+                // Check if JIT is available on this platform
+                #[cfg(any(target_arch = "x86_64", target_arch = "aarch64"))]
+                {
+                    true
+                }
+                #[cfg(not(any(target_arch = "x86_64", target_arch = "aarch64")))]
+                {
+                    false
+                }
+            }
+            _ => false,
+        }
+    }
+    
+    /// Get safe fallback strategy for unsupported features
+    pub fn get_fallback_strategy(&self, unsupported_feature: &str) -> InterpretationStrategy {
+        match unsupported_feature {
+            "jit" => InterpretationStrategy::AST,
+            "ast" => InterpretationStrategy::Rhai,
+            _ => InterpretationStrategy::Rhai, // Most compatible fallback
+        }
     }
     
     /// Interpret style changes specifically
