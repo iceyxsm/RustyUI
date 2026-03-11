@@ -2,8 +2,7 @@
 //! 
 //! Task 13: Production Build Verification - Simplified Test
 
-use rustyui_core::{DualModeEngine, DualModeConfig, UIFramework, ProductionVerifier};
-use std::path::PathBuf;
+use rustyui_core::{DualModeEngine, DualModeConfig, UIFramework, ProductionVerifier, Platform};
 use tempfile::TempDir;
 
 #[test]
@@ -154,7 +153,7 @@ fn test_dual_mode_engine_production_characteristics() {
     let engine = DualModeEngine::new(config).expect("Should create DualModeEngine");
     
     // Test basic functionality
-    assert!(engine.framework_name().len() > 0, "Should have a framework name");
+    assert!(engine.platform() != Platform::Other("unknown".to_string()), "Should detect valid platform");
     
     // Test memory overhead
     let memory_overhead = engine.current_memory_overhead_bytes();
