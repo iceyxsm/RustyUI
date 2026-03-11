@@ -29,6 +29,9 @@ pub mod error_reporting;
 #[cfg(feature = "dev-ui")]
 pub mod performance;
 
+#[cfg(feature = "dev-ui")]
+pub mod component_lifecycle;
+
 #[cfg(all(test, feature = "dev-ui"))]
 mod error_recovery_test;
 
@@ -66,6 +69,9 @@ pub use error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation, Err
 
 #[cfg(feature = "dev-ui")]
 pub use performance::{PerformanceMonitor, PerformanceTargets, PerformanceMetrics, PerformanceMeasurement};
+
+#[cfg(feature = "dev-ui")]
+pub use component_lifecycle::{ComponentLifecycleManager, ComponentLifecycle, ComponentState, ComponentStatistics};
 
 /// Trait for framework-agnostic rendering context
 pub trait RenderContext {

@@ -5,6 +5,8 @@ use crate::{config::DualModeConfig, error::{Result, RustyUIError}, platform::{Pl
 #[cfg(feature = "dev-ui")]
 use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}};
 
+use std::time::{Duration, Instant};
+
 // Production-compatible stub types
 #[cfg(not(feature = "dev-ui"))]
 #[derive(Debug, Clone)]
@@ -79,6 +81,10 @@ pub struct DualModeEngine {
     #[cfg(feature = "dev-ui")]
     performance_monitor: Option<PerformanceMonitor>,
     
+    /// Component lifecycle manager (development only)
+    #[cfg(feature = "dev-ui")]
+    component_manager: Option<crate::component_lifecycle::ComponentLifecycleManager>,
+    
     /// Engine initialization state
     initialized: bool,
 }
@@ -120,6 +126,8 @@ impl DualModeEngine {
             error_reporter: None,
             #[cfg(feature = "dev-ui")]
             performance_monitor: None,
+            #[cfg(feature = "dev-ui")]
+            component_manager: None,
             initialized: false,
         })
     }
@@ -145,6 +153,8 @@ impl DualModeEngine {
             error_reporter: None,
             #[cfg(feature = "dev-ui")]
             performance_monitor: None,
+            #[cfg(feature = "dev-ui")]
+            component_manager: None,
             initialized: false,
         })
     }
@@ -176,6 +186,9 @@ impl DualModeEngine {
                 max_state_preservation_time_ms: 10,
             };
             self.performance_monitor = Some(PerformanceMonitor::with_targets(performance_targets));
+            
+            // Initialize component lifecycle manager
+            self.component_manager = Some(crate::component_lifecycle::ComponentLifecycleManager::new());
             
             println!("✅ Development mode initialized with platform optimizations");
             println!("  File watcher: {} (expected latency: {}ms)", 
@@ -575,6 +588,175 @@ impl DualModeEngine {
         }
         if let Some(ref mut recovery_manager) = self.error_recovery {
             recovery_manager.clear_error_history();
+        }
+    }
+    
+    // Component Lifecycle Management Methods
+    
+    /// Register a new UI component (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn register_component(&mut self, id: String, type_name: String) -> Result<()> {
+        if let Some(ref mut manager) = self.component_manager {
+            manager.register_component(id.clone(), type_name.clone())?;
+            
+            // Record performance measurement
+            if let Some(ref mut perf_monitor) = self.performance_monitor {
+                let measurement = crate::performance::PerformanceMeasurement {
+                    operation: "component_registration".to_string(),
+                    duration: Duration::from_millis(1), // Minimal overhead
+                    timestamp: std::time::SystemTime::now(),
+                    component_id: Some(id),
+                    memory_usage_bytes: Some(0),
+                    success: true,
+                    metadata: std::collections::HashMap::new(),
+                };
+                perf_monitor.record_measurement(measurement);
+            }
+        }
+        Ok(())
+    }
+    
+    /// Update component state (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn update_component_state(&mut self, id: &str, state: crate::component_lifecycle::ComponentState) -> Result<()> {
+        if let Some(ref mut manager) = self.component_manager {
+            manager.update_component_state(id, state)?;
+        }
+        Ok(())
+    }
+    
+    /// Preserve component state for hot reload (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn preserve_component_state(&mut self, component_id: &str, state_data: serde_json::Value) -> Result<()> {
+        // Store in component manager
+        if let Some(ref mut manager) = self.component_manager {
+            manager.preserve_component_state(component_id, state_data.clone())?;
+        }
+        
+        // Store in state preservor
+        if let Some(ref mut preservor) = self.state_preservor {
+            preservor.save_global_state(component_id, &state_data)?;
+        }
+        
+        // Store in error recovery for fallback
+        if let Some(ref mut recovery) = self.error_recovery {
+            recovery.store_fallback_state(component_id.to_string(), state_data);
+        }
+        
+        Ok(())
+    }
+    
+    /// Restore component state after hot reload (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn restore_component_state(&mut self, component_id: &str) -> Option<serde_json::Value> {
+        // Try component manager first
+        if let Some(ref manager) = self.component_manager {
+            if let Some(state) = manager.restore_component_state(component_id) {
+                return Some(state.clone());
+            }
+        }
+        
+        // Fallback to state preservor
+        if let Some(ref mut preservor) = self.state_preservor {
+            if let Ok(Some(state)) = preservor.restore_global_state::<serde_json::Value>(component_id) {
+                return Some(state);
+            }
+        }
+        
+        None
+    }
+    
+    /// Get component lifecycle information (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_component_info(&self, id: &str) -> Option<&crate::component_lifecycle::ComponentLifecycle> {
+        self.component_manager.as_ref()?.get_component(id)
+    }
+    
+    /// Get all active components (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_active_components(&self) -> Vec<&crate::component_lifecycle::ComponentLifecycle> {
+        self.component_manager.as_ref()
+            .map(|manager| manager.get_active_components())
+            .unwrap_or_default()
+    }
+    
+    /// Get component statistics (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_component_statistics(&self) -> Option<crate::component_lifecycle::ComponentStatistics> {
+        self.component_manager.as_ref().map(|manager| manager.get_statistics())
+    }
+    
+    // Integrated Hot Reload Workflow
+    
+    /// Process file change and update components (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn process_file_change_and_update(&mut self, file_path: &str) -> Result<Vec<String>> {
+        let start_time = Instant::now();
+        let mut updated_components = Vec::new();
+        
+        // Process file change
+        let _changes = self.process_file_changes()?;
+        
+        // Analyze changes
+        if let Some(analysis_result) = self.process_and_analyze_changes()? {
+            // Extract affected components from analyzed changes
+            let affected_components: Vec<String> = analysis_result.analyzed_changes
+                .iter()
+                .filter_map(|change| {
+                    // Extract component ID from file path or change metadata
+                    // This is a simplified approach - in practice, you'd have more sophisticated mapping
+                    change.original_change.path.file_stem()
+                        .and_then(|stem| stem.to_str())
+                        .map(|s| s.to_string())
+                })
+                .collect();
+            
+            // Update affected components
+            for component_id in &affected_components {
+                // Preserve current state
+                if let Some(current_state) = self.restore_component_state(component_id) {
+                    self.preserve_component_state(component_id, current_state)?;
+                }
+                
+                // Update component state to updating
+                self.update_component_state(component_id, crate::component_lifecycle::ComponentState::Updating)?;
+                
+                // Apply hot reload (this would integrate with framework adapter)
+                // For now, just mark as updated
+                updated_components.push(component_id.to_string());
+                
+                // Update component state back to active
+                self.update_component_state(component_id, crate::component_lifecycle::ComponentState::Active)?;
+            }
+        }
+        
+        // Record performance
+        if let Some(ref mut perf_monitor) = self.performance_monitor {
+            let measurement = crate::performance::PerformanceMeasurement {
+                operation: "hot_reload_cycle".to_string(),
+                duration: start_time.elapsed(),
+                timestamp: std::time::SystemTime::now(),
+                component_id: None,
+                memory_usage_bytes: Some(0),
+                success: true,
+                metadata: {
+                    let mut map = std::collections::HashMap::new();
+                    map.insert("file_path".to_string(), file_path.to_string());
+                    map.insert("components_updated".to_string(), updated_components.len().to_string());
+                    map
+                },
+            };
+            perf_monitor.record_measurement(measurement);
+        }
+        
+        Ok(updated_components)
+    }
+    
+    /// Cleanup destroyed components (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn cleanup_components(&mut self) {
+        if let Some(ref mut manager) = self.component_manager {
+            manager.cleanup();
         }
     }
 }

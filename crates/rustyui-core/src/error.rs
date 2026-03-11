@@ -89,6 +89,13 @@ impl RustyUIError {
         }
     }
     
+    /// Create a component not found error
+    pub fn component_not_found(message: impl Into<String>) -> Self {
+        Self::Generic {
+            message: format!("Component not found: {}", message.into()),
+        }
+    }
+    
     /// Create a file watching error (development only)
     #[cfg(feature = "dev-ui")]
     pub fn file_watching(message: impl Into<String>) -> Self {
