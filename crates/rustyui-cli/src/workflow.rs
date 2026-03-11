@@ -240,8 +240,19 @@ impl WorkflowManager {
         println!("  {} Hot reload: enabled", style("🔥").green());
         println!("  {} State preservation: {}", 
             style("💾").blue(),
-            if cfg!(feature = "dev-ui") && config.development_settings.state_preservation {
-                style("enabled").green()
+            if cfg!(feature = "dev-ui") {
+                #[cfg(feature = "dev-ui")]
+                {
+                    if config.development_settings.state_preservation {
+                        style("enabled").green()
+                    } else {
+                        style("disabled").yellow()
+                    }
+                }
+                #[cfg(not(feature = "dev-ui"))]
+                {
+                    style("disabled").yellow()
+                }
             } else {
                 style("disabled").yellow()
             }

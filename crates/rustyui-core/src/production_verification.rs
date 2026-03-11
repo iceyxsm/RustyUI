@@ -1,10 +1,9 @@
 //! Production build verification and zero-overhead validation
 
 use crate::error::{Result, RustyUIError};
-use std::collections::HashMap;
 use std::path::Path;
 use std::process::Command;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 
 /// Production build verification system
 pub struct ProductionVerifier {
@@ -245,8 +244,8 @@ impl ProductionVerifier {
         let perf_acceptable = perf_diff.abs() <= 2.0;
         
         self.verification_results.performance_results = PerformanceResults {
-            rustyui_performance: rustyui_perf,
-            standard_performance: standard_perf,
+            rustyui_performance: rustyui_perf.clone(),
+            standard_performance: standard_perf.clone(),
             performance_difference_percent: perf_diff,
             performance_acceptable: perf_acceptable,
         };
@@ -590,7 +589,7 @@ panic = "abort"
         // Run the binary and measure performance
         let mut cmd = Command::new(binary_path);
         
-        let output = cmd.output()
+        let _output = cmd.output()
             .map_err(|e| RustyUIError::generic(format!("Failed to run binary: {}", e)))?;
         
         let execution_time = start_time.elapsed();

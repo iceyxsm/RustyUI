@@ -501,27 +501,27 @@ mod tests {
     #[test]
     fn test_conditional_compilation_macros() {
         // Test that macros compile (actual execution depends on platform)
-        windows_only! {
+        crate::windows_only! {
             let _windows_specific = "This only runs on Windows";
         }
         
-        macos_only! {
+        crate::macos_only! {
             let _macos_specific = "This only runs on macOS";
         }
         
-        linux_only! {
+        crate::linux_only! {
             let _linux_specific = "This only runs on Linux";
         }
         
-        unix_only! {
+        crate::unix_only! {
             let _unix_specific = "This only runs on Unix-like systems";
         }
         
-        dev_only! {
+        crate::dev_only! {
             let _dev_specific = "This only runs in development mode";
         }
         
-        production_only! {
+        crate::production_only! {
             let _prod_specific = "This only runs in production mode";
         }
     }

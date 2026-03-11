@@ -1,6 +1,7 @@
 //! UI Component trait with hot reload state preservation support
 
 use crate::error::Result;
+use crate::RenderContext;
 use serde::{Deserialize, Serialize};
 use std::any::Any;
 
@@ -12,6 +13,9 @@ use std::any::Any;
 pub trait UIComponent {
     /// The type of state this component maintains
     type State: Serialize + for<'de> Deserialize<'de> + Clone + Send + Sync + 'static;
+    
+    /// Render the component using the provided render context
+    fn render(&mut self, ctx: &mut dyn RenderContext);
     
     /// Get the unique identifier for this component instance
     fn component_id(&self) -> &str;
@@ -399,6 +403,13 @@ impl ButtonComponent {
 impl UIComponent for ButtonComponent {
     type State = ButtonState;
     
+    fn render(&mut self, ctx: &mut dyn RenderContext) {
+        ctx.render_button(&self.label, Box::new(|| {
+            // This would normally trigger the click handler
+            // For now, we'll just increment the count
+        }));
+    }
+    
     fn component_id(&self) -> &str {
         &self.id
     }
@@ -472,6 +483,10 @@ impl InputComponent {
 impl UIComponent for InputComponent {
     type State = InputState;
     
+    fn render(&mut self, ctx: &mut dyn RenderContext) {
+        ctx.render_text(&format!("Input: {} (placeholder: {})", self.value, self.placeholder));
+    }
+    
     fn component_id(&self) -> &str {
         &self.id
     }
@@ -520,8 +535,8 @@ mod tests {
     #[test]
     fn test_button_component_creation() {
         let button = ButtonComponent::new("btn1".to_string(), "Click Me".to_string());
-        assert_eq!(button.component_id(), "btn1");
-        assert_eq!(button.component_type(), "Button");
+        assert_eq!(UIComponent::component_id(&button), "btn1");
+        assert_eq!(UIComponent::component_type(&button), "Button");
         assert_eq!(button.get_click_count(), 0);
     }
     
@@ -576,8 +591,8 @@ mod tests {
     #[test]
     fn test_input_component_creation() {
         let input = InputComponent::new("input1".to_string(), "Enter text...".to_string());
-        assert_eq!(input.component_id(), "input1");
-        assert_eq!(input.component_type(), "Input");
+        assert_eq!(UIComponent::component_id(&input), "input1");
+        assert_eq!(UIComponent::component_type(&input), "Input");
         assert_eq!(input.get_value(), "");
     }
     
@@ -788,10 +803,10 @@ mod tests {
         let input = InputComponent::new("input1".to_string(), "Test".to_string());
         
         // Test dynamic trait methods
-        assert_eq!(button.component_id(), "btn1");
-        assert_eq!(button.component_type(), "Button");
-        assert_eq!(input.component_id(), "input1");
-        assert_eq!(input.component_type(), "Input");
+        assert_eq!(UIComponent::component_id(&button), "btn1");
+        assert_eq!(UIComponent::component_type(&button), "Button");
+        assert_eq!(UIComponent::component_id(&input), "input1");
+        assert_eq!(UIComponent::component_type(&input), "Input");
         
         // Test Any trait methods
         assert!(button.as_any().is::<ButtonComponent>());

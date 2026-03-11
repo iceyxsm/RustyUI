@@ -35,8 +35,11 @@ pub mod test_helpers {
 
         pub fn initialize(&mut self) -> Result<()> {
             self.initialized = true;
-            if self.config.development_settings.performance_monitoring {
-                self.performance_metrics = Some(MockPerformanceMetrics::new());
+            #[cfg(feature = "dev-ui")]
+            {
+                if self.config.development_settings.performance_monitoring {
+                    self.performance_metrics = Some(MockPerformanceMetrics::new());
+                }
             }
             Ok(())
         }
@@ -84,7 +87,14 @@ pub mod test_helpers {
         }
 
         pub fn has_performance_monitoring(&self) -> bool {
-            cfg!(feature = "dev-ui") && self.config.development_settings.performance_monitoring
+            #[cfg(feature = "dev-ui")]
+            {
+                cfg!(feature = "dev-ui") && self.config.development_settings.performance_monitoring
+            }
+            #[cfg(not(feature = "dev-ui"))]
+            {
+                false
+            }
         }
 
         pub fn get_performance_metrics(&self) -> Option<MockPerformanceMetrics> {
@@ -157,6 +167,7 @@ pub mod test_helpers {
     }
 
     /// Mock build configuration for testing
+    #[derive(Debug)]
     pub struct MockBuildConfig {
         pub dev_features: bool,
         pub zero_overhead: bool,
@@ -218,7 +229,7 @@ pub mod test_helpers {
             }
         }
 
-        pub fn handle_error(&mut self, _error: &RustyUIError, _context: ErrorContext) -> MockRecoveryResult {
+        pub fn handle_error(&mut self, _error: &RustyUIError, _context: &str) -> MockRecoveryResult {
             self.error_count += 1;
             self.recovery_count += 1;
             self.has_logs = true;
@@ -305,10 +316,10 @@ pub mod test_helpers {
                     production_settings: ProductionSettings {
                         strip_dev_features: !development_mode,
                         optimization_level: match optimization_level {
-                            0 => OptimizationLevel::Debug,
-                            1 => OptimizationLevel::Release,
-                            2 => OptimizationLevel::ReleaseLTO,
-                            _ => OptimizationLevel::Release,
+                            0 => crate::config::OptimizationLevel::Debug,
+                            1 => crate::config::OptimizationLevel::Release,
+                            2 => crate::config::OptimizationLevel::Release,
+                            _ => crate::config::OptimizationLevel::Release,
                         },
                         binary_size_optimization: true,
                         security_hardening: true,
@@ -346,7 +357,7 @@ pub mod test_helpers {
         pub fn assert_performance_within_bounds(
             execution_time: Duration,
             strategy: &str,
-        ) -> Result<(), String> {
+        ) -> std::result::Result<(), String> {
             let max_time = match strategy {
                 "rhai" => Duration::from_millis(1),
                 "ast" => Duration::from_millis(5),
@@ -367,7 +378,7 @@ pub mod test_helpers {
         pub fn assert_memory_within_bounds(
             memory_usage: u64,
             context: &str,
-        ) -> Result<(), String> {
+        ) -> std::result::Result<(), String> {
             let max_memory = match context {
                 "development" => 50 * 1024 * 1024, // 50MB
                 "production" => 0,                  // 0 bytes
@@ -388,7 +399,7 @@ pub mod test_helpers {
         pub fn assert_framework_compatibility(
             framework: &UIFramework,
             adapter_name: &str,
-        ) -> Result<(), String> {
+        ) -> std::result::Result<(), String> {
             let expected_name = match framework {
                 UIFramework::Egui => "egui",
                 UIFramework::Iced => "iced",
@@ -460,6 +471,8 @@ pub mod test_helpers {
         }
 
         impl UIComponent for MockUIComponent {
+            type State = HashMap<String, serde_json::Value>;
+            
             fn render(&mut self, ctx: &mut dyn RenderContext) {
                 ctx.render_text(&format!("Mock component: {}", self.id));
             }
@@ -468,21 +481,19 @@ pub mod test_helpers {
                 &self.id
             }
 
-            fn component_type(&self) -> &'static str {
-                // This is a limitation of the trait - we need a static str
+            fn component_type(&self) -> &str {
                 "MockUIComponent"
             }
 
             #[cfg(feature = "dev-ui")]
-            fn hot_reload_state(&self) -> serde_json::Value {
-                serde_json::to_value(&self.state).unwrap_or(serde_json::Value::Null)
+            fn hot_reload_state(&self) -> Result<Self::State> {
+                Ok(self.state.clone())
             }
 
             #[cfg(feature = "dev-ui")]
-            fn restore_state(&mut self, state: serde_json::Value) {
-                if let Ok(new_state) = serde_json::from_value(state) {
-                    self.state = new_state;
-                }
+            fn restore_state(&mut self, state: Self::State) -> Result<()> {
+                self.state = state;
+                Ok(())
             }
         }
     }
