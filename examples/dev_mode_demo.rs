@@ -32,10 +32,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     
     println!("Configuration:");
-    println!("  Framework: {:?}", config.framework);
-    println!("  Watch paths: {:?}", config.watch_paths);
-    println!("  State preservation: {}", config.development_settings.state_preservation);
-    println!("  Performance monitoring: {}", config.development_settings.performance_monitoring);
+    println!("Framework: {:?}", config.framework);
+    println!("Watch paths: {:?}", config.watch_paths);
+    println!("State preservation: {}", config.development_settings.state_preservation);
+    println!("Performance monitoring: {}", config.development_settings.performance_monitoring);
     
     #[cfg(feature = "dev-ui")]
     {
@@ -46,14 +46,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         engine.initialize()?;
         
         println!("Engine initialized successfully!");
-        println!("  Runtime interpreter available: {}", engine.has_runtime_interpreter());
-        println!("  Can interpret changes: {}", engine.can_interpret_changes());
-        println!("  Memory overhead: {:.1} MB", engine.memory_overhead() as f64 / (1024.0 * 1024.0));
+        println!("Runtime interpreter available: {}", engine.has_runtime_interpreter());
+        println!("Can interpret changes: {}", engine.can_interpret_changes());
+        println!("Memory overhead: {:.1} MB", engine.memory_overhead() as f64 / (1024.0 * 1024.0));
         
         // Demonstrate file change processing
         println!("\nTesting file change processing...");
         let changes = engine.process_file_changes()?;
-        println!("  Found {} pending changes", changes.len());
+        println!("Found {} pending changes", changes.len());
         
         // Test interpretation with sample code
         println!("\nTesting code interpretation...");
@@ -76,23 +76,23 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         match engine.interpret_ui_change(sample_code, Some("Button".to_string())) {
             Ok(result) => {
-                println!("  Interpretation successful!");
-                println!("    Execution time: {:?}", result.execution_time);
-                println!("    Success: {}", result.success);
+                println!("Interpretation successful!");
+                println!("Execution time: {:?}", result.execution_time);
+                println!("Success: {}", result.success);
             }
             Err(e) => {
-                println!("  Interpretation failed: {}", e);
+                println!("Interpretation failed: {}", e);
             }
         }
         
         println!("\nDevelopment mode demo completed successfully!");
-        println!("  Use 'rustyui dev' in your project to start the enhanced development server");
+        println!("Use 'rustyui dev' in your project to start the enhanced development server");
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
         println!("\nWARNING: Development features not available in this build");
-        println!("  Run with: cargo run --example dev_mode_demo --features dev-ui");
+        println!("Run with: cargo run --example dev_mode_demo --features dev-ui");
     }
     
     Ok(())

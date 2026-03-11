@@ -19,10 +19,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Analyze the project
     println!("2. Analyzing project structure...");
     let analysis = project_manager.analyze_project()?;
-    println!("   - Is Rust project: {}", analysis.is_rust_project);
-    println!("   - Is RustyUI project: {}", analysis.is_rustyui_project);
-    println!("   - Detected framework: {:?}", analysis.detected_framework);
-    println!("   - UI directories: {:?}", analysis.ui_directories);
+    println!("- Is Rust project: {}", analysis.is_rust_project);
+    println!("- Is RustyUI project: {}", analysis.is_rustyui_project);
+    println!("- Detected framework: {:?}", analysis.detected_framework);
+    println!("- UI directories: {:?}", analysis.ui_directories);
     
     // Create a basic Cargo.toml to make it a Rust project
     println!("\n3. Creating basic Rust project structure...");
@@ -39,29 +39,29 @@ edition = "2021"
     
     // Re-analyze after creating Rust project
     let analysis = project_manager.analyze_project()?;
-    println!("   - Is Rust project: {}", analysis.is_rust_project);
+    println!("- Is Rust project: {}", analysis.is_rust_project);
     
     // Create configuration manager
     println!("\n4. Creating configuration manager...");
     let config_manager = ConfigManager::new(project_path.clone())?;
-    println!("   - Config exists: {}", config_manager.config_exists());
+    println!("- Config exists: {}", config_manager.config_exists());
     
     // Create default configuration
     println!("5. Creating default configuration for egui...");
     let config = config_manager.create_default_config(UIFramework::Egui)?;
-    println!("   - Framework: {:?}", config.framework);
-    println!("   - Watch paths: {:?}", config.watch_paths);
+    println!("- Framework: {:?}", config.framework);
+    println!("- Watch paths: {:?}", config.watch_paths);
     
     // Validate and save configuration
     println!("6. Validating and saving configuration...");
     config_manager.validate_config(&config)?;
     config_manager.save_config(&config)?;
-    println!("   - Config saved successfully");
+    println!("- Config saved successfully");
     
     // Load configuration back
     println!("7. Loading configuration...");
     let loaded_config = config_manager.load_config()?;
-    println!("   - Loaded framework: {:?}", loaded_config.framework);
+    println!("- Loaded framework: {:?}", loaded_config.framework);
     
     // Create template manager
     println!("\n8. Creating template manager...");
@@ -70,7 +70,7 @@ edition = "2021"
     // Generate example code
     println!("9. Generating egui example code...");
     template_manager.generate_example_code("egui")?;
-    println!("   - Example code generated");
+    println!("- Example code generated");
     
     // Generate additional files
     println!("10. Generating additional project files...");
@@ -80,11 +80,11 @@ edition = "2021"
     // Final analysis
     println!("\n11. Final project analysis...");
     let final_analysis = project_manager.analyze_project()?;
-    println!("   - Is Rust project: {}", final_analysis.is_rust_project);
-    println!("   - Is RustyUI project: {}", final_analysis.is_rustyui_project);
-    println!("   - Has RustyUI config: {}", final_analysis.has_rustyui_config);
+    println!("- Is Rust project: {}", final_analysis.is_rust_project);
+    println!("- Is RustyUI project: {}", final_analysis.is_rustyui_project);
+    println!("- Has RustyUI config: {}", final_analysis.has_rustyui_config);
     
-    println!("\n✅ CLI library demonstration completed successfully!");
+    println!("\n CLI library demonstration completed successfully!");
     println!("📁 Project created at: {}", project_path.display());
     
     // List generated files
@@ -92,7 +92,7 @@ edition = "2021"
     for entry in std::fs::read_dir(&project_path)? {
         let entry = entry?;
         let file_name = entry.file_name();
-        println!("   - {}", file_name.to_string_lossy());
+        println!("- {}", file_name.to_string_lossy());
     }
     
     Ok(())

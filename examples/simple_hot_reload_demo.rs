@@ -239,27 +239,27 @@ impl HotReloadApp {
         
         // Component statistics
         if let Some(stats) = self.engine.get_component_statistics() {
-            println!("  Components: {} total, {} active", stats.total_components, stats.active_components);
-            println!("  Total updates: {}", stats.total_updates);
+            println!("Components: {} total, {} active", stats.total_components, stats.active_components);
+            println!("Total updates: {}", stats.total_updates);
             if let Some(avg_age) = stats.average_age {
-                println!("  Average component age: {:.2}s", avg_age.as_secs_f32());
+                println!("Average component age: {:.2}s", avg_age.as_secs_f32());
             }
         }
         
         // Memory usage
         let memory_overhead = self.engine.memory_overhead();
-        println!("  Memory overhead: {:.1} KB", memory_overhead as f32 / 1024.0);
+        println!("Memory overhead: {:.1} KB", memory_overhead as f32 / 1024.0);
         
         // Engine status
-        println!("  Hot reload: {}", if self.engine.has_runtime_interpreter() { "Active" } else { "Inactive" });
-        println!("  Platform: {:?}", self.engine.platform());
-        println!("  Native optimizations: {}", self.engine.is_using_native_optimizations());
+        println!("Hot reload: {}", if self.engine.has_runtime_interpreter() { "Active" } else { "Inactive" });
+        println!("Platform: {:?}", self.engine.platform());
+        println!("Native optimizations: {}", self.engine.is_using_native_optimizations());
         
         // Active components
         let active_components = self.engine.get_active_components();
-        println!("  Active components:");
+        println!("Active components:");
         for component in active_components {
-            println!("    - {} ({})", component.id, component.type_name);
+            println!("- {} ({})", component.id, component.type_name);
         }
     }
     

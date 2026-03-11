@@ -38,7 +38,7 @@ fn main() -> Result<()> {
     #[cfg(not(feature = "dev-ui"))]
     {
         println!("INFO: Error recovery features are only available in development mode");
-        println!("   Run with: cargo run --features dev-ui --example error_recovery_demo");
+        println!("Run with: cargo run --features dev-ui --example error_recovery_demo");
     }
     
     Ok(())
@@ -58,7 +58,7 @@ fn demonstrate_error_recovery(engine: &mut DualModeEngine) -> Result<()> {
     ];
     
     for (error, operation) in test_errors {
-        println!("\n🚨 Simulating error: {}", error);
+        println!("\nSimulating error: {}", error);
         
         let result = engine.handle_error(&error, operation, Some("demo_component".to_string()));
         
@@ -69,7 +69,7 @@ fn demonstrate_error_recovery(engine: &mut DualModeEngine) -> Result<()> {
             RecoveryResult::PartialRecovery { strategy, message, limitations } => {
                 println!("WARNING: Partial recovery: {} (strategy: {:?})", message, strategy);
                 for limitation in limitations {
-                    println!("   - Limitation: {}", limitation);
+                    println!("- Limitation: {}", limitation);
                 }
             }
             RecoveryResult::Failed { strategy, message } => {
@@ -101,32 +101,32 @@ fn demonstrate_error_reporting(engine: &mut DualModeEngine) -> Result<()> {
     // Get error metrics
     if let Some(metrics) = engine.get_error_metrics() {
         println!("📈 Error Metrics:");
-        println!("   Total errors: {}", metrics.total_errors);
-        println!("   Critical errors: {}", metrics.critical_errors);
-        println!("   High severity errors: {}", metrics.high_errors);
-        println!("   Medium severity errors: {}", metrics.medium_errors);
-        println!("   Low severity errors: {}", metrics.low_errors);
+        println!("Total errors: {}", metrics.total_errors);
+        println!("Critical errors: {}", metrics.critical_errors);
+        println!("High severity errors: {}", metrics.high_errors);
+        println!("Medium severity errors: {}", metrics.medium_errors);
+        println!("Low severity errors: {}", metrics.low_errors);
         
         println!("\nError breakdown by type:");
         for (error_type, count) in &metrics.error_type_counts {
-            println!("   {}: {}", error_type.as_str(), count);
+            println!("{}: {}", error_type.as_str(), count);
         }
         
         println!("\nComponent error breakdown:");
         for (component, count) in &metrics.component_error_counts {
-            println!("   {}: {}", component, count);
+            println!("{}: {}", component, count);
         }
     }
     
     // Generate comprehensive error report
     if let Some(report) = engine.get_error_report() {
         println!("\n📄 Error Report Generated:");
-        println!("   Recent errors: {}", report.recent_errors.len());
-        println!("   Error patterns identified: {}", report.error_patterns.len());
-        println!("   Recommendations: {}", report.recommendations.len());
+        println!("Recent errors: {}", report.recent_errors.len());
+        println!("Error patterns identified: {}", report.error_patterns.len());
+        println!("Recommendations: {}", report.recommendations.len());
         
         for (i, recommendation) in report.recommendations.iter().enumerate() {
-            println!("   {}. {}", i + 1, recommendation);
+            println!("{}. {}", i + 1, recommendation);
         }
     }
     
@@ -160,7 +160,7 @@ fn demonstrate_graceful_degradation(engine: &mut DualModeEngine) -> Result<()> {
         RecoveryResult::Success { message, fallback_data, .. } => {
             println!("SUCCESS: Graceful degradation successful: {}", message);
             if let Some(data) = fallback_data {
-                println!("   Restored to fallback state: {}", data.component_id);
+                println!("Restored to fallback state: {}", data.component_id);
             }
         }
         _ => {
@@ -177,9 +177,9 @@ fn demonstrate_graceful_degradation(engine: &mut DualModeEngine) -> Result<()> {
         RecoveryResult::PartialRecovery { message, limitations, .. } => {
             println!("Error isolated: {}", message);
             for limitation in limitations {
-                println!("   - {}", limitation);
+                println!("- {}", limitation);
             }
-            println!("   Main application continues running normally");
+            println!("Main application continues running normally");
         }
         _ => {
             println!("Error isolation mechanism activated");
@@ -200,25 +200,25 @@ fn demonstrate_health_monitoring(engine: &mut DualModeEngine) -> Result<()> {
     
     match health_status {
         HealthStatus::Healthy => {
-            println!("   All systems operating normally");
+            println!("All systems operating normally");
         }
         HealthStatus::Recovering => {
-            println!("   System is recovering from recent errors");
+            println!("System is recovering from recent errors");
         }
         HealthStatus::Degraded => {
-            println!("   System is in degraded mode due to persistent errors");
+            println!("System is in degraded mode due to persistent errors");
         }
     }
     
     // Get recovery metrics
     if let Some(recovery_metrics) = engine.get_error_recovery_metrics() {
         println!("\nRecovery Performance:");
-        println!("   Total errors handled: {}", recovery_metrics.total_errors);
-        println!("   Successful recoveries: {}", recovery_metrics.successful_recoveries);
-        println!("   Partial recoveries: {}", recovery_metrics.partial_recoveries);
-        println!("   Failed recoveries: {}", recovery_metrics.failed_recoveries);
-        println!("   Success rate: {:.1}%", recovery_metrics.success_rate() * 100.0);
-        println!("   Recovery rate: {:.1}%", recovery_metrics.recovery_rate() * 100.0);
+        println!("Total errors handled: {}", recovery_metrics.total_errors);
+        println!("Successful recoveries: {}", recovery_metrics.successful_recoveries);
+        println!("Partial recoveries: {}", recovery_metrics.partial_recoveries);
+        println!("Failed recoveries: {}", recovery_metrics.failed_recoveries);
+        println!("Success rate: {:.1}%", recovery_metrics.success_rate() * 100.0);
+        println!("Recovery rate: {:.1}%", recovery_metrics.recovery_rate() * 100.0);
     }
     
     // Demonstrate system resilience
@@ -232,9 +232,9 @@ fn demonstrate_health_monitoring(engine: &mut DualModeEngine) -> Result<()> {
     println!("🏥 Health after stress test: {:?}", final_health);
     
     if final_health == HealthStatus::Healthy || final_health == HealthStatus::Recovering {
-        println!("   System maintained stability under stress");
+        println!("System maintained stability under stress");
     } else {
-        println!("   System entered degraded mode - recovery mechanisms active");
+        println!("System entered degraded mode - recovery mechanisms active");
     }
     
     Ok(())
@@ -254,8 +254,8 @@ fn demonstrate_unsupported_features() -> Result<()> {
     
     for feature in unsupported_features {
         println!("BLOCKED: Unsupported feature detected: {}", feature);
-        println!("   Gracefully disabled, fallback mechanisms active");
-        println!("   Suggestion: Use alternative implementation or update library");
+        println!("Gracefully disabled, fallback mechanisms active");
+        println!("Suggestion: Use alternative implementation or update library");
     }
     
     Ok(())

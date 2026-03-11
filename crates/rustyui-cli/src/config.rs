@@ -479,7 +479,7 @@ members = [{}]
             project_analysis.project_type,
             project_analysis.workspace_info.as_ref().map_or(false, |w| w.is_workspace_root),
             project_analysis.workspace_info.as_ref()
-                .map(|w| w.workspace_members.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(", "))
+                .map(|w| w.workspace_members.iter().map(|m| format!("\"{}\"", m)).collect::<Vec<_>>().join(","))
                 .unwrap_or_default()
         );
         

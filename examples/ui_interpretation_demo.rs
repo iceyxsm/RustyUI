@@ -28,7 +28,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(result) => {
                 println!("✓ Button interpretation: {:?}", result.execution_time);
                 if !result.success {
-                    println!("  Error: {:?}", result.error_message);
+                    println!("Error: {:?}", result.error_message);
                 }
             }
             Err(e) => println!("✗ Button interpretation failed: {}", e),
@@ -140,9 +140,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(result) => {
                 println!("✓ Complex UI interpretation: {:?}", result.execution_time);
                 if result.execution_time > std::time::Duration::from_millis(100) {
-                    println!("  WARNING: Interpretation took longer than 100ms target");
+                    println!("WARNING: Interpretation took longer than 100ms target");
                 } else {
-                    println!("  ✓ Performance target met (<100ms)");
+                    println!("✓ Performance target met (<100ms)");
                 }
             }
             Err(e) => println!("✗ Complex UI interpretation failed: {}", e),

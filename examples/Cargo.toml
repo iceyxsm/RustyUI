@@ -62,9 +62,15 @@ name = "comprehensive_demo"
 path = "comprehensive_demo.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "performance_optimization_demo"
+path = "performance_optimization_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 rustyui-adapters = { path = "../crates/rustyui-adapters" }
+rustyui-interpreter = { path = "../crates/rustyui-interpreter" }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 eframe = "0.28"
@@ -73,5 +79,5 @@ env_logger = "0.11"
 
 [features]
 default = []
-dev-ui = ["rustyui-core/dev-ui", "rustyui-adapters/dev-ui"]
+dev-ui = ["rustyui-core/dev-ui", "rustyui-adapters/dev-ui", "rustyui-interpreter/dev-ui"]
 egui-adapter = ["rustyui-adapters/egui-adapter"]

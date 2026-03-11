@@ -30,10 +30,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let mut input2 = InputComponent::new("password_input".to_string(), "Enter password".to_string());
         
         println!("Created components:");
-        println!("  - Button: {} ({})", button1.component_id(), button1.component_type());
-        println!("  - Button: {} ({})", button2.component_id(), button2.component_type());
-        println!("  - Input: {} ({})", input1.component_id(), input1.component_type());
-        println!("  - Input: {} ({})", input2.component_id(), input2.component_type());
+        println!("- Button: {} ({})", button1.component_id(), button1.component_type());
+        println!("- Button: {} ({})", button2.component_id(), button2.component_type());
+        println!("- Input: {} ({})", input1.component_id(), input1.component_type());
+        println!("- Input: {} ({})", input2.component_id(), input2.component_type());
         
         println!("\n=== Simulating User Interaction ===");
         
@@ -75,10 +75,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         println!("New components created (simulating hot reload)");
         println!("Initial states:");
-        println!("  - Login button clicks: {}", new_button1.get_click_count());
-        println!("  - Cancel button clicks: {}", new_button2.get_click_count());
-        println!("  - Username input: '{}'", new_input1.get_value());
-        println!("  - Password input: '{}'", new_input2.get_value());
+        println!("- Login button clicks: {}", new_button1.get_click_count());
+        println!("- Cancel button clicks: {}", new_button2.get_click_count());
+        println!("- Username input: '{}'", new_input1.get_value());
+        println!("- Password input: '{}'", new_input2.get_value());
         
         println!("\n=== Restoring Component States ===");
         
@@ -89,17 +89,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let restored4 = state_manager.restore_component_state(&mut new_input2)?;
         
         println!("State restoration results:");
-        println!("  - Login button: {} (clicks: {})", restored1, new_button1.get_click_count());
-        println!("  - Cancel button: {} (clicks: {})", restored2, new_button2.get_click_count());
-        println!("  - Username input: {} (value: '{}')", restored3, new_input1.get_value());
-        println!("  - Password input: {} (value length: {})", restored4, new_input2.get_value().len());
+        println!("- Login button: {} (clicks: {})", restored1, new_button1.get_click_count());
+        println!("- Cancel button: {} (clicks: {})", restored2, new_button2.get_click_count());
+        println!("- Username input: {} (value: '{}')", restored3, new_input1.get_value());
+        println!("- Password input: {} (value length: {})", restored4, new_input2.get_value().len());
         
         let final_stats = state_manager.get_stats();
         println!("\nFinal statistics:");
-        println!("  - Total saves: {}", final_stats.total_saves);
-        println!("  - Total restores: {}", final_stats.total_restores);
-        println!("  - Serialization failures: {}", final_stats.serialization_failures);
-        println!("  - Deserialization failures: {}", final_stats.deserialization_failures);
+        println!("- Total saves: {}", final_stats.total_saves);
+        println!("- Total restores: {}", final_stats.total_restores);
+        println!("- Serialization failures: {}", final_stats.serialization_failures);
+        println!("- Deserialization failures: {}", final_stats.deserialization_failures);
         
         println!("\n=== Testing State Validation ===");
         
@@ -149,20 +149,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         // Demonstrate priority ordering
         println!("Component priorities:");
-        println!("  - Button priority: {}", new_button1.state_preservation_priority());
-        println!("  - Input priority: {}", new_input1.state_preservation_priority());
-        println!("  - Input has higher priority: {}", 
+        println!("- Button priority: {}", new_button1.state_preservation_priority());
+        println!("- Input priority: {}", new_input1.state_preservation_priority());
+        println!("- Input has higher priority: {}", 
             new_input1.state_preservation_priority() > new_button1.state_preservation_priority());
         
         println!("\n=== State Preservation Demo Completed ===");
         println!("Key features demonstrated:");
-        println!("  ✓ Component state serialization and deserialization");
-        println!("  ✓ Type-safe state restoration with validation");
-        println!("  ✓ Component ID and type validation");
-        println!("  ✓ Priority-based state preservation");
-        println!("  ✓ Memory usage tracking and statistics");
-        println!("  ✓ Error handling for invalid states");
-        println!("  ✓ Hot reload simulation with state preservation");
+        println!("✓ Component state serialization and deserialization");
+        println!("✓ Type-safe state restoration with validation");
+        println!("✓ Component ID and type validation");
+        println!("✓ Priority-based state preservation");
+        println!("✓ Memory usage tracking and statistics");
+        println!("✓ Error handling for invalid states");
+        println!("✓ Hot reload simulation with state preservation");
         
         println!("\nMemory overhead: {} bytes", engine.memory_overhead());
     }

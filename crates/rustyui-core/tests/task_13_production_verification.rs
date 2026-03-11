@@ -132,11 +132,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let total_time = start_time.elapsed();
     
     println!("Performance Results:");
-    println!("  Initialization: {:?}", init_time);
-    println!("  Workload: {:?}", workload_time);
-    println!("  Total: {:?}", total_time);
-    println!("  Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
-    println!("  Runtime interpretation: {}", engine.supports_runtime_interpretation());
+    println!("Initialization: {:?}", init_time);
+    println!("Workload: {:?}", workload_time);
+    println!("Total: {:?}", total_time);
+    println!("Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
+    println!("Runtime interpretation: {}", engine.supports_runtime_interpretation());
     
     Ok(())
 }
@@ -310,35 +310,35 @@ fn task_13_1_zero_overhead_production_builds() {
         .expect("Should setup test project");
     
     // Phase 1: Build production version
-    println!("  Phase 1: Building production version");
+    println!("Phase 1: Building production version");
     let prod_result = fixture.build_production()
         .expect("Production build should succeed");
     
-    println!("    Production build time: {:?}", prod_result.build_time);
-    println!("    Production binary size: {} bytes", prod_result.binary_size);
+    println!("Production build time: {:?}", prod_result.build_time);
+    println!("Production binary size: {} bytes", prod_result.binary_size);
     
     // Phase 2: Build development version for comparison
-    println!("  Phase 2: Building development version");
+    println!("Phase 2: Building development version");
     let dev_result = fixture.build_development()
         .expect("Development build should succeed");
     
-    println!("    Development build time: {:?}", dev_result.build_time);
-    println!("    Development binary size: {} bytes", dev_result.binary_size);
+    println!("Development build time: {:?}", dev_result.build_time);
+    println!("Development binary size: {} bytes", dev_result.binary_size);
     
     // Phase 3: Binary size verification
-    println!("  Phase 3: Binary size verification");
+    println!("Phase 3: Binary size verification");
     let size_difference = dev_result.binary_size as i64 - prod_result.binary_size as i64;
     let size_ratio = prod_result.binary_size as f64 / dev_result.binary_size as f64;
     
-    println!("    Size difference: {} bytes", size_difference);
-    println!("    Size ratio (prod/dev): {:.3}", size_ratio);
+    println!("Size difference: {} bytes", size_difference);
+    println!("Size ratio (prod/dev): {:.3}", size_ratio);
     
     // Production should not be significantly larger than development
     assert!(size_ratio <= 1.1, 
         "Production binary should not be >10% larger than development, got {:.3}", size_ratio);
     
     // Phase 4: Performance benchmarking
-    println!("  Phase 4: Performance benchmarking");
+    println!("Phase 4: Performance benchmarking");
     
     let prod_benchmark = fixture.benchmark_binary(&prod_result.binary_path)
         .expect("Production binary should execute successfully");
@@ -346,19 +346,19 @@ fn task_13_1_zero_overhead_production_builds() {
     let dev_benchmark = fixture.benchmark_binary(&dev_result.binary_path)
         .expect("Development binary should execute successfully");
     
-    println!("    Production execution: {:?}", prod_benchmark.execution_time);
-    println!("    Development execution: {:?}", dev_benchmark.execution_time);
+    println!("Production execution: {:?}", prod_benchmark.execution_time);
+    println!("Development execution: {:?}", dev_benchmark.execution_time);
     
     let perf_ratio = prod_benchmark.execution_time.as_nanos() as f64 / 
                      dev_benchmark.execution_time.as_nanos() as f64;
-    println!("    Performance ratio (prod/dev): {:.3}", perf_ratio);
+    println!("Performance ratio (prod/dev): {:.3}", perf_ratio);
     
     // Production should be faster or at least not significantly slower
     assert!(perf_ratio <= 1.5, 
         "Production should not be >50% slower than development, got {:.3}", perf_ratio);
     
     // Phase 5: Binary content analysis
-    println!("  Phase 5: Binary content analysis");
+    println!("Phase 5: Binary content analysis");
     
     let prod_analysis = fixture.analyze_binary_content(&prod_result.binary_path)
         .expect("Should analyze production binary");
@@ -366,15 +366,15 @@ fn task_13_1_zero_overhead_production_builds() {
     let dev_analysis = fixture.analyze_binary_content(&dev_result.binary_path)
         .expect("Should analyze development binary");
     
-    println!("    Production dev markers: {:?}", prod_analysis.dev_markers_found);
-    println!("    Development dev markers: {:?}", dev_analysis.dev_markers_found);
+    println!("Production dev markers: {:?}", prod_analysis.dev_markers_found);
+    println!("Development dev markers: {:?}", dev_analysis.dev_markers_found);
     
     // Production should have fewer or no development markers
     assert!(prod_analysis.dev_markers_found.len() <= dev_analysis.dev_markers_found.len(),
         "Production should have fewer development markers");
     
     // Phase 6: Output verification
-    println!("  Phase 6: Output verification");
+    println!("Phase 6: Output verification");
     
     // Both should produce valid output
     assert!(prod_benchmark.stdout.contains("Performance Results"),
@@ -389,12 +389,12 @@ fn task_13_1_zero_overhead_production_builds() {
         "Production should show zero overhead characteristics");
     
     // Phase 7: Verification summary
-    println!("  Task 13.1 Verification Summary:");
-    println!("    Production build successful");
-    println!("    Binary size reasonable (ratio: {:.3})", size_ratio);
-    println!("    Performance acceptable (ratio: {:.3})", perf_ratio);
-    println!("    Development markers reduced");
-    println!("    Zero overhead characteristics verified");
+    println!("Task 13.1 Verification Summary:");
+    println!("Production build successful");
+    println!("Binary size reasonable (ratio: {:.3})", size_ratio);
+    println!("Performance acceptable (ratio: {:.3})", perf_ratio);
+    println!("Development markers reduced");
+    println!("Zero overhead characteristics verified");
     
     println!("Task 13.1: Zero-overhead production builds completed successfully");
 }
@@ -416,7 +416,7 @@ fn task_13_2_property_test_zero_overhead_production() {
     ];
     
     for (config_name, framework, opt_level) in test_configs {
-        println!("  🔬 Testing configuration: {} ({:?}, {:?})", config_name, framework, opt_level);
+        println!("🔬 Testing configuration: {} ({:?}, {:?})", config_name, framework, opt_level);
         
         let fixture = ProductionVerificationFixture::new();
         fixture.setup_test_project()
@@ -480,7 +480,7 @@ strip = true
             "Config {}: Production should have ≤ 2 dev markers, found: {:?}", 
             config_name, prod_analysis.dev_markers_found);
         
-        println!("    {} configuration verified", config_name);
+        println!("{} configuration verified", config_name);
     }
     
     println!("Task 13.2: Property test completed - zero-overhead property holds universally");
@@ -499,7 +499,7 @@ fn task_13_3_production_vs_development_benchmarks() {
         .expect("Should setup test project");
     
     // Phase 1: Build both versions
-    println!("  🔨 Phase 1: Building both versions");
+    println!("🔨 Phase 1: Building both versions");
     
     let prod_result = fixture.build_production()
         .expect("Production build should succeed");
@@ -507,19 +507,19 @@ fn task_13_3_production_vs_development_benchmarks() {
     let dev_result = fixture.build_development()
         .expect("Development build should succeed");
     
-    println!("    Production build: {:?}, {} bytes", 
+    println!("Production build: {:?}, {} bytes", 
         prod_result.build_time, prod_result.binary_size);
-    println!("    Development build: {:?}, {} bytes", 
+    println!("Development build: {:?}, {} bytes", 
         dev_result.build_time, dev_result.binary_size);
     
     // Phase 2: Multiple benchmark runs for statistical accuracy
-    println!("  Phase 2: Performance benchmarking (5 runs each)");
+    println!("Phase 2: Performance benchmarking (5 runs each)");
     
     let mut prod_times = Vec::new();
     let mut dev_times = Vec::new();
     
     for run in 1..=5 {
-        println!("    Run {}/5", run);
+        println!("Run {}/5", run);
         
         let prod_bench = fixture.benchmark_binary(&prod_result.binary_path)
             .expect("Production benchmark should succeed");
@@ -529,12 +529,12 @@ fn task_13_3_production_vs_development_benchmarks() {
             .expect("Development benchmark should succeed");
         dev_times.push(dev_bench.execution_time);
         
-        println!("      Production: {:?}, Development: {:?}", 
+        println!("Production: {:?}, Development: {:?}", 
             prod_bench.execution_time, dev_bench.execution_time);
     }
     
     // Phase 3: Statistical analysis
-    println!("  📈 Phase 3: Statistical analysis");
+    println!("📈 Phase 3: Statistical analysis");
     
     let avg_prod_time = prod_times.iter().sum::<Duration>() / prod_times.len() as u32;
     let avg_dev_time = dev_times.iter().sum::<Duration>() / dev_times.len() as u32;
@@ -544,28 +544,28 @@ fn task_13_3_production_vs_development_benchmarks() {
     let min_dev_time = *dev_times.iter().min().unwrap();
     let max_dev_time = *dev_times.iter().max().unwrap();
     
-    println!("    Production times:");
-    println!("      Average: {:?}", avg_prod_time);
-    println!("      Min: {:?}, Max: {:?}", min_prod_time, max_prod_time);
-    println!("      Consistency: {:.1}%", 
+    println!("Production times:");
+    println!("Average: {:?}", avg_prod_time);
+    println!("Min: {:?}, Max: {:?}", min_prod_time, max_prod_time);
+    println!("Consistency: {:.1}%", 
         (min_prod_time.as_nanos() as f64 / max_prod_time.as_nanos() as f64) * 100.0);
     
-    println!("    Development times:");
-    println!("      Average: {:?}", avg_dev_time);
-    println!("      Min: {:?}, Max: {:?}", min_dev_time, max_dev_time);
-    println!("      Consistency: {:.1}%", 
+    println!("Development times:");
+    println!("Average: {:?}", avg_dev_time);
+    println!("Min: {:?}, Max: {:?}", min_dev_time, max_dev_time);
+    println!("Consistency: {:.1}%", 
         (min_dev_time.as_nanos() as f64 / max_dev_time.as_nanos() as f64) * 100.0);
     
     // Phase 4: Performance comparison
-    println!("  🏁 Phase 4: Performance comparison");
+    println!("🏁 Phase 4: Performance comparison");
     
     let perf_ratio = avg_prod_time.as_nanos() as f64 / avg_dev_time.as_nanos() as f64;
     let size_ratio = prod_result.binary_size as f64 / dev_result.binary_size as f64;
     let build_time_ratio = prod_result.build_time.as_nanos() as f64 / dev_result.build_time.as_nanos() as f64;
     
-    println!("    Performance ratio (prod/dev): {:.3}", perf_ratio);
-    println!("    Size ratio (prod/dev): {:.3}", size_ratio);
-    println!("    Build time ratio (prod/dev): {:.3}", build_time_ratio);
+    println!("Performance ratio (prod/dev): {:.3}", perf_ratio);
+    println!("Size ratio (prod/dev): {:.3}", size_ratio);
+    println!("Build time ratio (prod/dev): {:.3}", build_time_ratio);
     
     // Performance targets validation
     assert!(perf_ratio <= 1.1, 
@@ -575,7 +575,7 @@ fn task_13_3_production_vs_development_benchmarks() {
         "Production should not be >5% larger than development, got {:.3}", size_ratio);
     
     // Phase 5: Memory and resource analysis
-    println!("  💾 Phase 5: Memory and resource analysis");
+    println!("💾 Phase 5: Memory and resource analysis");
     
     let prod_analysis = fixture.analyze_binary_content(&prod_result.binary_path)
         .expect("Should analyze production binary");
@@ -583,8 +583,8 @@ fn task_13_3_production_vs_development_benchmarks() {
     let dev_analysis = fixture.analyze_binary_content(&dev_result.binary_path)
         .expect("Should analyze development binary");
     
-    println!("    Production dev markers: {} found", prod_analysis.dev_markers_found.len());
-    println!("    Development dev markers: {} found", dev_analysis.dev_markers_found.len());
+    println!("Production dev markers: {} found", prod_analysis.dev_markers_found.len());
+    println!("Development dev markers: {} found", dev_analysis.dev_markers_found.len());
     
     let marker_reduction = if dev_analysis.dev_markers_found.len() > 0 {
         ((dev_analysis.dev_markers_found.len() - prod_analysis.dev_markers_found.len()) as f64 / 
@@ -593,30 +593,30 @@ fn task_13_3_production_vs_development_benchmarks() {
         100.0
     };
     
-    println!("    Development marker reduction: {:.1}%", marker_reduction);
+    println!("Development marker reduction: {:.1}%", marker_reduction);
     
     // Phase 6: Comprehensive benchmark summary
-    println!("  Task 13.3 Benchmark Summary:");
-    println!("    Performance Metrics:");
-    println!("      - Production avg execution: {:?}", avg_prod_time);
-    println!("      - Development avg execution: {:?}", avg_dev_time);
-    println!("      - Performance ratio: {:.3} (target: ≤ 1.1)", perf_ratio);
-    println!("      - Performance advantage: {:.1}%", (1.0 - perf_ratio) * 100.0);
+    println!("Task 13.3 Benchmark Summary:");
+    println!("Performance Metrics:");
+    println!("- Production avg execution: {:?}", avg_prod_time);
+    println!("- Development avg execution: {:?}", avg_dev_time);
+    println!("- Performance ratio: {:.3} (target: ≤ 1.1)", perf_ratio);
+    println!("- Performance advantage: {:.1}%", (1.0 - perf_ratio) * 100.0);
     
-    println!("    📏 Size Metrics:");
-    println!("      - Production binary: {} bytes", prod_result.binary_size);
-    println!("      - Development binary: {} bytes", dev_result.binary_size);
-    println!("      - Size ratio: {:.3} (target: ≤ 1.05)", size_ratio);
-    println!("      - Size efficiency: {:.1}%", (1.0 - size_ratio) * 100.0);
+    println!("📏 Size Metrics:");
+    println!("- Production binary: {} bytes", prod_result.binary_size);
+    println!("- Development binary: {} bytes", dev_result.binary_size);
+    println!("- Size ratio: {:.3} (target: ≤ 1.05)", size_ratio);
+    println!("- Size efficiency: {:.1}%", (1.0 - size_ratio) * 100.0);
     
-    println!("    🔨 Build Metrics:");
-    println!("      - Production build: {:?}", prod_result.build_time);
-    println!("      - Development build: {:?}", dev_result.build_time);
-    println!("      - Build time ratio: {:.3}", build_time_ratio);
+    println!("🔨 Build Metrics:");
+    println!("- Production build: {:?}", prod_result.build_time);
+    println!("- Development build: {:?}", dev_result.build_time);
+    println!("- Build time ratio: {:.3}", build_time_ratio);
     
-    println!("    🔒 Optimization Metrics:");
-    println!("      - Development markers reduced: {:.1}%", marker_reduction);
-    println!("      - Zero overhead achieved: {}", prod_analysis.dev_markers_found.len() <= 1);
+    println!("🔒 Optimization Metrics:");
+    println!("- Development markers reduced: {:.1}%", marker_reduction);
+    println!("- Zero overhead achieved: {}", prod_analysis.dev_markers_found.len() <= 1);
     
     // Final validation
     assert!(perf_ratio <= 1.1, "Performance target met");
@@ -639,21 +639,21 @@ fn task_13_complete_production_verification() {
         .expect("Should setup test project");
     
     // Run all three subtasks in sequence
-    println!("  Running Task 13.1: Zero-overhead production builds");
+    println!("Running Task 13.1: Zero-overhead production builds");
     let prod_result = fixture.build_production()
         .expect("Production build should succeed");
     
     let dev_result = fixture.build_development()
         .expect("Development build should succeed");
     
-    println!("  🧪 Running Task 13.2: Property verification");
+    println!("🧪 Running Task 13.2: Property verification");
     let prod_benchmark = fixture.benchmark_binary(&prod_result.binary_path)
         .expect("Production benchmark should succeed");
     
     let dev_benchmark = fixture.benchmark_binary(&dev_result.binary_path)
         .expect("Development benchmark should succeed");
     
-    println!("  Running Task 13.3: Performance comparison");
+    println!("Running Task 13.3: Performance comparison");
     let prod_analysis = fixture.analyze_binary_content(&prod_result.binary_path)
         .expect("Should analyze production binary");
     
@@ -662,20 +662,20 @@ fn task_13_complete_production_verification() {
     let perf_ratio = prod_benchmark.execution_time.as_nanos() as f64 / 
                      dev_benchmark.execution_time.as_nanos() as f64;
     
-    println!("  Task 13 Complete Verification Results:");
-    println!("    Task 13.1: Zero-overhead implementation");
-    println!("      - Binary size ratio: {:.3} (≤ 1.05)", size_ratio);
-    println!("      - Performance ratio: {:.3} (≤ 1.1)", perf_ratio);
-    println!("      - Dev markers found: {}", prod_analysis.dev_markers_found.len());
+    println!("Task 13 Complete Verification Results:");
+    println!("Task 13.1: Zero-overhead implementation");
+    println!("- Binary size ratio: {:.3} (≤ 1.05)", size_ratio);
+    println!("- Performance ratio: {:.3} (≤ 1.1)", perf_ratio);
+    println!("- Dev markers found: {}", prod_analysis.dev_markers_found.len());
     
-    println!("    Task 13.2: Property verification");
-    println!("      - Zero overhead property: VERIFIED");
-    println!("      - Cross-configuration consistency: VERIFIED");
+    println!("Task 13.2: Property verification");
+    println!("- Zero overhead property: VERIFIED");
+    println!("- Cross-configuration consistency: VERIFIED");
     
-    println!("    Task 13.3: Performance benchmarking");
-    println!("      - Production performance: {:?}", prod_benchmark.execution_time);
-    println!("      - Development performance: {:?}", dev_benchmark.execution_time);
-    println!("      - Performance advantage: {:.1}%", (1.0 - perf_ratio) * 100.0);
+    println!("Task 13.3: Performance benchmarking");
+    println!("- Production performance: {:?}", prod_benchmark.execution_time);
+    println!("- Development performance: {:?}", dev_benchmark.execution_time);
+    println!("- Performance advantage: {:.1}%", (1.0 - perf_ratio) * 100.0);
     
     // Final assertions
     assert!(size_ratio <= 1.05, "Size efficiency requirement met");
@@ -684,11 +684,11 @@ fn task_13_complete_production_verification() {
     assert!(prod_benchmark.stdout.contains("Performance Results"), "Valid output produced");
     
     println!("SUCCESS: Task 13: Production Build Verification COMPLETED SUCCESSFULLY");
-    println!("   All requirements validated:");
-    println!("   - 3.1: Production builds have zero runtime overhead PASS");
-    println!("   - 3.2: Binary size matches standard Rust builds PASS");
-    println!("   - 3.3: Performance equals native Rust compilation PASS");
-    println!("   - 3.4: All development features stripped PASS");
-    println!("   - 3.5: Memory usage identical to standard Rust PASS");
-    println!("   - 3.6: No runtime interpretation in production PASS");
+    println!("All requirements validated:");
+    println!("- 3.1: Production builds have zero runtime overhead PASS");
+    println!("- 3.2: Binary size matches standard Rust builds PASS");
+    println!("- 3.3: Performance equals native Rust compilation PASS");
+    println!("- 3.4: All development features stripped PASS");
+    println!("- 3.5: Memory usage identical to standard Rust PASS");
+    println!("- 3.6: No runtime interpretation in production PASS");
 }

@@ -28,8 +28,7 @@ Features:
   • Zero runtime overhead in production builds
   • Framework-agnostic (egui, iced, slint, tauri)
   • State preservation across interpretation cycles
-  • Seamless transition between development and production modes
-")]
+  • Seamless transition between development and production modes")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -192,7 +191,7 @@ fn check_platform_compatibility(verbose: bool) -> CliResult<()> {
     // Check minimum requirements
     if let Err(e) = PlatformCapabilities::check_minimum_requirements() {
         eprintln!("{} Platform compatibility issue: {}", style("⚠").yellow(), e);
-        eprintln!("  RustyUI may not work optimally on this platform.");
+        eprintln!("RustyUI may not work optimally on this platform.");
     }
     
     // Show platform capabilities if verbose
@@ -202,8 +201,8 @@ fn check_platform_compatibility(verbose: bool) -> CliResult<()> {
         let watcher_backend = platform.file_watcher_backend();
         let watcher_perf = watcher_backend.performance_characteristics();
         
-        println!("{} Platform capabilities:", style("🔧").green());
-        println!("  File watcher: {} ({}ms latency)", 
+        println!("{} Platform capabilities:", style("").green());
+        println!("File watcher: {} ({}ms latency)", 
             match watcher_backend {
                 rustyui_core::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
                 rustyui_core::FileWatcherBackend::FSEvents => "FSEvents",
@@ -212,13 +211,13 @@ fn check_platform_compatibility(verbose: bool) -> CliResult<()> {
             },
             watcher_perf.latency_ms
         );
-        println!("  JIT compilation: {}", 
+        println!("JIT compilation: {}", 
             if jit_caps.supports_cranelift { "supported" } else { "not supported" }
         );
-        println!("  Native APIs: {}", 
+        println!("Native APIs: {}", 
             if config.use_native_apis { "enabled" } else { "disabled" }
         );
-        println!("  Thread count: {}", config.thread_count);
+        println!("Thread count: {}", config.thread_count);
     }
     
     Ok(())
@@ -271,40 +270,40 @@ fn show_config(path: &PathBuf) -> CliResult<()> {
     let platform_config = PlatformConfig::auto_detect();
     
     println!("{}", style("RustyUI Configuration:").bold());
-    println!("  Framework: {}", style(&format!("{:?}", config.framework)).cyan());
-    println!("  Watch paths: {:?}", config.watch_paths);
+    println!("Framework: {}", style(&format!("{:?}", config.framework)).cyan());
+    println!("Watch paths: {:?}", config.watch_paths);
     
     println!("\n{}", style("Platform Information:").bold());
-    println!("  Platform: {}", style(platform.to_string()).cyan());
-    println!("  File watcher: {}", match platform_config.file_watcher_backend {
+    println!("Platform: {}", style(platform.to_string()).cyan());
+    println!("File watcher: {}", match platform_config.file_watcher_backend {
         rustyui_core::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
         rustyui_core::FileWatcherBackend::FSEvents => "FSEvents",
         rustyui_core::FileWatcherBackend::INotify => "inotify",
         rustyui_core::FileWatcherBackend::Poll => "polling",
     });
-    println!("  JIT compilation: {}", 
+    println!("JIT compilation: {}", 
         if platform_config.use_jit_compilation { "enabled" } else { "disabled" }
     );
-    println!("  Native optimizations: {}", 
+    println!("Native optimizations: {}", 
         if platform_config.use_native_apis { "enabled" } else { "disabled" }
     );
-    println!("  Thread count: {}", platform_config.thread_count);
+    println!("Thread count: {}", platform_config.thread_count);
     
     #[cfg(feature = "dev-ui")]
     {
         println!("\n{}", style("Development Settings:").bold());
-        println!("    Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
-        println!("    JIT threshold: {}ms", config.development_settings.jit_compilation_threshold);
-        println!("    State preservation: {}", config.development_settings.state_preservation);
-        println!("    Performance monitoring: {}", config.development_settings.performance_monitoring);
-        println!("    Change detection delay: {}ms", config.development_settings.change_detection_delay_ms);
+        println!("Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
+        println!("JIT threshold: {}ms", config.development_settings.jit_compilation_threshold);
+        println!("State preservation: {}", config.development_settings.state_preservation);
+        println!("Performance monitoring: {}", config.development_settings.performance_monitoring);
+        println!("Change detection delay: {}ms", config.development_settings.change_detection_delay_ms);
     }
     
     println!("\n{}", style("Production Settings:").bold());
-    println!("    Strip dev features: {}", config.production_settings.strip_dev_features);
-    println!("    Optimization level: {:?}", config.production_settings.optimization_level);
-    println!("    Binary size optimization: {}", config.production_settings.binary_size_optimization);
-    println!("    Security hardening: {}", config.production_settings.security_hardening);
+    println!("Strip dev features: {}", config.production_settings.strip_dev_features);
+    println!("Optimization level: {:?}", config.production_settings.optimization_level);
+    println!("Binary size optimization: {}", config.production_settings.binary_size_optimization);
+    println!("Security hardening: {}", config.production_settings.security_hardening);
     
     Ok(())
 }

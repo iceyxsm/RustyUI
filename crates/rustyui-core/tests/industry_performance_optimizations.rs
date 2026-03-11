@@ -208,7 +208,7 @@ fn test_memory_pooling_optimization() {
         let mut engine = fixture.engine.take().unwrap();
         
         // Phase 1: Baseline Memory Allocation Test
-        println!("  📊 Phase 1: Baseline Memory Allocation");
+        println!("Phase 1: Baseline Memory Allocation");
         
         let baseline_start = Instant::now();
         let initial_memory = engine.current_memory_overhead_bytes();
@@ -225,20 +225,20 @@ fn test_memory_pooling_optimization() {
             
             match result {
                 Ok(_) => baseline_components.push(component_name),
-                Err(e) => println!("    ⚠️ Baseline component {} handled gracefully: {}", i, e),
+                Err(e) => println!("Baseline component {} handled gracefully: {}", i, e),
             }
         }
         
         let baseline_time = baseline_start.elapsed();
         let baseline_memory = engine.current_memory_overhead_bytes();
         
-        println!("    📊 Baseline Results:");
-        println!("      - Time: {:?}", baseline_time);
-        println!("      - Memory used: {:.2} KB", (baseline_memory - initial_memory) as f64 / 1024.0);
-        println!("      - Components created: {}", baseline_components.len());
+        println!("Baseline Results:");
+        println!("- Time: {:?}", baseline_time);
+        println!("- Memory used: {:.2} KB", (baseline_memory - initial_memory) as f64 / 1024.0);
+        println!("- Components created: {}", baseline_components.len());
         
         // Phase 2: Memory Pool Optimization Test
-        println!("  📊 Phase 2: Memory Pool Optimization");
+        println!("Phase 2: Memory Pool Optimization");
         
         // Enable memory pooling
         engine.enable_aggressive_memory_pooling(true).expect("Should enable memory pooling");
@@ -258,25 +258,25 @@ fn test_memory_pooling_optimization() {
             
             match result {
                 Ok(_) => pooled_components.push(component_name),
-                Err(e) => println!("    ⚠️ Pooled component {} handled gracefully: {}", i, e),
+                Err(e) => println!("Pooled component {} handled gracefully: {}", i, e),
             }
         }
         
         let pooled_time = pooled_start.elapsed();
         let pooled_memory = engine.current_memory_overhead_bytes();
         
-        println!("    📊 Memory Pool Results:");
-        println!("      - Time: {:?}", pooled_time);
-        println!("      - Memory used: {:.2} KB", (pooled_memory - pooled_start_memory) as f64 / 1024.0);
-        println!("      - Components created: {}", pooled_components.len());
+        println!("Memory Pool Results:");
+        println!("- Time: {:?}", pooled_time);
+        println!("- Memory used: {:.2} KB", (pooled_memory - pooled_start_memory) as f64 / 1024.0);
+        println!("- Components created: {}", pooled_components.len());
         
         // Calculate optimization gains
         let time_improvement = baseline_time.as_nanos() as f64 / pooled_time.as_nanos() as f64;
         let memory_improvement = (baseline_memory - initial_memory) as f64 / (pooled_memory - pooled_start_memory) as f64;
         
-        println!("  📈 Memory Pooling Optimization Results:");
-        println!("    - Time improvement: {:.2}x faster", time_improvement);
-        println!("    - Memory efficiency: {:.2}x better", memory_improvement);
+        println!("📈 Memory Pooling Optimization Results:");
+        println!("- Time improvement: {:.2}x faster", time_improvement);
+        println!("- Memory efficiency: {:.2}x better", memory_improvement);
         
         // Should achieve significant improvements
         assert!(time_improvement >= 1.2, 
@@ -285,7 +285,7 @@ fn test_memory_pooling_optimization() {
             "Memory pooling should improve memory efficiency by at least 10%, got {:.2}x", memory_improvement);
         
         // Phase 3: Collection Preallocation Test
-        println!("  📊 Phase 3: Collection Preallocation Optimization");
+        println!("Phase 3: Collection Preallocation Optimization");
         
         let prealloc_start = Instant::now();
         
@@ -315,16 +315,16 @@ fn test_memory_pooling_optimization() {
             let result = engine.interpret_ui_change(&optimized_code, Some(component_name));
             match result {
                 Ok(_) => {},
-                Err(e) => println!("    ⚠️ Preallocation test {} handled gracefully: {}", i, e),
+                Err(e) => println!("Preallocation test {} handled gracefully: {}", i, e),
             }
         }
         
         let prealloc_time = prealloc_start.elapsed();
         let prealloc_memory = engine.current_memory_overhead_bytes();
         
-        println!("    📊 Preallocation Results:");
-        println!("      - Time: {:?}", prealloc_time);
-        println!("      - Final memory: {:.2} MB", prealloc_memory as f64 / (1024.0 * 1024.0));
+        println!("Preallocation Results:");
+        println!("- Time: {:?}", prealloc_time);
+        println!("- Final memory: {:.2} MB", prealloc_memory as f64 / (1024.0 * 1024.0));
         
         // Memory should be efficiently managed
         assert!(prealloc_memory < 50 * 1024 * 1024, 
@@ -336,10 +336,10 @@ fn test_memory_pooling_optimization() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Memory pooling overhead eliminated");
+        println!("Production mode: Memory pooling overhead eliminated");
     }
     
-    println!("✅ Memory pooling optimization test completed");
+    println!("Memory pooling optimization test completed");
 }
 // ============================================================================
 // Test 2: Incremental Compilation with Dependency Tracking
@@ -352,14 +352,14 @@ fn test_incremental_compilation_dependency_tracking() {
     let mut fixture = IndustryOptimizationFixture::new();
     fixture.initialize_optimized_engine().expect("Engine initialization should succeed");
     
-    println!("🔄 Testing Incremental Compilation with Dependency Tracking");
+    println!("Testing Incremental Compilation with Dependency Tracking");
     
     #[cfg(feature = "dev-ui")]
     {
         let mut engine = fixture.engine.take().unwrap();
         
         // Phase 1: Build Dependency Graph
-        println!("  📊 Phase 1: Building Component Dependency Graph");
+        println!("Phase 1: Building Component Dependency Graph");
         
         let components = vec![
             ("Core", vec![], "Core utilities - no dependencies"),
@@ -410,7 +410,7 @@ fn test_incremental_compilation_dependency_tracking() {
                 }}
             "#, 
                 component_name, dependencies, component_name, component_name, component_name,
-                dependencies.iter().map(|d| format!("\"{}\"", d)).collect::<Vec<_>>().join(", ")
+                dependencies.iter().map(|d| format!("\"{}\"", d)).collect::<Vec<_>>().join(",")
             );
             
             let compile_start = Instant::now();
@@ -419,16 +419,16 @@ fn test_incremental_compilation_dependency_tracking() {
             
             compilation_cache.insert(component_name.to_string(), compile_time);
             
-            println!("    📊 {} initial compilation: {:?}", component_name, compile_time);
+            println!("{} initial compilation: {:?}", component_name, compile_time);
             
             match result {
                 Ok(_) => {},
-                Err(e) => println!("    ⚠️ Component {} handled gracefully: {}", component_name, e),
+                Err(e) => println!("Component {} handled gracefully: {}", component_name, e),
             }
         }
         
         // Phase 2: Test Incremental Compilation
-        println!("  📊 Phase 2: Incremental Compilation Testing");
+        println!("Phase 2: Incremental Compilation Testing");
         
         // Modify Core component (should trigger recompilation of dependents)
         let core_modification = r#"
@@ -453,7 +453,7 @@ fn test_incremental_compilation_dependency_tracking() {
             }
         }
         
-        println!("    📊 Components requiring recompilation: {:?}", recompilation_needed);
+        println!("Components requiring recompilation: {:?}", recompilation_needed);
         
         // Perform incremental compilation
         let mut incremental_times = HashMap::new();
@@ -472,18 +472,18 @@ fn test_incremental_compilation_dependency_tracking() {
             
             incremental_times.insert(component_name.clone(), recompile_time);
             
-            println!("    📊 {} incremental compilation: {:?}", component_name, recompile_time);
+            println!("{} incremental compilation: {:?}", component_name, recompile_time);
             
             match result {
                 Ok(_) => {},
-                Err(e) => println!("    ⚠️ Incremental compilation for {} handled gracefully: {}", component_name, e),
+                Err(e) => println!("Incremental compilation for {} handled gracefully: {}", component_name, e),
             }
         }
         
         let total_incremental_time = incremental_start.elapsed();
         
         // Phase 3: Cache Hit Rate Analysis
-        println!("  📊 Phase 3: Cache Hit Rate Analysis");
+        println!("Phase 3: Cache Hit Rate Analysis");
         
         let total_components = components.len();
         let recompiled_components = recompilation_needed.len();
@@ -491,19 +491,19 @@ fn test_incremental_compilation_dependency_tracking() {
         
         let cache_hit_rate = (cached_components as f64 / total_components as f64) * 100.0;
         
-        println!("    📈 Dependency Tracking Results:");
-        println!("      - Total components: {}", total_components);
-        println!("      - Recompiled components: {}", recompiled_components);
-        println!("      - Cached components: {}", cached_components);
-        println!("      - Cache hit rate: {:.1}%", cache_hit_rate);
-        println!("      - Total incremental time: {:?}", total_incremental_time);
+        println!("📈 Dependency Tracking Results:");
+        println!("- Total components: {}", total_components);
+        println!("- Recompiled components: {}", recompiled_components);
+        println!("- Cached components: {}", cached_components);
+        println!("- Cache hit rate: {:.1}%", cache_hit_rate);
+        println!("- Total incremental time: {:?}", total_incremental_time);
         
         // Calculate efficiency gains
         let initial_total_time: Duration = compilation_cache.values().sum();
         let incremental_total_time: Duration = incremental_times.values().sum();
         let time_savings = initial_total_time.as_nanos() as f64 / incremental_total_time.as_nanos() as f64;
         
-        println!("      - Time savings: {:.2}x faster", time_savings);
+        println!("- Time savings: {:.2}x faster", time_savings);
         
         // Should achieve high cache hit rate and significant time savings
         assert!(cache_hit_rate >= 50.0, 
@@ -512,7 +512,7 @@ fn test_incremental_compilation_dependency_tracking() {
             "Incremental compilation should be at least 1.5x faster, got {:.2}x", time_savings);
         
         // Phase 4: Dependency Invalidation Test
-        println!("  📊 Phase 4: Smart Dependency Invalidation");
+        println!("Phase 4: Smart Dependency Invalidation");
         
         // Modify a leaf component (should not trigger other recompilations)
         let leaf_modification = r#"
@@ -528,15 +528,15 @@ fn test_incremental_compilation_dependency_tracking() {
         let result = engine.interpret_ui_change(leaf_modification, Some("Modal".to_string()));
         let leaf_time = leaf_start.elapsed();
         
-        println!("    📊 Leaf component modification: {:?}", leaf_time);
+        println!("Leaf component modification: {:?}", leaf_time);
         
         // Leaf modifications should be very fast (no dependents to recompile)
         assert!(leaf_time < Duration::from_millis(50), 
             "Leaf component modification should be under 50ms, got {:?}", leaf_time);
         
         match result {
-            Ok(_) => println!("    ✅ Smart dependency invalidation working correctly"),
-            Err(e) => println!("    ⚠️ Leaf modification handled gracefully: {}", e),
+            Ok(_) => println!("Smart dependency invalidation working correctly"),
+            Err(e) => println!("Leaf modification handled gracefully: {}", e),
         }
         
         fixture.engine = Some(engine);
@@ -544,10 +544,10 @@ fn test_incremental_compilation_dependency_tracking() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Incremental compilation overhead eliminated");
+        println!("Production mode: Incremental compilation overhead eliminated");
     }
     
-    println!("✅ Incremental compilation dependency tracking test completed");
+    println!("Incremental compilation dependency tracking test completed");
 }
 // ============================================================================
 // Test 3: Performance Instrumentation and Metrics Collection
@@ -567,7 +567,7 @@ fn test_performance_instrumentation_and_metrics() {
         let mut engine = fixture.engine.take().unwrap();
         
         // Phase 1: Instrumentation Overhead Measurement
-        println!("  📊 Phase 1: Instrumentation Overhead Measurement");
+        println!("Phase 1: Instrumentation Overhead Measurement");
         
         let operations = vec![
             ("component_registration", 100),
@@ -645,7 +645,7 @@ fn test_performance_instrumentation_and_metrics() {
             
             overhead_measurements.insert(operation_type.to_string(), overhead_per_op);
             
-            println!("    📊 {} overhead: {:?} per operation", operation_type, overhead_per_op);
+            println!("{} overhead: {:?} per operation", operation_type, overhead_per_op);
             
             // Instrumentation overhead should be minimal
             assert!(overhead_per_op < Duration::from_micros(10), 
@@ -656,7 +656,7 @@ fn test_performance_instrumentation_and_metrics() {
         }
         
         // Phase 2: Comprehensive Metrics Collection
-        println!("  📊 Phase 2: Comprehensive Metrics Collection");
+        println!("Phase 2: Comprehensive Metrics Collection");
         
         engine.enable_comprehensive_metrics(true).expect("Should enable comprehensive metrics");
         
@@ -698,21 +698,21 @@ fn test_performance_instrumentation_and_metrics() {
                     });
                     let _ = engine.preserve_component_state(&component_name, state);
                 }
-                Err(e) => println!("    ⚠️ Metrics test {} handled gracefully: {}", i, e),
+                Err(e) => println!("Metrics test {} handled gracefully: {}", i, e),
             }
         }
         
         // Collect and analyze metrics
         let metrics = engine.get_comprehensive_metrics().expect("Should get comprehensive metrics");
         
-        println!("    📈 Comprehensive Metrics Results:");
-        println!("      - Total operations: {}", metrics.total_operations);
-        println!("      - Average interpretation time: {:?}", metrics.average_interpretation_time);
-        println!("      - P95 interpretation time: {:?}", metrics.p95_interpretation_time);
-        println!("      - P99 interpretation time: {:?}", metrics.p99_interpretation_time);
-        println!("      - Memory allocations: {}", metrics.memory_allocations);
-        println!("      - Cache hit rate: {:.1}%", metrics.cache_hit_rate);
-        println!("      - Error rate: {:.2}%", metrics.error_rate);
+        println!("📈 Comprehensive Metrics Results:");
+        println!("- Total operations: {}", metrics.total_operations);
+        println!("- Average interpretation time: {:?}", metrics.average_interpretation_time);
+        println!("- P95 interpretation time: {:?}", metrics.p95_interpretation_time);
+        println!("- P99 interpretation time: {:?}", metrics.p99_interpretation_time);
+        println!("- Memory allocations: {}", metrics.memory_allocations);
+        println!("- Cache hit rate: {:.1}%", metrics.cache_hit_rate);
+        println!("- Error rate: {:.2}%", metrics.error_rate);
         
         // Verify metrics quality
         assert!(metrics.total_operations > 0, "Should have recorded operations");
@@ -722,7 +722,7 @@ fn test_performance_instrumentation_and_metrics() {
             "Error rate should be under 5%, got {:.2}%", metrics.error_rate);
         
         // Phase 3: Performance Regression Detection
-        println!("  📊 Phase 3: Performance Regression Detection");
+        println!("Phase 3: Performance Regression Detection");
         
         // Establish baseline performance
         let baseline_metrics = metrics.clone();
@@ -743,10 +743,10 @@ fn test_performance_instrumentation_and_metrics() {
         let performance_change = regression_metrics.average_interpretation_time.as_nanos() as f64 
             / baseline_metrics.average_interpretation_time.as_nanos() as f64;
         
-        println!("    📊 Regression Detection Results:");
-        println!("      - Baseline avg time: {:?}", baseline_metrics.average_interpretation_time);
-        println!("      - Regression avg time: {:?}", regression_metrics.average_interpretation_time);
-        println!("      - Performance change: {:.2}x", performance_change);
+        println!("Regression Detection Results:");
+        println!("- Baseline avg time: {:?}", baseline_metrics.average_interpretation_time);
+        println!("- Regression avg time: {:?}", regression_metrics.average_interpretation_time);
+        println!("- Performance change: {:.2}x", performance_change);
         
         // Should detect the simulated regression
         assert!(performance_change > 1.1, 
@@ -760,10 +760,10 @@ fn test_performance_instrumentation_and_metrics() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Performance instrumentation overhead eliminated");
+        println!("Production mode: Performance instrumentation overhead eliminated");
     }
     
-    println!("✅ Performance instrumentation and metrics test completed");
+    println!("Performance instrumentation and metrics test completed");
 }
 // ============================================================================
 // Test 4: Thread Pool Optimization with Work-Stealing
@@ -783,10 +783,10 @@ fn test_thread_pool_work_stealing_optimization() {
         let mut engine = fixture.engine.take().unwrap();
         
         let cpu_count = num_cpus::get();
-        println!("  📊 Available CPU cores: {}", cpu_count);
+        println!("Available CPU cores: {}", cpu_count);
         
         // Phase 1: Single-Threaded Baseline
-        println!("  📊 Phase 1: Single-Threaded Baseline");
+        println!("Phase 1: Single-Threaded Baseline");
         
         engine.set_thread_pool_size(1).expect("Should set single thread");
         
@@ -831,20 +831,20 @@ fn test_thread_pool_work_stealing_optimization() {
             
             match result {
                 Ok(_) => {},
-                Err(e) => println!("    ⚠️ Single thread task {} handled gracefully: {}", i, e),
+                Err(e) => println!("Single thread task {} handled gracefully: {}", i, e),
             }
         }
         
         let single_thread_total = single_thread_start.elapsed();
         let single_thread_avg = single_thread_tasks.iter().sum::<Duration>() / single_thread_tasks.len() as u32;
         
-        println!("    📊 Single-Thread Results:");
-        println!("      - Total time: {:?}", single_thread_total);
-        println!("      - Average task time: {:?}", single_thread_avg);
-        println!("      - Tasks completed: {}", single_thread_tasks.len());
+        println!("Single-Thread Results:");
+        println!("- Total time: {:?}", single_thread_total);
+        println!("- Average task time: {:?}", single_thread_avg);
+        println!("- Tasks completed: {}", single_thread_tasks.len());
         
         // Phase 2: Multi-Threaded with Work-Stealing
-        println!("  📊 Phase 2: Multi-Threaded with Work-Stealing");
+        println!("Phase 2: Multi-Threaded with Work-Stealing");
         
         engine.set_thread_pool_size(cpu_count).expect("Should set multi-thread");
         engine.enable_work_stealing(true).expect("Should enable work-stealing");
@@ -900,7 +900,7 @@ fn test_thread_pool_work_stealing_optimization() {
                     let task_time = task_start.elapsed();
                     multi_thread_tasks.push(task_time);
                 }
-                Err(e) => println!("    ⚠️ Parallel task {} handled gracefully: {}", i, e),
+                Err(e) => println!("Parallel task {} handled gracefully: {}", i, e),
             }
         }
         
@@ -911,19 +911,19 @@ fn test_thread_pool_work_stealing_optimization() {
             Duration::from_millis(0)
         };
         
-        println!("    📊 Multi-Thread Results:");
-        println!("      - Total time: {:?}", multi_thread_total);
-        println!("      - Average task time: {:?}", multi_thread_avg);
-        println!("      - Tasks completed: {}", multi_thread_tasks.len());
+        println!("Multi-Thread Results:");
+        println!("- Total time: {:?}", multi_thread_total);
+        println!("- Average task time: {:?}", multi_thread_avg);
+        println!("- Tasks completed: {}", multi_thread_tasks.len());
         
         // Calculate parallelization efficiency
         let speedup = single_thread_total.as_nanos() as f64 / multi_thread_total.as_nanos() as f64;
         let efficiency = speedup / cpu_count as f64;
         
-        println!("  📈 Thread Pool Optimization Results:");
-        println!("    - Speedup: {:.2}x", speedup);
-        println!("    - Parallel efficiency: {:.1}%", efficiency * 100.0);
-        println!("    - Theoretical max speedup: {}x", cpu_count);
+        println!("📈 Thread Pool Optimization Results:");
+        println!("- Speedup: {:.2}x", speedup);
+        println!("- Parallel efficiency: {:.1}%", efficiency * 100.0);
+        println!("- Theoretical max speedup: {}x", cpu_count);
         
         // Should achieve reasonable parallelization
         assert!(speedup >= 1.5, 
@@ -932,7 +932,7 @@ fn test_thread_pool_work_stealing_optimization() {
             "Parallel efficiency should be at least 30%, got {:.1}%", efficiency * 100.0);
         
         // Phase 3: Work-Stealing Effectiveness Test
-        println!("  📊 Phase 3: Work-Stealing Effectiveness");
+        println!("Phase 3: Work-Stealing Effectiveness");
         
         // Create unbalanced workload to test work-stealing
         let unbalanced_start = Instant::now();
@@ -978,14 +978,14 @@ fn test_thread_pool_work_stealing_optimization() {
         
         let unbalanced_time = unbalanced_start.elapsed();
         
-        println!("    📊 Work-Stealing Results:");
-        println!("      - Unbalanced workload time: {:?}", unbalanced_time);
-        println!("      - Tasks completed: {}", completed_tasks);
+        println!("Work-Stealing Results:");
+        println!("- Unbalanced workload time: {:?}", unbalanced_time);
+        println!("- Tasks completed: {}", completed_tasks);
         
         // Get work-stealing statistics
         if let Some(thread_stats) = engine.get_thread_pool_statistics() {
-            println!("      - Work steals: {}", thread_stats.total_steals);
-            println!("      - Load balance efficiency: {:.1}%", thread_stats.load_balance_efficiency);
+            println!("- Work steals: {}", thread_stats.total_steals);
+            println!("- Load balance efficiency: {:.1}%", thread_stats.load_balance_efficiency);
             
             // Work-stealing should be active for unbalanced workloads
             assert!(thread_stats.total_steals > 0, 
@@ -1000,10 +1000,10 @@ fn test_thread_pool_work_stealing_optimization() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Thread pool overhead eliminated");
+        println!("Production mode: Thread pool overhead eliminated");
     }
     
-    println!("✅ Thread pool work-stealing optimization test completed");
+    println!("Thread pool work-stealing optimization test completed");
 }
 // ============================================================================
 // Test 5: Streaming Data Processing and Memory Pressure Monitoring
@@ -1023,12 +1023,12 @@ fn test_streaming_processing_memory_pressure() {
         let mut engine = fixture.engine.take().unwrap();
         
         // Phase 1: Streaming vs Batch Processing Comparison
-        println!("  📊 Phase 1: Streaming vs Batch Processing Comparison");
+        println!("Phase 1: Streaming vs Batch Processing Comparison");
         
         let data_sizes = vec![1024, 10240, 102400, 1024000]; // 1KB to 1MB
         
         for data_size in &data_sizes {
-            println!("    📊 Testing data size: {} bytes", data_size);
+            println!("Testing data size: {} bytes", data_size);
             
             // Batch processing (load everything into memory)
             let batch_start = Instant::now();
@@ -1064,9 +1064,9 @@ fn test_streaming_processing_memory_pressure() {
             let batch_time = batch_start.elapsed();
             let batch_memory = engine.current_memory_overhead_bytes();
             
-            println!("      📊 Batch processing:");
-            println!("        - Time: {:?}", batch_time);
-            println!("        - Memory used: {:.2} KB", (batch_memory - batch_start_memory) as f64 / 1024.0);
+            println!("Batch processing:");
+            println!("- Time: {:?}", batch_time);
+            println!("- Memory used: {:.2} KB", (batch_memory - batch_start_memory) as f64 / 1024.0);
             
             // Streaming processing (process in chunks)
             let streaming_start = Instant::now();
@@ -1113,17 +1113,17 @@ fn test_streaming_processing_memory_pressure() {
             let streaming_time = streaming_start.elapsed();
             let streaming_memory = engine.current_memory_overhead_bytes();
             
-            println!("      📊 Streaming processing:");
-            println!("        - Time: {:?}", streaming_time);
-            println!("        - Memory used: {:.2} KB", (streaming_memory - streaming_start_memory) as f64 / 1024.0);
+            println!("Streaming processing:");
+            println!("- Time: {:?}", streaming_time);
+            println!("- Memory used: {:.2} KB", (streaming_memory - streaming_start_memory) as f64 / 1024.0);
             
             // Calculate efficiency
             let memory_efficiency = (batch_memory - batch_start_memory) as f64 / (streaming_memory - streaming_start_memory) as f64;
             let time_ratio = streaming_time.as_nanos() as f64 / batch_time.as_nanos() as f64;
             
-            println!("      📈 Efficiency:");
-            println!("        - Memory efficiency: {:.2}x better with streaming", memory_efficiency);
-            println!("        - Time ratio: {:.2}x", time_ratio);
+            println!("📈 Efficiency:");
+            println!("- Memory efficiency: {:.2}x better with streaming", memory_efficiency);
+            println!("- Time ratio: {:.2}x", time_ratio);
             
             // Streaming should use less memory for large data
             if *data_size > 10240 { // For data > 10KB
@@ -1137,15 +1137,15 @@ fn test_streaming_processing_memory_pressure() {
             
             match result {
                 Ok(_) => {},
-                Err(e) => println!("      ⚠️ Streaming test handled gracefully: {}", e),
+                Err(e) => println!("Streaming test handled gracefully: {}", e),
             }
         }
         
         // Phase 2: Memory Pressure Monitoring
-        println!("  📊 Phase 2: Memory Pressure Monitoring");
+        println!("Phase 2: Memory Pressure Monitoring");
         
         let initial_memory = engine.current_memory_overhead_bytes();
-        println!("    📊 Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
+        println!("Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
         
         // Set memory pressure thresholds
         let warning_threshold = 30 * 1024 * 1024; // 30MB
@@ -1192,7 +1192,7 @@ fn test_streaming_processing_memory_pressure() {
             let current_memory = engine.current_memory_overhead_bytes();
             let memory_pressure_status = engine.get_memory_pressure_status();
             
-            println!("    📊 Component {}: {:.2} MB, Status: {:?}", 
+            println!("Component {}: {:.2} MB, Status: {:?}", 
                 i, current_memory as f64 / (1024.0 * 1024.0), memory_pressure_status);
             
             match result {
@@ -1205,20 +1205,20 @@ fn test_streaming_processing_memory_pressure() {
                             // Continue normal operation
                         },
                         rustyui_core::MemoryPressureStatus::Warning => {
-                            println!("      ⚠️ Memory pressure warning triggered - adaptive throttling active");
+                            println!("Memory pressure warning triggered - adaptive throttling active");
                             
                             // Verify adaptive behavior
                             assert!(engine.is_adaptive_throttling_active(), 
                                 "Adaptive throttling should be active under memory pressure");
                         },
                         rustyui_core::MemoryPressureStatus::Critical => {
-                            println!("      🚨 Critical memory pressure - aggressive cleanup triggered");
+                            println!("Critical memory pressure - aggressive cleanup triggered");
                             
                             // Should trigger aggressive cleanup
                             engine.trigger_aggressive_cleanup().expect("Should trigger cleanup");
                             
                             let cleanup_memory = engine.current_memory_overhead_bytes();
-                            println!("      📊 Memory after cleanup: {:.2} MB", 
+                            println!("Memory after cleanup: {:.2} MB", 
                                 cleanup_memory as f64 / (1024.0 * 1024.0));
                             
                             // Cleanup should reduce memory usage
@@ -1230,7 +1230,7 @@ fn test_streaming_processing_memory_pressure() {
                     }
                 }
                 Err(e) => {
-                    println!("      ⚠️ Memory pressure component {} handled gracefully: {}", i, e);
+                    println!("Memory pressure component {} handled gracefully: {}", i, e);
                     break;
                 }
             }
@@ -1242,16 +1242,16 @@ fn test_streaming_processing_memory_pressure() {
         }
         
         // Phase 3: Adaptive Throttling Effectiveness
-        println!("  📊 Phase 3: Adaptive Throttling Effectiveness");
+        println!("Phase 3: Adaptive Throttling Effectiveness");
         
         let final_memory = engine.current_memory_overhead_bytes();
         let memory_growth = final_memory - initial_memory;
         
-        println!("    📈 Memory Pressure Results:");
-        println!("      - Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
-        println!("      - Final memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
-        println!("      - Memory growth: {:.2} MB", memory_growth as f64 / (1024.0 * 1024.0));
-        println!("      - Components created: {}", memory_pressure_components.len());
+        println!("📈 Memory Pressure Results:");
+        println!("- Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
+        println!("- Final memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("- Memory growth: {:.2} MB", memory_growth as f64 / (1024.0 * 1024.0));
+        println!("- Components created: {}", memory_pressure_components.len());
         
         // Memory should be kept under control
         assert!(final_memory < 50 * 1024 * 1024, 
@@ -1268,10 +1268,10 @@ fn test_streaming_processing_memory_pressure() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Streaming processing overhead eliminated");
+        println!("Production mode: Streaming processing overhead eliminated");
     }
     
-    println!("✅ Streaming processing and memory pressure monitoring test completed");
+    println!("Streaming processing and memory pressure monitoring test completed");
 }
 
 // ============================================================================
@@ -1285,7 +1285,7 @@ fn test_comprehensive_industry_optimization_integration() {
     let mut fixture = IndustryOptimizationFixture::new();
     fixture.initialize_optimized_engine().expect("Engine initialization should succeed");
     
-    println!("🏆 Testing Comprehensive Industry Optimization Integration");
+    println!("Testing Comprehensive Industry Optimization Integration");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -1296,13 +1296,13 @@ fn test_comprehensive_industry_optimization_integration() {
         // Enable all optimizations
         engine.enable_all_optimizations(true).expect("Should enable all optimizations");
         
-        println!("  📊 All industry-level optimizations enabled:");
-        println!("    ✅ Memory pooling with jemalloc");
-        println!("    ✅ Incremental compilation with dependency tracking");
-        println!("    ✅ Performance instrumentation with sub-μs overhead");
-        println!("    ✅ Thread pool with work-stealing scheduler");
-        println!("    ✅ Streaming data processing");
-        println!("    ✅ Memory pressure monitoring with adaptive throttling");
+        println!("All industry-level optimizations enabled:");
+        println!("Memory pooling with jemalloc");
+        println!("Incremental compilation with dependency tracking");
+        println!("Performance instrumentation with sub-μs overhead");
+        println!("Thread pool with work-stealing scheduler");
+        println!("Streaming data processing");
+        println!("Memory pressure monitoring with adaptive throttling");
         
         // Realistic development session simulation
         let session_start = Instant::now();
@@ -1333,7 +1333,7 @@ fn test_comprehensive_industry_optimization_integration() {
                     });
                     let _ = engine.preserve_component_state(&component_name, state);
                 }
-                Err(e) => println!("    ⚠️ Optimized component {} handled gracefully: {}", i, e),
+                Err(e) => println!("Optimized component {} handled gracefully: {}", i, e),
             }
         }
         
@@ -1343,14 +1343,14 @@ fn test_comprehensive_industry_optimization_integration() {
         // Get comprehensive optimization metrics
         let optimization_metrics = engine.get_optimization_metrics().expect("Should get optimization metrics");
         
-        println!("  🏆 Comprehensive Optimization Results:");
-        println!("    - Total integration time: {:?}", integration_start.elapsed());
-        println!("    - Development session time: {:?}", session_time);
-        println!("    - Final memory usage: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
-        println!("    - Memory pool efficiency: {:.1}%", optimization_metrics.memory_pool_efficiency);
-        println!("    - Cache hit rate: {:.1}%", optimization_metrics.cache_hit_rate);
-        println!("    - Thread pool utilization: {:.1}%", optimization_metrics.thread_pool_utilization);
-        println!("    - Streaming efficiency: {:.1}%", optimization_metrics.streaming_efficiency);
+        println!("Comprehensive Optimization Results:");
+        println!("- Total integration time: {:?}", integration_start.elapsed());
+        println!("- Development session time: {:?}", session_time);
+        println!("- Final memory usage: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("- Memory pool efficiency: {:.1}%", optimization_metrics.memory_pool_efficiency);
+        println!("- Cache hit rate: {:.1}%", optimization_metrics.cache_hit_rate);
+        println!("- Thread pool utilization: {:.1}%", optimization_metrics.thread_pool_utilization);
+        println!("- Streaming efficiency: {:.1}%", optimization_metrics.streaming_efficiency);
         
         // Verify all optimizations are working effectively
         assert!(optimization_metrics.memory_pool_efficiency >= 80.0, 
@@ -1375,22 +1375,22 @@ fn test_comprehensive_industry_optimization_integration() {
             "Average time per component should be under 20ms with optimizations, got {:?}", 
             avg_time_per_component);
         
-        println!("    🎯 All industry-level optimization targets achieved!");
+        println!("All industry-level optimization targets achieved!");
         
         fixture.engine = Some(engine);
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: All optimization overhead perfectly eliminated");
+        println!("Production mode: All optimization overhead perfectly eliminated");
         let engine = fixture.engine.as_ref().unwrap();
         
         assert_eq!(engine.current_memory_overhead_bytes(), 0);
         assert!(!engine.has_runtime_interpreter());
         assert!(engine.get_health_status().is_healthy());
         
-        println!("    ✅ Production mode: Perfect zero-overhead abstractions verified");
+        println!("Production mode: Perfect zero-overhead abstractions verified");
     }
     
-    println!("🏆 Comprehensive industry optimization integration test completed successfully!");
+    println!("Comprehensive industry optimization integration test completed successfully!");
 }

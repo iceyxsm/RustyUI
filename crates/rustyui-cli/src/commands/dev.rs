@@ -27,7 +27,7 @@ impl DevCommand {
     
     /// Execute the dev command
     pub fn execute(&mut self) -> CliResult<()> {
-        println!("{} Starting RustyUI development mode...", style("🚀").blue());
+        println!("{} Starting RustyUI development mode...", style("").blue());
         
         // Initialize workflow manager for seamless integration
         let mut workflow_manager = crate::workflow::WorkflowManager::new(self.path.clone())?;
@@ -58,35 +58,35 @@ impl DevCommand {
     /// Show development mode information
     fn show_dev_info(&self, config: &rustyui_core::DualModeConfig) -> CliResult<()> {
         println!("\n{}", style("Development Mode Configuration:").bold());
-        println!("  Framework: {}", style(&format!("{:?}", config.framework)).cyan());
-        println!("  Watch paths: {:?}", config.watch_paths);
+        println!("Framework: {}", style(&format!("{:?}", config.framework)).cyan());
+        println!("Watch paths: {:?}", config.watch_paths);
         
         #[cfg(feature = "dev-ui")]
         {
-            println!("  Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
-            println!("  JIT threshold: {}ms", config.development_settings.jit_compilation_threshold);
-            println!("  State preservation: {}", 
+            println!("Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
+            println!("JIT threshold: {}ms", config.development_settings.jit_compilation_threshold);
+            println!("State preservation: {}", 
                 if config.development_settings.state_preservation { 
                     style("enabled").green() 
                 } else { 
                     style("disabled").red() 
                 }
             );
-            println!("  Performance monitoring: {}", 
+            println!("Performance monitoring: {}", 
                 if config.development_settings.performance_monitoring { 
                     style("enabled").green() 
                 } else { 
                     style("disabled").red() 
                 }
             );
-            println!("  Change detection delay: {}ms", config.development_settings.change_detection_delay_ms);
+            println!("Change detection delay: {}ms", config.development_settings.change_detection_delay_ms);
         }
         
         if let Some(port) = self.port {
-            println!("  Port: {}", style(port.to_string()).cyan());
+            println!("Port: {}", style(port.to_string()).cyan());
         }
         
-        println!("  File watching: {}", 
+        println!("File watching: {}", 
             if self.watch { 
                 style("enabled").green() 
             } else { 
@@ -95,15 +95,15 @@ impl DevCommand {
         );
         
         println!("\n{}", style("Features:").bold());
-        println!("  🔥 Instant hot reload for UI changes");
-        println!("  💾 State preservation across code changes");
-        println!("  📊 Performance monitoring and metrics");
-        println!("  🔍 File watching for automatic updates");
-        println!("  🛡️  Safe runtime code evaluation");
+        println!("Instant hot reload for UI changes");
+        println!("💾 State preservation across code changes");
+        println!("Performance monitoring and metrics");
+        println!("File watching for automatic updates");
+        println!("Safe runtime code evaluation");
         
         println!("\n{}", style("Controls:").bold());
-        println!("  Ctrl+C to stop development mode");
-        println!("  Edit your UI code and see instant changes!");
+        println!("Ctrl+C to stop development mode");
+        println!("Edit your UI code and see instant changes!");
         
         Ok(())
     }
@@ -120,8 +120,8 @@ impl DevCommand {
         #[cfg(not(feature = "dev-ui"))]
         {
             // Fallback to basic cargo run in production builds
-            println!("{} Development features not available in production build", style("⚠️").yellow());
-            println!("  Run with: cargo run --features dev-ui");
+            println!("{} Development features not available in production build", style("").yellow());
+            println!("Run with: cargo run --features dev-ui");
             
             let project_manager = ProjectManager::new(self.path.clone())?;
             project_manager.run_development(self.watch)
@@ -130,7 +130,7 @@ impl DevCommand {
     
     /// Start the development mode (legacy fallback)
     fn start_development_mode(&self, project_manager: &ProjectManager) -> CliResult<()> {
-        println!("\n{} Launching development server...", style("🔧").blue());
+        println!("\n{} Launching development server...", style("").blue());
         
         // For now, delegate to the project manager to run with dev-ui feature
         // In the future, this will integrate directly with the DualModeEngine
@@ -160,9 +160,9 @@ impl DevCommand {
         engine.start_development_mode()
             .map_err(|e| CliError::dev_mode(format!("Failed to start development mode: {}", e)))?;
         
-        println!("{} Development mode active!", style("✅").green());
-        println!("  🔥 Hot reload enabled - edit your UI code and see instant changes!");
-        println!("  📊 Performance monitoring: {}", 
+        println!("{} Development mode active!", style("").green());
+        println!("Hot reload enabled - edit your UI code and see instant changes!");
+        println!("Performance monitoring: {}", 
             if config.development_settings.performance_monitoring { 
                 style("enabled").green() 
             } else { 
@@ -171,9 +171,9 @@ impl DevCommand {
         );
         
         if self.watch {
-            println!("  👀 File watching active on {} paths", config.watch_paths.len());
+            println!("👀 File watching active on {} paths", config.watch_paths.len());
             for path in &config.watch_paths {
-                println!("     - {}", style(path.display()).dim());
+                println!("- {}", style(path.display()).dim());
             }
         }
         
@@ -200,11 +200,11 @@ impl DevCommand {
     /// Show mode-specific information and capabilities
     #[cfg(feature = "dev-ui")]
     fn show_mode_information(&self, engine: &rustyui_core::DualModeEngine) -> CliResult<()> {
-        println!("\n{} Mode Information:", style("ℹ️").blue());
+        println!("\n{} Mode Information:", style("").blue());
         
         // Current mode
-        println!("  Current mode: {}", style("Development").green());
-        println!("  Runtime interpreter: {}", 
+        println!("Current mode: {}", style("Development").green());
+        println!("Runtime interpreter: {}", 
             if engine.has_runtime_interpreter() { 
                 style("active").green() 
             } else { 
@@ -213,15 +213,15 @@ impl DevCommand {
         );
         
         // Platform capabilities
-        println!("  Platform: {:?}", engine.platform());
-        println!("  Native optimizations: {}", 
+        println!("Platform: {:?}", engine.platform());
+        println!("Native optimizations: {}", 
             if engine.is_using_native_optimizations() { 
                 style("enabled").green() 
             } else { 
                 style("disabled").yellow() 
             }
         );
-        println!("  JIT compilation: {}", 
+        println!("JIT compilation: {}", 
             if engine.jit_compilation_available() { 
                 style("available").green() 
             } else { 
@@ -231,20 +231,20 @@ impl DevCommand {
         
         // Memory and performance
         let memory_mb = engine.memory_overhead() as f64 / (1024.0 * 1024.0);
-        println!("  Memory overhead: {:.1} MB", memory_mb);
+        println!("Memory overhead: {:.1} MB", memory_mb);
         
         let expected_mb = engine.expected_memory_overhead() as f64 / (1024.0 * 1024.0);
-        println!("  Expected overhead: {:.1} MB", expected_mb);
+        println!("Expected overhead: {:.1} MB", expected_mb);
         
         // Health status
         let health = engine.get_health_status();
-        println!("  System health: {:?}", health);
+        println!("System health: {:?}", health);
         
         // Configuration validation
         if engine.can_interpret_changes() {
-            println!("  {} Ready for hot reload", style("✓").green());
+            println!("{} Ready for hot reload", style("✓").green());
         } else {
-            println!("  {} Hot reload not available", style("⚠").yellow());
+            println!("{} Hot reload not available", style("⚠").yellow());
         }
         
         Ok(())
@@ -259,8 +259,8 @@ impl DevCommand {
     ) -> CliResult<()> {
         use std::time::{Duration, Instant};
         
-        println!("\n{} Development server running...", style("🌟").green());
-        println!("  Press Ctrl+C to stop");
+        println!("\n{} Development server running...", style("").green());
+        println!("Press Ctrl+C to stop");
         
         let mut last_stats_report = Instant::now();
         let stats_interval = Duration::from_secs(30); // Report stats every 30 seconds
@@ -302,12 +302,11 @@ impl DevCommand {
         engine: &mut rustyui_core::DualModeEngine, 
         analysis: rustyui_core::change_analyzer::AnalysisResult
     ) -> CliResult<()> {
-        use console::Emoji;
+        use console::style;
         
         let start_time = std::time::Instant::now();
         
-        println!("\n{} Processing {} file changes...", 
-            Emoji("🔄", "->"), 
+        println!("\nProcessing {} file changes...", 
             analysis.analyzed_changes.len()
         );
         
@@ -322,7 +321,7 @@ impl DevCommand {
             let content = match std::fs::read_to_string(&change.path) {
                 Ok(content) => content,
                 Err(e) => {
-                    println!("  {} Failed to read {}: {}", 
+                    println!("{} Failed to read {}: {}", 
                         style("✗").red(), 
                         change.path.display(), 
                         e
@@ -342,7 +341,7 @@ impl DevCommand {
                 Ok(result) => {
                     successful_interpretations += 1;
                     
-                    println!("  {} {} ({:?})", 
+                    println!("{} {} ({:?})", 
                         style("✓").green(),
                         change.path.display(),
                         result.execution_time
@@ -352,7 +351,7 @@ impl DevCommand {
                     if matches!(analyzed_change.classification.priority, 
                         rustyui_core::change_analyzer::ChangePriority::Critical | 
                         rustyui_core::change_analyzer::ChangePriority::High) {
-                        println!("    Priority: {:?}, Impact: {:?}", 
+                        println!("Priority: {:?}, Impact: {:?}", 
                             analyzed_change.classification.priority,
                             analyzed_change.impact.scope // Fixed field access
                         );
@@ -361,7 +360,7 @@ impl DevCommand {
                 Err(e) => {
                     failed_interpretations += 1;
                     
-                    println!("  {} {} - {}", 
+                    println!("{} {} - {}", 
                         style("✗").red(),
                         change.path.display(),
                         e
@@ -373,11 +372,10 @@ impl DevCommand {
         let total_time = start_time.elapsed();
         
         // Report results
-        println!("\n{} Hot reload completed in {:?}", 
-            Emoji("🎉", "Done"), 
+        println!("\nHot reload completed in {:?}", 
             total_time
         );
-        println!("  {} successful, {} failed", 
+        println!("{} successful, {} failed", 
             style(successful_interpretations.to_string()).green(),
             if failed_interpretations > 0 { 
                 style(failed_interpretations.to_string()).red() 
@@ -388,15 +386,14 @@ impl DevCommand {
         
         // Check if full reload is needed
         if analysis.requires_full_reload {
-            println!("  {} Full application reload recommended", 
-                style("⚠️").yellow()
+            println!("{} Full application reload recommended", 
+                style("").yellow()
             );
         }
         
         // Report cascade updates
         if !analysis.cascade_updates.is_empty() {
-            println!("  {} {} cascade updates triggered", 
-                Emoji("🔗", "->"),
+            println!("{} cascade updates triggered", 
                 analysis.cascade_updates.len()
             );
         }
@@ -407,33 +404,33 @@ impl DevCommand {
     /// Report performance statistics
     #[cfg(feature = "dev-ui")]
     fn report_performance_stats(&self, engine: &rustyui_core::DualModeEngine) {
-        println!("\n{} Performance Report:", style("📊").blue());
+        println!("\n{} Performance Report:", style("").blue());
         
         // Memory overhead
         let memory_mb = engine.memory_overhead() as f64 / (1024.0 * 1024.0);
-        println!("  Memory overhead: {:.1} MB", memory_mb);
+        println!("Memory overhead: {:.1} MB", memory_mb);
         
         // File watching stats
         if let Some(stats) = engine.get_file_watching_stats() {
-            println!("  File watching:");
-            println!("    Events processed: {}", stats.total_events);
-            println!("    Average response time: {:?}", stats.average_processing_time());
-            println!("    Performance target: {}", 
+            println!("File watching:");
+            println!("Events processed: {}", stats.total_events);
+            println!("Average response time: {:?}", stats.average_processing_time());
+            println!("Performance target: {}", 
                 if stats.meets_performance_targets() { 
                     style("✓ Met (<50ms)").green() 
                 } else { 
                     style("✗ Exceeded (>50ms)").red() 
                 }
             );
-            println!("    Debounced events: {}", stats.debounced_events);
+            println!("Debounced events: {}", stats.debounced_events);
         }
         
         // Analysis stats
         if let Some(stats) = engine.get_analysis_stats() {
-            println!("  Change analysis:");
-            println!("    Total analyses: {}", stats.total_analyses);
-            println!("    Average analysis time: {:?}", stats.average_analysis_time());
-            println!("    Cache hit rate: {:.1}%", stats.cache_hit_rate() * 100.0);
+            println!("Change analysis:");
+            println!("Total analyses: {}", stats.total_analyses);
+            println!("Average analysis time: {:?}", stats.average_analysis_time());
+            println!("Cache hit rate: {:.1}%", stats.cache_hit_rate() * 100.0);
         }
     }
     

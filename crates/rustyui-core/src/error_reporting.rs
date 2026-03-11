@@ -221,10 +221,10 @@ impl ErrorReporter {
     /// Output error to console
     fn output_to_console(&self, error_log: &ErrorLog) {
         let severity_icon = match error_log.severity {
-            ErrorSeverity::Critical => "🚨",
-            ErrorSeverity::High => "❌",
-            ErrorSeverity::Medium => "⚠️",
-            ErrorSeverity::Low => "ℹ️",
+            ErrorSeverity::Critical => "",
+            ErrorSeverity::High => "",
+            ErrorSeverity::Medium => "",
+            ErrorSeverity::Low => "",
         };
         
         println!("{} {} Error: {}", 
@@ -233,10 +233,10 @@ impl ErrorReporter {
                 error_log.error_message);
         
         if let Some(ref component_id) = error_log.context.component_id {
-            println!("  Component: {}", component_id);
+            println!("Component: {}", component_id);
         }
         
-        println!("  Operation: {}", error_log.context.operation.as_str());
+        println!("Operation: {}", error_log.context.operation.as_str());
         
         if self.config.show_suggestions {
             self.show_suggestions_for_error(error_log);
@@ -280,9 +280,9 @@ impl ErrorReporter {
         
         if let Some(pattern) = self.error_patterns.get(&pattern_key) {
             if !pattern.suggested_fixes.is_empty() {
-                println!("💡 Suggestions:");
+                println!("Suggestions:");
                 for (i, fix) in pattern.suggested_fixes.iter().enumerate() {
-                    println!("  {}. {}", i + 1, fix);
+                    println!("{}. {}", i + 1, fix);
                 }
             }
         }
@@ -359,7 +359,7 @@ impl ErrorReporter {
         
         if !problematic_components.is_empty() {
             recommendations.push(format!("Review these components with frequent errors: {}", 
-                                       problematic_components.join(", ")));
+                                       problematic_components.join(",")));
         }
         
         recommendations

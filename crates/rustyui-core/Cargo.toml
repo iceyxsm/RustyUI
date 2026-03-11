@@ -24,6 +24,7 @@ rhai = { version = "1.16", optional = true }
 notify = { workspace = true, optional = true }
 notify-debouncer-mini = { workspace = true, optional = true }
 num_cpus = { workspace = true }
+regex = { version = "1.10", optional = true }
 
 # Cross-platform system dependencies
 [target.'cfg(windows)'.dependencies]
@@ -46,7 +47,8 @@ dev-ui = [
     "notify",
     "notify-debouncer-mini",
     "rustyui-interpreter",
-    "rustyui-interpreter/dev-ui"
+    "rustyui-interpreter/dev-ui",
+    "regex"
 ]
 
 # Platform-specific features

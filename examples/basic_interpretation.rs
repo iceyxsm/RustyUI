@@ -36,10 +36,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         match engine.interpret_ui_change(ui_code, Some("button1".to_string())) {
             Ok(result) => {
                 println!("✓ Interpretation successful!");
-                println!("  Execution time: {:?}", result.execution_time);
-                println!("  Success: {}", result.success);
+                println!("Execution time: {:?}", result.execution_time);
+                println!("Success: {}", result.success);
                 if let Some(error) = result.error_message {
-                    println!("  Error: {}", error);
+                    println!("Error: {}", error);
                 }
             }
             Err(e) => {
@@ -65,7 +65,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         match engine.interpret_ui_change(complex_ui_code, Some("main_layout".to_string())) {
             Ok(result) => {
                 println!("✓ Complex UI interpretation successful!");
-                println!("  Execution time: {:?}", result.execution_time);
+                println!("Execution time: {:?}", result.execution_time);
             }
             Err(e) => {
                 println!("✗ Complex UI interpretation failed: {}", e);

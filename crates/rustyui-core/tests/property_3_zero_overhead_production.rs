@@ -523,10 +523,10 @@ proptest! {
                 "Production binary should not contain development marker: {}", marker);
         }
         
-        println!("✅ Property 3 verified for config: {:?}, complexity: {:?}", config, complexity);
-        println!("   Production: {} bytes, {:?} execution", 
+        println!("Property 3 verified for config: {:?}, complexity: {:?}", config, complexity);
+        println!("Production: {} bytes, {:?} execution", 
             prod_result.binary_size, prod_benchmark.execution_time);
-        println!("   Development: {} bytes, {:?} execution", 
+        println!("Development: {} bytes, {:?} execution", 
             dev_result.binary_size, dev_benchmark.execution_time);
     }
 }

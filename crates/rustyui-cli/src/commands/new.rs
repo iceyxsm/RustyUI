@@ -25,7 +25,7 @@ impl NewCommand {
     
     /// Execute the new command
     pub fn execute(&mut self) -> CliResult<()> {
-        println!("{} Creating new RustyUI project '{}'...", style("🚀").blue(), self.name);
+        println!("{} Creating new RustyUI project '{}'...", style("").blue(), self.name);
         
         // Validate project name
         self.validate_project_name()?;
@@ -94,23 +94,23 @@ impl NewCommand {
     
     /// Show final success message
     fn show_success_message(&self, _project_path: &PathBuf) -> CliResult<()> {
-        println!("\n{} Successfully created RustyUI project '{}'!", style("🎉").green(), self.name);
+        println!("\n{} Successfully created RustyUI project '{}'!", style("").green(), self.name);
         println!("\n{}", style("Get started:").bold());
-        println!("  {}", style(format!("cd {}", self.name)).cyan());
-        println!("  {}", style("rustyui dev").cyan());
+        println!("{}", style(format!("cd {}", self.name)).cyan());
+        println!("{}", style("rustyui dev").cyan());
         println!("\n{}", style("Project structure:").bold());
-        println!("  {}/", self.name);
-        println!("  ├── src/");
-        println!("  │   └── main.rs      # Main application with hot reload");
-        println!("  ├── rustyui.toml     # RustyUI configuration");
-        println!("  ├── Cargo.toml       # Rust dependencies");
-        println!("  └── README.md        # Project documentation");
+        println!("{}/", self.name);
+        println!("├── src/");
+        println!("│   └── main.rs      # Main application with hot reload");
+        println!("├── rustyui.toml     # RustyUI configuration");
+        println!("├── Cargo.toml       # Rust dependencies");
+        println!("└── README.md        # Project documentation");
         
         println!("\n{}", style("Features enabled:").bold());
-        println!("  🔥 Instant hot reload for {} UI", self.framework);
-        println!("  💾 State preservation across changes");
-        println!("  🚀 Zero overhead production builds");
-        println!("  📝 Example code ready to run");
+        println!("Instant hot reload for {} UI", self.framework);
+        println!("💾 State preservation across changes");
+        println!("Zero overhead production builds");
+        println!("📝 Example code ready to run");
         
         Ok(())
     }

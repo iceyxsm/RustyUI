@@ -127,7 +127,7 @@ impl ProductionVerifier {
     
     /// Run complete production build verification
     pub fn verify_production_build(&mut self) -> Result<&VerificationResults> {
-        println!("🔍 Starting production build verification...");
+        println!("Starting production build verification...");
         
         // Step 1: Verify conditional compilation
         self.verify_conditional_compilation()?;
@@ -144,14 +144,14 @@ impl ProductionVerifier {
         // Step 5: Generate overall assessment
         self.generate_overall_assessment();
         
-        println!("✅ Production build verification completed");
+        println!("Production build verification completed");
         
         Ok(&self.verification_results)
     }
     
     /// Verify that conditional compilation is working correctly
     fn verify_conditional_compilation(&mut self) -> Result<()> {
-        println!("  🔧 Verifying conditional compilation...");
+        println!("Verifying conditional compilation...");
         
         // Build with dev-ui feature
         let dev_build_result = self.build_with_features(&["dev-ui"])?;
@@ -167,9 +167,9 @@ impl ProductionVerifier {
         self.verification_results.conditional_compilation_ok = dev_has_markers && !prod_has_markers;
         
         if self.verification_results.conditional_compilation_ok {
-            println!("    ✅ Conditional compilation working correctly");
+            println!("Conditional compilation working correctly");
         } else {
-            println!("    ❌ Conditional compilation issues detected");
+            println!("Conditional compilation issues detected");
         }
         
         Ok(())
@@ -177,7 +177,7 @@ impl ProductionVerifier {
     
     /// Compare binary sizes between RustyUI and standard Rust builds
     fn compare_binary_sizes(&mut self) -> Result<()> {
-        println!("  📏 Comparing binary sizes...");
+        println!("📏 Comparing binary sizes...");
         
         // Build RustyUI production binary
         let rustyui_build = self.build_rustyui_production()?;
@@ -208,14 +208,14 @@ impl ProductionVerifier {
             size_acceptable,
         };
         
-        println!("    RustyUI size: {} bytes", rustyui_size);
-        println!("    Standard size: {} bytes", standard_size);
-        println!("    Difference: {:.2}%", size_diff_percent);
+        println!("RustyUI size: {} bytes", rustyui_size);
+        println!("Standard size: {} bytes", standard_size);
+        println!("Difference: {:.2}%", size_diff_percent);
         
         if size_acceptable {
-            println!("    ✅ Binary size within acceptable limits");
+            println!("Binary size within acceptable limits");
         } else {
-            println!("    ⚠️ Binary size difference exceeds 5%");
+            println!("Binary size difference exceeds 5%");
         }
         
         Ok(())
@@ -223,7 +223,7 @@ impl ProductionVerifier {
     
     /// Compare performance between RustyUI and standard Rust builds
     fn compare_performance(&mut self) -> Result<()> {
-        println!("  ⚡ Comparing performance...");
+        println!("⚡ Comparing performance...");
         
         // Build both versions
         let rustyui_build = self.build_rustyui_production()?;
@@ -250,14 +250,14 @@ impl ProductionVerifier {
             performance_acceptable: perf_acceptable,
         };
         
-        println!("    RustyUI benchmark: {:.2}ms", rustyui_perf.benchmark_time_ms);
-        println!("    Standard benchmark: {:.2}ms", standard_perf.benchmark_time_ms);
-        println!("    Performance difference: {:.2}%", perf_diff);
+        println!("RustyUI benchmark: {:.2}ms", rustyui_perf.benchmark_time_ms);
+        println!("Standard benchmark: {:.2}ms", standard_perf.benchmark_time_ms);
+        println!("Performance difference: {:.2}%", perf_diff);
         
         if perf_acceptable {
-            println!("    ✅ Performance within acceptable limits");
+            println!("Performance within acceptable limits");
         } else {
-            println!("    ⚠️ Performance difference exceeds 2%");
+            println!("Performance difference exceeds 2%");
         }
         
         Ok(())
@@ -265,7 +265,7 @@ impl ProductionVerifier {
     
     /// Verify that development features are stripped from production builds
     fn verify_feature_stripping(&mut self) -> Result<()> {
-        println!("  🔒 Verifying feature stripping...");
+        println!("🔒 Verifying feature stripping...");
         
         let prod_build = self.build_rustyui_production()?;
         
@@ -283,14 +283,14 @@ impl ProductionVerifier {
         };
         
         if all_stripped {
-            println!("    ✅ All development features stripped successfully");
+            println!("All development features stripped successfully");
         } else {
-            println!("    ⚠️ Development features found in production build:");
+            println!("Development features found in production build:");
             for feature in &dev_features {
-                println!("      - Feature: {}", feature);
+                println!("- Feature: {}", feature);
             }
             for symbol in &dev_symbols {
-                println!("      - Symbol: {}", symbol);
+                println!("- Symbol: {}", symbol);
             }
         }
         
@@ -323,26 +323,26 @@ impl ProductionVerifier {
         report.push_str(&format!("## Overall Status: {:?}\n\n", status));
         
         report.push_str("## Conditional Compilation\n");
-        report.push_str(&format!("- Status: {}\n", if compilation_ok { "✅ PASS" } else { "❌ FAIL" }));
+        report.push_str(&format!("- Status: {}\n", if compilation_ok { " PASS" } else { " FAIL" }));
         report.push_str(&format!("- Development features properly gated: {}\n\n", compilation_ok));
         
         report.push_str("## Binary Size Analysis\n");
         let size_results = &self.verification_results.binary_size_results;
-        report.push_str(&format!("- Status: {}\n", if size_ok { "✅ PASS" } else { "⚠️ WARN" }));
+        report.push_str(&format!("- Status: {}\n", if size_ok { " PASS" } else { " WARN" }));
         report.push_str(&format!("- RustyUI production size: {} bytes\n", size_results.rustyui_production_size));
         report.push_str(&format!("- Standard Rust size: {} bytes\n", size_results.standard_rust_size));
         report.push_str(&format!("- Size difference: {:.2}%\n\n", size_results.size_difference_percent));
         
         report.push_str("## Performance Analysis\n");
         let perf_results = &self.verification_results.performance_results;
-        report.push_str(&format!("- Status: {}\n", if perf_ok { "✅ PASS" } else { "⚠️ WARN" }));
+        report.push_str(&format!("- Status: {}\n", if perf_ok { " PASS" } else { " WARN" }));
         report.push_str(&format!("- RustyUI benchmark: {:.2}ms\n", perf_results.rustyui_performance.benchmark_time_ms));
         report.push_str(&format!("- Standard benchmark: {:.2}ms\n", perf_results.standard_performance.benchmark_time_ms));
         report.push_str(&format!("- Performance difference: {:.2}%\n\n", perf_results.performance_difference_percent));
         
         report.push_str("## Feature Stripping Analysis\n");
         let feature_results = &self.verification_results.feature_stripping_results;
-        report.push_str(&format!("- Status: {}\n", if features_ok { "✅ PASS" } else { "❌ FAIL" }));
+        report.push_str(&format!("- Status: {}\n", if features_ok { " PASS" } else { " FAIL" }));
         report.push_str(&format!("- Development features found: {}\n", feature_results.dev_features_found.len()));
         report.push_str(&format!("- Development symbols found: {}\n", feature_results.dev_symbols_found.len()));
         
@@ -356,10 +356,10 @@ impl ProductionVerifier {
         report.push_str("\n## Recommendations\n");
         match status {
             VerificationStatus::ZeroOverheadConfirmed => {
-                report.push_str("- ✅ Zero overhead confirmed! Production builds are optimal.\n");
+                report.push_str("-  Zero overhead confirmed! Production builds are optimal.\n");
             }
             VerificationStatus::MinorOverheadDetected => {
-                report.push_str("- ⚠️ Minor overhead detected. Consider optimization.\n");
+                report.push_str("-  Minor overhead detected. Consider optimization.\n");
                 if !size_ok {
                     report.push_str("- Consider binary size optimization techniques.\n");
                 }
@@ -368,12 +368,12 @@ impl ProductionVerifier {
                 }
             }
             VerificationStatus::SignificantOverheadDetected => {
-                report.push_str("- ❌ Significant overhead detected. Investigation required.\n");
+                report.push_str("-  Significant overhead detected. Investigation required.\n");
                 report.push_str("- Review conditional compilation implementation.\n");
                 report.push_str("- Analyze remaining development code in production builds.\n");
             }
             VerificationStatus::VerificationFailed => {
-                report.push_str("- ❌ Verification failed. Critical issues detected.\n");
+                report.push_str("-  Verification failed. Critical issues detected.\n");
                 report.push_str("- Fix conditional compilation issues immediately.\n");
                 report.push_str("- Ensure development features are properly gated.\n");
             }
@@ -613,7 +613,7 @@ panic = "abort"
         
         // Parse Cargo.toml to get package name (simplified)
         for line in cargo_content.lines() {
-            if line.trim().starts_with("name = ") {
+            if line.trim().starts_with("name =") {
                 if let Some(name) = line.split('=').nth(1) {
                     let name = name.trim().trim_matches('"');
                     return Ok(name.to_string());

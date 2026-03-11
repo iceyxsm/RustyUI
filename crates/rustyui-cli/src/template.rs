@@ -76,7 +76,7 @@ impl eframe::App for MyApp {
             ui.heading("RustyUI egui Example");
             
             ui.horizontal(|ui| {
-                let name_label = ui.label("Your name: ");
+                let name_label = ui.label("Your name:");
                 ui.text_edit_singleline(&mut self.name)
                     .labelled_by(name_label.id);
             });
@@ -92,7 +92,7 @@ impl eframe::App for MyApp {
             #[cfg(feature = "dev-ui")]
             {
                 ui.separator();
-                ui.label("🔥 Hot reload is active! Edit this code and see instant changes.");
+                ui.label(" Hot reload is active! Edit this code and see instant changes.");
             }
         });
     }
@@ -187,7 +187,7 @@ impl Application for MyApp {
         #[cfg(feature = "dev-ui")]
         let content = column![
             content,
-            text("🔥 Hot reload is active! Edit this code and see instant changes.")
+            text(" Hot reload is active! Edit this code and see instant changes.")
                 .size(14)
         ]
         .spacing(10);
@@ -268,7 +268,7 @@ export component AppWindow inherits Window {
         }
         
         @if (debug) : Text {
-            text: "🔥 Hot reload is active! Edit this code and see instant changes.";
+            text: " Hot reload is active! Edit this code and see instant changes.";
             font-size: 12px;
         }
     }
@@ -343,7 +343,7 @@ fn main() {
         </div>
         <p id="greet-msg"></p>
         <p style="font-size: 12px; color: #666;">
-            🔥 Hot reload is active! Edit the Rust code and see instant changes.
+             Hot reload is active! Edit the Rust code and see instant changes.
         </p>
     </div>
     
@@ -415,11 +415,11 @@ A RustyUI project using {framework} with instant hot reload capabilities.
 
 ## Features
 
-- 🔥 **Instant Hot Reload**: 0ms compilation time for UI changes during development
-- 🚀 **Zero Production Overhead**: Native Rust performance with no runtime penalties
-- 🎯 **Framework Agnostic**: Works with {framework} and other Rust UI frameworks
+-  **Instant Hot Reload**: 0ms compilation time for UI changes during development
+-  **Zero Production Overhead**: Native Rust performance with no runtime penalties
+-  **Framework Agnostic**: Works with {framework} and other Rust UI frameworks
 - 💾 **State Preservation**: Application state maintained across code changes
-- 🔄 **Seamless Transition**: Same codebase for development and production
+-  **Seamless Transition**: Same codebase for development and production
 
 ## Getting Started
 

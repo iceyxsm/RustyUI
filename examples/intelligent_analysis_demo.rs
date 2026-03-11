@@ -25,11 +25,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("Development mode started with change analysis");
         println!("Watching paths: {:?}", engine.config().watch_paths);
         println!("\nChange Classification System:");
-        println!("  Critical: Cargo.toml, core configuration files");
-        println!("  High: .rs files, rustyui.toml, CSS/SCSS");
-        println!("  Medium: JSON data files");
-        println!("  Low: Assets (PNG, SVG, etc.)");
-        println!("  Very Low: Documentation (.md files)");
+        println!("Critical: Cargo.toml, core configuration files");
+        println!("High: .rs files, rustyui.toml, CSS/SCSS");
+        println!("Medium: JSON data files");
+        println!("Low: Assets (PNG, SVG, etc.)");
+        println!("Very Low: Documentation (.md files)");
         println!("\nTry editing different file types to see classification!");
         println!("Press Ctrl+C to exit\n");
         
@@ -74,14 +74,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     );
                     
                     // Show analysis details
-                    println!("  Analysis:");
-                    println!("    Priority: {:?}", analyzed_change.classification.priority);
-                    println!("    Requires interpretation: {}", analyzed_change.classification.requires_interpretation);
-                    println!("    Affects layout: {}", analyzed_change.classification.affects_layout);
-                    println!("    Affects styling: {}", analyzed_change.classification.affects_styling);
-                    println!("    Impact scope: {:?}", analyzed_change.impact.scope);
-                    println!("    Estimated update time: {:?}", analyzed_change.impact.estimated_update_time);
-                    println!("    Processing order: {}", analyzed_change.processing_order);
+                    println!("Analysis:");
+                    println!("Priority: {:?}", analyzed_change.classification.priority);
+                    println!("Requires interpretation: {}", analyzed_change.classification.requires_interpretation);
+                    println!("Affects layout: {}", analyzed_change.classification.affects_layout);
+                    println!("Affects styling: {}", analyzed_change.classification.affects_styling);
+                    println!("Impact scope: {:?}", analyzed_change.impact.scope);
+                    println!("Estimated update time: {:?}", analyzed_change.impact.estimated_update_time);
+                    println!("Processing order: {}", analyzed_change.processing_order);
                     
                     // Count priority changes
                     match analyzed_change.classification.priority {
@@ -111,10 +111,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                         
                         match engine.interpret_ui_change(&ui_code, Some("change_analysis".to_string())) {
                             Ok(result) => {
-                                println!("    UI interpreted in {:?}", result.execution_time);
+                                println!("UI interpreted in {:?}", result.execution_time);
                             }
                             Err(e) => {
-                                println!("    UI interpretation failed: {}", e);
+                                println!("UI interpretation failed: {}", e);
                             }
                         }
                     }
@@ -133,7 +133,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Cascade Updates: {} files will be updated automatically", 
                         analysis.cascade_updates.len());
                     for cascade in &analysis.cascade_updates {
-                        println!("  {} -> {} ({:?})", 
+                        println!("{} -> {} ({:?})", 
                             cascade.source_file.file_name().unwrap_or_default().to_string_lossy(),
                             cascade.affected_file.file_name().unwrap_or_default().to_string_lossy(),
                             cascade.update_type
@@ -153,10 +153,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             if start_time.elapsed().as_secs() % 5 == 0 && start_time.elapsed().as_millis() % 5000 < 100 {
                 if let Some(analysis_stats) = engine.get_analysis_stats() {
                     println!("\nAnalysis Performance Stats:");
-                    println!("  Total analyses: {}", analysis_stats.total_analyses);
-                    println!("  Average analysis time: {:?}", analysis_stats.average_analysis_time());
-                    println!("  Meets targets (<10ms): {}", analysis_stats.meets_performance_targets());
-                    println!("  Changes processed: {}\n", analysis_stats.changes_processed);
+                    println!("Total analyses: {}", analysis_stats.total_analyses);
+                    println!("Average analysis time: {:?}", analysis_stats.average_analysis_time());
+                    println!("Meets targets (<10ms): {}", analysis_stats.meets_performance_targets());
+                    println!("Changes processed: {}\n", analysis_stats.changes_processed);
                 }
             }
             
@@ -166,29 +166,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         println!("\nChange Analysis Demo Completed!");
         println!("Final Statistics:");
-        println!("  Total changes analyzed: {}", total_changes);
-        println!("  Critical priority changes: {}", critical_changes);
-        println!("  High priority changes: {}", high_priority_changes);
+        println!("Total changes analyzed: {}", total_changes);
+        println!("Critical priority changes: {}", critical_changes);
+        println!("High priority changes: {}", high_priority_changes);
         
         if let Some(analysis_stats) = engine.get_analysis_stats() {
             println!("\nAnalysis Performance Report:");
-            println!("  Total analyses: {}", analysis_stats.total_analyses);
-            println!("  Average analysis time: {:?}", analysis_stats.average_analysis_time());
-            println!("  Performance target met: {}", analysis_stats.meets_performance_targets());
-            println!("  Total changes processed: {}", analysis_stats.changes_processed);
+            println!("Total analyses: {}", analysis_stats.total_analyses);
+            println!("Average analysis time: {:?}", analysis_stats.average_analysis_time());
+            println!("Performance target met: {}", analysis_stats.meets_performance_targets());
+            println!("Total changes processed: {}", analysis_stats.changes_processed);
             
             if analysis_stats.meets_performance_targets() {
-                println!("  Performance targets met successfully");
+                println!("Performance targets met successfully");
             } else {
-                println!("  Analysis performance could be improved");
+                println!("Analysis performance could be improved");
             }
         }
         
         if let Some(watch_stats) = engine.get_file_watching_stats() {
             println!("\nFile Watching Performance:");
-            println!("  Events processed: {}", watch_stats.total_events);
-            println!("  Average response time: {:?}", watch_stats.average_processing_time());
-            println!("  Meets response targets: {}", watch_stats.meets_performance_targets());
+            println!("Events processed: {}", watch_stats.total_events);
+            println!("Average response time: {:?}", watch_stats.average_processing_time());
+            println!("Meets response targets: {}", watch_stats.meets_performance_targets());
         }
     }
     

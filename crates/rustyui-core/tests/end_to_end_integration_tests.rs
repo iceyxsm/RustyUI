@@ -188,7 +188,7 @@ fn test_complete_workflow_integration() {
     let mut fixture = IntegrationTestFixture::new();
     
     // Step 1: Initialize project (simulating `rustyui init`)
-    println!("🚀 Step 1: Project Initialization");
+    println!("Step 1: Project Initialization");
     
     // Create Cargo.toml
     let cargo_toml = r#"[package]
@@ -224,13 +224,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     #[cfg(feature = "dev-ui")]
     {
-        println!("🔥 Development mode with hot reload enabled!");
+        println!("Development mode with hot reload enabled!");
         engine.start_development_mode()?;
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("🚀 Production mode - zero overhead!");
+        println!("Production mode - zero overhead!");
     }
     
     Ok(())
@@ -239,7 +239,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     fixture.create_test_component_file("main.rs", main_rs);
     
     // Step 2: Development mode initialization
-    println!("🔥 Step 2: Development Mode Initialization");
+    println!("Step 2: Development Mode Initialization");
     
     fixture.initialize_engine().expect("Engine initialization should succeed");
     let engine = fixture.engine.as_ref().unwrap();
@@ -297,7 +297,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     // Step 4: Production build verification
-    println!("🚀 Step 4: Production Build Verification");
+    println!("Step 4: Production Build Verification");
     
     // Simulate production build (without dev-ui feature)
     let verifier = ProductionVerifier::new();
@@ -310,7 +310,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     assert!(results.has_zero_overhead(), "Production build should have zero overhead");
     assert!(!results.contains_dev_features(), "Production build should not contain dev features");
     
-    println!("✅ Complete workflow integration test passed!");
+    println!("Complete workflow integration test passed!");
 }
 // ============================================================================
 // Test 2: State Preservation Across Interpretation Cycles
@@ -325,7 +325,7 @@ fn test_state_preservation_across_interpretation_cycles() {
     let mut fixture = IntegrationTestFixture::new();
     fixture.initialize_engine().expect("Engine initialization should succeed");
     
-    println!("🔄 Testing State Preservation Across Interpretation Cycles");
+    println!("Testing State Preservation Across Interpretation Cycles");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -344,7 +344,7 @@ fn test_state_preservation_across_interpretation_cycles() {
             .expect("Should register component");
         
         // Cycle 1: Preserve initial state
-        println!("  📸 Cycle 1: Preserving initial state");
+        println!("📸 Cycle 1: Preserving initial state");
         let initial_state = test_component.hot_reload_state();
         engine.preserve_component_state(component_id, initial_state.clone())
             .expect("Should preserve initial state");
@@ -354,13 +354,13 @@ fn test_state_preservation_across_interpretation_cycles() {
         test_component.add_item("Another Item".to_string());
         
         // Cycle 2: Preserve modified state
-        println!("  📸 Cycle 2: Preserving modified state");
+        println!("📸 Cycle 2: Preserving modified state");
         let modified_state = test_component.hot_reload_state();
         engine.preserve_component_state(component_id, modified_state.clone())
             .expect("Should preserve modified state");
         
         // Simulate hot reload - restore state
-        println!("  🔄 Cycle 2: Restoring state after hot reload");
+        println!("Cycle 2: Restoring state after hot reload");
         let restored_state = engine.restore_component_state(component_id);
         assert!(restored_state.is_some(), "Should restore preserved state");
         
@@ -373,7 +373,7 @@ fn test_state_preservation_across_interpretation_cycles() {
         assert!(!restored_component.enabled, "Enabled state should be preserved");
         
         // Cycle 3: Test state preservation under rapid changes
-        println!("  ⚡ Cycle 3: Rapid state changes");
+        println!("⚡ Cycle 3: Rapid state changes");
         for i in 0..10 {
             restored_component.increment_counter();
             restored_component.add_item(format!("Rapid Item {}", i));
@@ -394,7 +394,7 @@ fn test_state_preservation_across_interpretation_cycles() {
         assert_eq!(final_component.items.len(), 14, "Final items should be preserved");
         
         // Test state preservation with serialization errors
-        println!("  ❌ Cycle 4: Error handling in state preservation");
+        println!("Cycle 4: Error handling in state preservation");
         
         // Attempt to preserve invalid state (should handle gracefully)
         let invalid_state = json!({"invalid": "structure"});
@@ -413,14 +413,14 @@ fn test_state_preservation_across_interpretation_cycles() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: State preservation disabled for zero overhead");
+        println!("Production mode: State preservation disabled for zero overhead");
         // In production mode, state preservation should be disabled
         let engine = fixture.engine.as_ref().unwrap();
         assert_eq!(engine.current_memory_overhead_bytes(), 0, 
             "Production mode should have zero memory overhead");
     }
     
-    println!("✅ State preservation across interpretation cycles test passed!");
+    println!("State preservation across interpretation cycles test passed!");
 }
 // ============================================================================
 // Test 3: Error Recovery and Graceful Degradation
@@ -435,14 +435,14 @@ fn test_error_recovery_and_graceful_degradation() {
     let mut fixture = IntegrationTestFixture::new();
     fixture.initialize_engine().expect("Engine initialization should succeed");
     
-    println!("🛡️ Testing Error Recovery and Graceful Degradation");
+    println!("️ Testing Error Recovery and Graceful Degradation");
     
     #[cfg(feature = "dev-ui")]
     {
         let mut engine = fixture.engine.take().unwrap();
         
         // Test 1: Interpretation Error Recovery
-        println!("  ❌ Test 1: Interpretation Error Recovery");
+        println!("Test 1: Interpretation Error Recovery");
         
         let invalid_ui_code = r#"
             this is not valid rust code!!!
@@ -453,9 +453,9 @@ fn test_error_recovery_and_graceful_degradation() {
         
         // Should handle interpretation errors gracefully
         match interpretation_result {
-            Ok(_) => println!("    ✅ Invalid code was handled gracefully"),
+            Ok(_) => println!("Invalid code was handled gracefully"),
             Err(error) => {
-                println!("    ✅ Interpretation error handled: {}", error);
+                println!("Interpretation error handled: {}", error);
                 
                 // System should remain stable after error
                 assert!(engine.get_health_status().is_healthy(), 
@@ -464,15 +464,15 @@ fn test_error_recovery_and_graceful_degradation() {
         }
         
         // Test 2: Component Registration Error Recovery
-        println!("  ❌ Test 2: Component Registration Error Recovery");
+        println!("Test 2: Component Registration Error Recovery");
         
         // Try to register component with invalid ID
         let invalid_registration = engine.register_component("".to_string(), "InvalidComponent".to_string());
         
         match invalid_registration {
-            Ok(_) => println!("    ✅ Invalid registration was handled gracefully"),
+            Ok(_) => println!("Invalid registration was handled gracefully"),
             Err(error) => {
-                println!("    ✅ Registration error handled: {}", error);
+                println!("Registration error handled: {}", error);
                 
                 // Verify error recovery metrics are updated
                 if let Some(recovery_metrics) = engine.get_error_recovery_metrics() {
@@ -483,7 +483,7 @@ fn test_error_recovery_and_graceful_degradation() {
         }
         
         // Test 3: State Preservation Error Recovery
-        println!("  ❌ Test 3: State Preservation Error Recovery");
+        println!("Test 3: State Preservation Error Recovery");
         
         // Create component and preserve valid state first
         engine.register_component("recovery_test".to_string(), "TestComponent".to_string())
@@ -507,9 +507,9 @@ fn test_error_recovery_and_graceful_degradation() {
         
         // Should handle invalid state gracefully
         match invalid_preserve_result {
-            Ok(_) => println!("    ✅ Invalid state preservation handled gracefully"),
+            Ok(_) => println!("Invalid state preservation handled gracefully"),
             Err(error) => {
-                println!("    ✅ State preservation error handled: {}", error);
+                println!("State preservation error handled: {}", error);
             }
         }
         
@@ -518,7 +518,7 @@ fn test_error_recovery_and_graceful_degradation() {
         assert!(restored_state.is_some(), "Should still be able to restore valid state");
         
         // Test 4: Memory Pressure Recovery
-        println!("  💾 Test 4: Memory Pressure Recovery");
+        println!("💾 Test 4: Memory Pressure Recovery");
         
         // Simulate memory pressure by creating many components
         for i in 0..100 {
@@ -535,14 +535,14 @@ fn test_error_recovery_and_graceful_degradation() {
         
         // Check memory overhead is still within bounds
         let memory_overhead = engine.current_memory_overhead_bytes();
-        println!("    📊 Memory overhead after stress test: {} MB", memory_overhead / (1024 * 1024));
+        println!("Memory overhead after stress test: {} MB", memory_overhead / (1024 * 1024));
         
         // Should still be under the 50MB limit (with some tolerance for test overhead)
         assert!(memory_overhead < 75 * 1024 * 1024, 
             "Memory overhead should remain reasonable under stress, got {} bytes", memory_overhead);
         
         // Test 5: Graceful Degradation Under Platform Limitations
-        println!("  🖥️ Test 5: Platform Limitation Handling");
+        println!("🖥️ Test 5: Platform Limitation Handling");
         
         // Test platform-specific capabilities
         let platform = engine.platform();
@@ -550,19 +550,19 @@ fn test_error_recovery_and_graceful_degradation() {
         
         match platform {
             Platform::Windows | Platform::MacOS | Platform::Linux => {
-                println!("    ✅ Running on supported platform: {:?}", platform);
+                println!("Running on supported platform: {:?}", platform);
                 
                 // Verify platform-specific optimizations are available
                 if platform_config.jit_capabilities.cranelift_available {
-                    println!("    ✅ JIT compilation available");
+                    println!("JIT compilation available");
                     assert!(engine.jit_compilation_available(), "JIT should be available");
                 } else {
-                    println!("    ⚠️ JIT compilation not available, graceful degradation expected");
+                    println!("JIT compilation not available, graceful degradation expected");
                     assert!(!engine.jit_compilation_available(), "JIT should not be available");
                 }
             }
             Platform::Unknown => {
-                println!("    ⚠️ Unknown platform, testing graceful degradation");
+                println!("Unknown platform, testing graceful degradation");
                 // System should still function with basic capabilities
                 assert!(engine.get_health_status().is_healthy(), 
                     "System should remain healthy on unknown platforms");
@@ -570,7 +570,7 @@ fn test_error_recovery_and_graceful_degradation() {
         }
         
         // Test 6: Error Isolation and Recovery
-        println!("  🔒 Test 6: Error Isolation and Recovery");
+        println!("🔒 Test 6: Error Isolation and Recovery");
         
         // Create multiple components to test error isolation
         for i in 0..5 {
@@ -590,8 +590,8 @@ fn test_error_recovery_and_graceful_degradation() {
             
             // These should still work despite error in isolation_test_2
             match result {
-                Ok(_) => println!("    ✅ Component {} remains functional after isolated error", i),
-                Err(e) => println!("    ⚠️ Component {} affected by error: {}", i, e),
+                Ok(_) => println!("Component {} remains functional after isolated error", i),
+                Err(e) => println!("Component {} affected by error: {}", i, e),
             }
         }
         
@@ -605,7 +605,7 @@ fn test_error_recovery_and_graceful_degradation() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Error recovery overhead eliminated for zero-cost abstractions");
+        println!("Production mode: Error recovery overhead eliminated for zero-cost abstractions");
         let engine = fixture.engine.as_ref().unwrap();
         
         // Production mode should have minimal error handling overhead
@@ -617,7 +617,7 @@ fn test_error_recovery_and_graceful_degradation() {
             "Production mode should maintain basic health status");
     }
     
-    println!("✅ Error recovery and graceful degradation test passed!");
+    println!("Error recovery and graceful degradation test passed!");
 }
 // ============================================================================
 // Test 4: Performance Bounds Validation and Optimization
@@ -642,7 +642,7 @@ fn test_performance_bounds_validation() {
         let mut engine = fixture.engine.take().unwrap();
         
         // Test 1: Interpretation Performance (<100ms target)
-        println!("  ⏱️ Test 1: Interpretation Performance Validation");
+        println!("⏱️ Test 1: Interpretation Performance Validation");
         
         let test_cases = vec![
             ("Simple UI update", "button.text = 'Updated';"),
@@ -673,7 +673,7 @@ fn test_performance_bounds_validation() {
             
             interpretation_times.push(interpretation_time);
             
-            println!("    📊 {}: {:?}", test_name, interpretation_time);
+            println!("{}: {:?}", test_name, interpretation_time);
             
             // Individual interpretation should be under 100ms
             assert!(interpretation_time < Duration::from_millis(100), 
@@ -681,21 +681,21 @@ fn test_performance_bounds_validation() {
             
             // Verify interpretation succeeded or failed gracefully
             match result {
-                Ok(_) => println!("      ✅ Interpretation succeeded"),
-                Err(e) => println!("      ⚠️ Interpretation handled gracefully: {}", e),
+                Ok(_) => println!("Interpretation succeeded"),
+                Err(e) => println!("Interpretation handled gracefully: {}", e),
             }
         }
         
         // Calculate average interpretation time
         let avg_time = interpretation_times.iter().sum::<Duration>() / interpretation_times.len() as u32;
-        println!("    📈 Average interpretation time: {:?}", avg_time);
+        println!("📈 Average interpretation time: {:?}", avg_time);
         
         // Average should be well under the 100ms target
         assert!(avg_time < Duration::from_millis(50), 
             "Average interpretation time should be under 50ms for optimal performance, got {:?}", avg_time);
         
         // Test 2: Change Detection Performance (<50ms target)
-        println!("  🔍 Test 2: Change Detection Performance");
+        println!("Test 2: Change Detection Performance");
         
         // Create test files to monitor
         let test_files = vec![
@@ -726,7 +726,7 @@ fn test_performance_bounds_validation() {
             
             detection_times.push(detection_time);
             
-            println!("    📊 Change detection for {}: {:?}", filename, detection_time);
+            println!("Change detection for {}: {:?}", filename, detection_time);
             
             // Change detection should be under 50ms
             assert!(detection_time < Duration::from_millis(50), 
@@ -736,21 +736,21 @@ fn test_performance_bounds_validation() {
             match changes_result {
                 Ok(changes) => {
                     if !changes.is_empty() {
-                        println!("      ✅ Changes detected: {} files", changes.len());
+                        println!("Changes detected: {} files", changes.len());
                     }
                 }
-                Err(e) => println!("      ⚠️ Change detection handled gracefully: {}", e),
+                Err(e) => println!("Change detection handled gracefully: {}", e),
             }
         }
         
         let avg_detection_time = detection_times.iter().sum::<Duration>() / detection_times.len() as u32;
-        println!("    📈 Average change detection time: {:?}", avg_detection_time);
+        println!("📈 Average change detection time: {:?}", avg_detection_time);
         
         // Test 3: Memory Usage Optimization (<50MB target)
-        println!("  💾 Test 3: Memory Usage Optimization");
+        println!("💾 Test 3: Memory Usage Optimization");
         
         let initial_memory = engine.current_memory_overhead_bytes();
-        println!("    📊 Initial memory overhead: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
+        println!("Initial memory overhead: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
         
         // Simulate realistic development session
         for i in 0..50 {
@@ -777,7 +777,7 @@ fn test_performance_bounds_validation() {
         }
         
         let final_memory = engine.current_memory_overhead_bytes();
-        println!("    📊 Final memory overhead: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("Final memory overhead: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
         
         // Memory should stay under 50MB even with many components
         assert!(final_memory < 50 * 1024 * 1024, 
@@ -785,14 +785,14 @@ fn test_performance_bounds_validation() {
             final_memory as f64 / (1024.0 * 1024.0));
         
         // Test 4: Performance Monitoring Accuracy
-        println!("  📈 Test 4: Performance Monitoring Accuracy");
+        println!("📈 Test 4: Performance Monitoring Accuracy");
         
         if let Some(metrics) = engine.get_performance_metrics() {
-            println!("    📊 Performance Metrics:");
-            println!("      - Total operations: {}", metrics.total_operations);
-            println!("      - Average interpretation time: {:?}", metrics.average_interpretation_time);
-            println!("      - Max interpretation time: {:?}", metrics.max_interpretation_time);
-            println!("      - Target violations: {}", metrics.target_violations);
+            println!("Performance Metrics:");
+            println!("- Total operations: {}", metrics.total_operations);
+            println!("- Average interpretation time: {:?}", metrics.average_interpretation_time);
+            println!("- Max interpretation time: {:?}", metrics.max_interpretation_time);
+            println!("- Target violations: {}", metrics.target_violations);
             
             // Verify metrics are reasonable
             assert!(metrics.total_operations > 0, "Should have recorded operations");
@@ -808,7 +808,7 @@ fn test_performance_bounds_validation() {
                 100.0
             };
             
-            println!("    📈 Performance efficiency: {:.1}%", efficiency);
+            println!("📈 Performance efficiency: {:.1}%", efficiency);
             
             // Should maintain high efficiency (>90%)
             assert!(efficiency >= 90.0, 
@@ -818,7 +818,7 @@ fn test_performance_bounds_validation() {
         }
         
         // Test 5: Incremental Compilation Optimization
-        println!("  🔄 Test 5: Incremental Compilation Optimization");
+        println!("Test 5: Incremental Compilation Optimization");
         
         // Test smart rebuild strategies
         let component_code = r#"
@@ -839,7 +839,7 @@ fn test_performance_bounds_validation() {
         let first_result = engine.interpret_ui_change(component_code, Some("incremental_test".to_string()));
         let first_compile_time = start_time.elapsed();
         
-        println!("    📊 First compilation time: {:?}", first_compile_time);
+        println!("First compilation time: {:?}", first_compile_time);
         
         // Second compilation (should be faster due to incremental compilation)
         let modified_code = r#"
@@ -861,17 +861,17 @@ fn test_performance_bounds_validation() {
         let second_result = engine.interpret_ui_change(modified_code, Some("incremental_test".to_string()));
         let second_compile_time = start_time.elapsed();
         
-        println!("    📊 Incremental compilation time: {:?}", second_compile_time);
+        println!("Incremental compilation time: {:?}", second_compile_time);
         
         // Incremental compilation should be faster (or at least not significantly slower)
         let speedup_ratio = first_compile_time.as_nanos() as f64 / second_compile_time.as_nanos() as f64;
-        println!("    📈 Compilation speedup ratio: {:.2}x", speedup_ratio);
+        println!("📈 Compilation speedup ratio: {:.2}x", speedup_ratio);
         
         // Both compilations should succeed or fail gracefully
         match (first_result, second_result) {
-            (Ok(_), Ok(_)) => println!("    ✅ Both compilations succeeded"),
-            (Err(e1), Err(e2)) => println!("    ⚠️ Both compilations handled gracefully: {} / {}", e1, e2),
-            _ => println!("    ⚠️ Mixed results - system handling gracefully"),
+            (Ok(_), Ok(_)) => println!("Both compilations succeeded"),
+            (Err(e1), Err(e2)) => println!("Both compilations handled gracefully: {} / {}", e1, e2),
+            _ => println!("Mixed results - system handling gracefully"),
         }
         
         fixture.engine = Some(engine);
@@ -879,7 +879,7 @@ fn test_performance_bounds_validation() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Performance optimization overhead eliminated");
+        println!("Production mode: Performance optimization overhead eliminated");
         let engine = fixture.engine.as_ref().unwrap();
         
         // Production mode should have zero overhead
@@ -890,7 +890,7 @@ fn test_performance_bounds_validation() {
             "Production mode should not have performance monitoring overhead");
     }
     
-    println!("✅ Performance bounds validation test passed!");
+    println!("Performance bounds validation test passed!");
 }
 // ============================================================================
 // Test 5: Cross-Platform Compatibility and Production Build Verification
@@ -908,40 +908,40 @@ fn test_cross_platform_compatibility_and_production_verification() {
     println!("🌍 Testing Cross-Platform Compatibility and Production Build Verification");
     
     // Test 1: Platform Detection and Capabilities
-    println!("  🖥️ Test 1: Platform Detection and Capabilities");
+    println!("🖥️ Test 1: Platform Detection and Capabilities");
     
     let engine = fixture.engine.as_ref().unwrap();
     let platform = engine.platform();
     let platform_config = engine.platform_config();
     
-    println!("    📊 Detected platform: {:?}", platform);
-    println!("    📊 Platform capabilities:");
-    println!("      - JIT available: {}", platform_config.jit_capabilities.cranelift_available);
-    println!("      - File watcher backend: {:?}", platform_config.file_watcher_backend);
-    println!("      - Native optimizations: {}", engine.is_using_native_optimizations());
+    println!("Detected platform: {:?}", platform);
+    println!("Platform capabilities:");
+    println!("- JIT available: {}", platform_config.jit_capabilities.cranelift_available);
+    println!("- File watcher backend: {:?}", platform_config.file_watcher_backend);
+    println!("- Native optimizations: {}", engine.is_using_native_optimizations());
     
     // Verify platform is supported
     match platform {
         Platform::Windows => {
-            println!("    ✅ Windows platform detected and supported");
+            println!("Windows platform detected and supported");
             // Windows-specific validations
             assert!(platform_config.file_watcher_backend != rustyui_core::FileWatcherBackend::Unsupported, 
                 "File watching should be supported on Windows");
         }
         Platform::MacOS => {
-            println!("    ✅ macOS platform detected and supported");
+            println!("macOS platform detected and supported");
             // macOS-specific validations
             assert!(platform_config.file_watcher_backend != rustyui_core::FileWatcherBackend::Unsupported, 
                 "File watching should be supported on macOS");
         }
         Platform::Linux => {
-            println!("    ✅ Linux platform detected and supported");
+            println!("Linux platform detected and supported");
             // Linux-specific validations
             assert!(platform_config.file_watcher_backend != rustyui_core::FileWatcherBackend::Unsupported, 
                 "File watching should be supported on Linux");
         }
         Platform::Unknown => {
-            println!("    ⚠️ Unknown platform - testing graceful degradation");
+            println!("Unknown platform - testing graceful degradation");
             // System should still function with basic capabilities
             assert!(engine.get_health_status().is_healthy(), 
                 "System should remain healthy on unknown platforms");
@@ -949,7 +949,7 @@ fn test_cross_platform_compatibility_and_production_verification() {
     }
     
     // Test 2: Platform-Specific Optimizations
-    println!("  ⚡ Test 2: Platform-Specific Optimizations");
+    println!("⚡ Test 2: Platform-Specific Optimizations");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -957,7 +957,7 @@ fn test_cross_platform_compatibility_and_production_verification() {
         
         // Test JIT compilation availability
         if engine.jit_compilation_available() {
-            println!("    ✅ JIT compilation available - testing performance");
+            println!("JIT compilation available - testing performance");
             
             let jit_test_code = r#"
                 fn performance_critical_function(x: i32) -> i32 {
@@ -973,26 +973,26 @@ fn test_cross_platform_compatibility_and_production_verification() {
             let jit_result = engine.interpret_ui_change(jit_test_code, Some("jit_test".to_string()));
             let jit_time = start_time.elapsed();
             
-            println!("    📊 JIT compilation time: {:?}", jit_time);
+            println!("JIT compilation time: {:?}", jit_time);
             
             // JIT compilation should be under 100ms
             assert!(jit_time < Duration::from_millis(100), 
                 "JIT compilation should be under 100ms, got {:?}", jit_time);
             
             match jit_result {
-                Ok(_) => println!("    ✅ JIT compilation succeeded"),
-                Err(e) => println!("    ⚠️ JIT compilation handled gracefully: {}", e),
+                Ok(_) => println!("JIT compilation succeeded"),
+                Err(e) => println!("JIT compilation handled gracefully: {}", e),
             }
         } else {
-            println!("    ⚠️ JIT compilation not available - testing fallback");
+            println!("JIT compilation not available - testing fallback");
             
             // Should fall back to AST interpretation
             let fallback_code = "button.enabled = true;";
             let fallback_result = engine.interpret_ui_change(fallback_code, Some("fallback_test".to_string()));
             
             match fallback_result {
-                Ok(_) => println!("    ✅ Fallback interpretation succeeded"),
-                Err(e) => println!("    ⚠️ Fallback interpretation handled gracefully: {}", e),
+                Ok(_) => println!("Fallback interpretation succeeded"),
+                Err(e) => println!("Fallback interpretation handled gracefully: {}", e),
             }
         }
         
@@ -1000,7 +1000,7 @@ fn test_cross_platform_compatibility_and_production_verification() {
     }
     
     // Test 3: Production Build Zero-Overhead Verification
-    println!("  🚀 Test 3: Production Build Zero-Overhead Verification");
+    println!("Test 3: Production Build Zero-Overhead Verification");
     
     let verifier = ProductionVerifier::new();
     
@@ -1058,11 +1058,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     match verification_result {
         Ok(results) => {
-            println!("    📊 Production Build Verification Results:");
-            println!("      - Zero overhead: {}", results.has_zero_overhead());
-            println!("      - Contains dev features: {}", results.contains_dev_features());
-            println!("      - Binary size optimized: {}", results.is_size_optimized());
-            println!("      - Security hardened: {}", results.is_security_hardened());
+            println!("Production Build Verification Results:");
+            println!("- Zero overhead: {}", results.has_zero_overhead());
+            println!("- Contains dev features: {}", results.contains_dev_features());
+            println!("- Binary size optimized: {}", results.is_size_optimized());
+            println!("- Security hardened: {}", results.is_security_hardened());
             
             // Verify zero overhead characteristics
             assert!(results.has_zero_overhead(), 
@@ -1072,10 +1072,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "Production build should not contain development features");
             
             if let Some(binary_results) = results.binary_size_results() {
-                println!("    📊 Binary Size Analysis:");
-                println!("      - Optimized size: {} bytes", binary_results.optimized_size);
-                println!("      - Baseline size: {} bytes", binary_results.baseline_size);
-                println!("      - Size ratio: {:.2}", binary_results.size_ratio());
+                println!("Binary Size Analysis:");
+                println!("- Optimized size: {} bytes", binary_results.optimized_size);
+                println!("- Baseline size: {} bytes", binary_results.baseline_size);
+                println!("- Size ratio: {:.2}", binary_results.size_ratio());
                 
                 // Binary should be reasonably sized (not bloated with dev features)
                 assert!(binary_results.size_ratio() <= 1.1, 
@@ -1083,20 +1083,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             
             if let Some(perf_results) = results.performance_results() {
-                println!("    📊 Performance Analysis:");
-                println!("      - Startup time: {:?}", perf_results.startup_time);
-                println!("      - Memory usage: {} bytes", perf_results.memory_usage);
-                println!("      - Performance ratio: {:.2}", perf_results.performance_ratio());
+                println!("Performance Analysis:");
+                println!("- Startup time: {:?}", perf_results.startup_time);
+                println!("- Memory usage: {} bytes", perf_results.memory_usage);
+                println!("- Performance ratio: {:.2}", perf_results.performance_ratio());
                 
                 // Performance should match native Rust
                 assert!(perf_results.performance_ratio() >= 0.95, 
                     "Production performance should be at least 95% of native Rust");
             }
             
-            println!("    ✅ Production build verification passed");
+            println!("Production build verification passed");
         }
         Err(e) => {
-            println!("    ⚠️ Production build verification handled gracefully: {}", e);
+            println!("Production build verification handled gracefully: {}", e);
             
             // Even if verification fails, basic production mode should work
             let engine = fixture.engine.as_ref().unwrap();
@@ -1112,7 +1112,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     // Test 4: Cross-Platform File Watching
-    println!("  👁️ Test 4: Cross-Platform File Watching");
+    println!("👁️ Test 4: Cross-Platform File Watching");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -1128,7 +1128,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let changes_result = engine.process_file_changes();
         let detection_time = start_time.elapsed();
         
-        println!("    📊 File change detection time: {:?}", detection_time);
+        println!("File change detection time: {:?}", detection_time);
         
         // Should detect changes quickly regardless of platform
         assert!(detection_time < Duration::from_millis(100), 
@@ -1136,17 +1136,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         match changes_result {
             Ok(changes) => {
-                println!("    ✅ File changes detected: {} files", changes.len());
+                println!("File changes detected: {} files", changes.len());
             }
             Err(e) => {
-                println!("    ⚠️ File watching handled gracefully: {}", e);
+                println!("File watching handled gracefully: {}", e);
             }
         }
         
         fixture.engine = Some(engine);
     }
     
-    println!("✅ Cross-platform compatibility and production verification test passed!");
+    println!("Cross-platform compatibility and production verification test passed!");
 }
 
 // ============================================================================
@@ -1168,11 +1168,11 @@ fn test_comprehensive_integration_benchmark() {
     {
         let mut engine = fixture.engine.take().unwrap();
         
-        println!("  🚀 Starting development mode");
+        println!("Starting development mode");
         engine.start_development_mode().expect("Should start development mode");
         
         // Benchmark 1: Realistic Development Session
-        println!("  📊 Benchmark 1: Realistic Development Session");
+        println!("Benchmark 1: Realistic Development Session");
         
         let session_start = Instant::now();
         
@@ -1217,7 +1217,7 @@ fn test_comprehensive_integration_benchmark() {
             let result = engine.interpret_ui_change(&ui_code, Some(component_id.to_string()));
             let interpretation_time = interpretation_start.elapsed();
             
-            println!("    📊 {} interpretation: {:?}", component_id, interpretation_time);
+            println!("{} interpretation: {:?}", component_id, interpretation_time);
             
             // Each component interpretation should be fast
             assert!(interpretation_time < Duration::from_millis(100), 
@@ -1238,15 +1238,15 @@ fn test_comprehensive_integration_benchmark() {
                     engine.preserve_component_state(component_id, state)
                         .expect("Should preserve component state");
                 }
-                Err(e) => println!("    ⚠️ Component {} handled gracefully: {}", component_id, e),
+                Err(e) => println!("Component {} handled gracefully: {}", component_id, e),
             }
         }
         
         let session_time = session_start.elapsed();
-        println!("    📈 Total development session time: {:?}", session_time);
+        println!("📈 Total development session time: {:?}", session_time);
         
         // Benchmark 2: Hot Reload Stress Test
-        println!("  🔥 Benchmark 2: Hot Reload Stress Test");
+        println!("Benchmark 2: Hot Reload Stress Test");
         
         let stress_start = Instant::now();
         let mut total_reload_time = Duration::new(0, 0);
@@ -1276,27 +1276,27 @@ fn test_comprehensive_integration_benchmark() {
             total_reload_time += reload_time;
             
             if i % 5 == 0 {
-                println!("    📊 Stress test iteration {}: {:?}", i, reload_time);
+                println!("Stress test iteration {}: {:?}", i, reload_time);
             }
         }
         
         let stress_total_time = stress_start.elapsed();
         let avg_reload_time = total_reload_time / 20;
         
-        println!("    📈 Stress test results:");
-        println!("      - Total time: {:?}", stress_total_time);
-        println!("      - Average reload time: {:?}", avg_reload_time);
-        println!("      - Reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
+        println!("📈 Stress test results:");
+        println!("- Total time: {:?}", stress_total_time);
+        println!("- Average reload time: {:?}", avg_reload_time);
+        println!("- Reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
         
         // Average reload should be very fast
         assert!(avg_reload_time < Duration::from_millis(50), 
             "Average hot reload should be under 50ms, got {:?}", avg_reload_time);
         
         // Benchmark 3: Memory Efficiency Under Load
-        println!("  💾 Benchmark 3: Memory Efficiency Under Load");
+        println!("💾 Benchmark 3: Memory Efficiency Under Load");
         
         let initial_memory = engine.current_memory_overhead_bytes();
-        println!("    📊 Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
+        println!("Initial memory: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
         
         // Create many components with state
         for i in 0..100 {
@@ -1324,8 +1324,8 @@ fn test_comprehensive_integration_benchmark() {
         let final_memory = engine.current_memory_overhead_bytes();
         let memory_per_component = (final_memory - initial_memory) / 100;
         
-        println!("    📊 Final memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
-        println!("    📊 Memory per component: {:.2} KB", memory_per_component as f64 / 1024.0);
+        println!("Final memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("Memory per component: {:.2} KB", memory_per_component as f64 / 1024.0);
         
         // Memory should remain reasonable
         assert!(final_memory < 50 * 1024 * 1024, 
@@ -1333,15 +1333,15 @@ fn test_comprehensive_integration_benchmark() {
             final_memory as f64 / (1024.0 * 1024.0));
         
         // Benchmark 4: Final Performance Metrics
-        println!("  📈 Benchmark 4: Final Performance Metrics");
+        println!("📈 Benchmark 4: Final Performance Metrics");
         
         if let Some(metrics) = engine.get_performance_metrics() {
-            println!("    📊 Final Performance Summary:");
-            println!("      - Total operations: {}", metrics.total_operations);
-            println!("      - Average interpretation: {:?}", metrics.average_interpretation_time);
-            println!("      - Max interpretation: {:?}", metrics.max_interpretation_time);
-            println!("      - Target violations: {}", metrics.target_violations);
-            println!("      - Success rate: {:.1}%", 
+            println!("Final Performance Summary:");
+            println!("- Total operations: {}", metrics.total_operations);
+            println!("- Average interpretation: {:?}", metrics.average_interpretation_time);
+            println!("- Max interpretation: {:?}", metrics.max_interpretation_time);
+            println!("- Target violations: {}", metrics.target_violations);
+            println!("- Success rate: {:.1}%", 
                 ((metrics.total_operations - metrics.target_violations) as f64 / metrics.total_operations as f64) * 100.0);
             
             // Final performance should meet all targets
@@ -1360,7 +1360,7 @@ fn test_comprehensive_integration_benchmark() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode benchmark");
+        println!("Production mode benchmark");
         let engine = fixture.engine.as_ref().unwrap();
         
         // Production mode should have zero overhead
@@ -1368,8 +1368,8 @@ fn test_comprehensive_integration_benchmark() {
         assert!(!engine.has_runtime_interpreter());
         assert!(!engine.has_performance_monitoring());
         
-        println!("    ✅ Production mode: Zero overhead verified");
+        println!("Production mode: Zero overhead verified");
     }
     
-    println!("🏆 Comprehensive integration benchmark completed successfully!");
+    println!("Comprehensive integration benchmark completed successfully!");
 }

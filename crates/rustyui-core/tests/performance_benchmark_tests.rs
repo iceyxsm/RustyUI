@@ -208,10 +208,10 @@ pub enum {}Event {{
             (0..complexity).map(|i| format!("    pub field_{}: i32,", i)).collect::<Vec<_>>().join("\n"),
             name,
             name,
-            (0..3).map(|i| format!("\"Item {}\"", i)).collect::<Vec<_>>().join(", "),
+            (0..3).map(|i| format!("\"Item {}\"", i)).collect::<Vec<_>>().join(","),
             (0..complexity).map(|i| format!("            field_{}: {},", i)).collect::<Vec<_>>().join("\n"),
             name,
-            (0..complexity).map(|i| format!("    pub fn update_field_{}(&mut self, value: i32) {{ self.field_{} = value; self.update_metadata(); }}", i, i)).collect::<Vec<_>>().join("\n    "),
+            (0..complexity).map(|i| format!("    pub fn update_field_{}(&mut self, value: i32) {{ self.field_{} = value; self.update_metadata(); }}", i, i)).collect::<Vec<_>>().join("\n"),
             name, name,
             name,
             name,
@@ -233,7 +233,7 @@ fn benchmark_incremental_compilation_optimization() {
     let mut fixture = PerformanceBenchmarkFixture::new();
     fixture.initialize_optimized_engine().expect("Engine initialization should succeed");
     
-    println!("🔄 Benchmarking Incremental Compilation Optimization");
+    println!("Benchmarking Incremental Compilation Optimization");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -255,7 +255,7 @@ fn benchmark_incremental_compilation_optimization() {
         let mut initial_compile_times = HashMap::new();
         
         // Initial compilation benchmark
-        println!("  📊 Phase 1: Initial Compilation");
+        println!("Phase 1: Initial Compilation");
         for (component_name, complexity) in &components {
             let component_code = fixture.create_realistic_component(component_name, *complexity);
             let file_path = fixture.create_component_file(
@@ -274,7 +274,7 @@ fn benchmark_incremental_compilation_optimization() {
             
             initial_compile_times.insert(component_name.to_string(), compile_time);
             
-            println!("    📊 {} initial compilation: {:?}", component_name, compile_time);
+            println!("{} initial compilation: {:?}", component_name, compile_time);
             
             // Should meet performance target
             assert!(compile_time < Duration::from_millis(fixture.performance_targets.max_interpretation_time_ms), 
@@ -282,13 +282,13 @@ fn benchmark_incremental_compilation_optimization() {
                 component_name, fixture.performance_targets.max_interpretation_time_ms, compile_time);
             
             match result {
-                Ok(_) => println!("      ✅ Compilation succeeded"),
-                Err(e) => println!("      ⚠️ Compilation handled gracefully: {}", e),
+                Ok(_) => println!("Compilation succeeded"),
+                Err(e) => println!("Compilation handled gracefully: {}", e),
             }
         }
         
         // Incremental compilation benchmark
-        println!("  📊 Phase 2: Incremental Compilation (Function-Level Changes)");
+        println!("Phase 2: Incremental Compilation (Function-Level Changes)");
         let mut incremental_compile_times = HashMap::new();
         
         for (component_name, _) in &components {
@@ -309,13 +309,13 @@ fn benchmark_incremental_compilation_optimization() {
             
             incremental_compile_times.insert(component_name.to_string(), incremental_time);
             
-            println!("    📊 {} incremental compilation: {:?}", component_name, incremental_time);
+            println!("{} incremental compilation: {:?}", component_name, incremental_time);
             
             // Incremental compilation should be faster or at least not significantly slower
             let initial_time = initial_compile_times.get(component_name).unwrap();
             let speedup_ratio = initial_time.as_nanos() as f64 / incremental_time.as_nanos() as f64;
             
-            println!("      📈 Speedup ratio: {:.2}x", speedup_ratio);
+            println!("📈 Speedup ratio: {:.2}x", speedup_ratio);
             
             // Should still meet performance targets
             assert!(incremental_time < Duration::from_millis(fixture.performance_targets.max_interpretation_time_ms), 
@@ -323,8 +323,8 @@ fn benchmark_incremental_compilation_optimization() {
                 component_name, fixture.performance_targets.max_interpretation_time_ms, incremental_time);
             
             match result {
-                Ok(_) => println!("      ✅ Incremental compilation succeeded"),
-                Err(e) => println!("      ⚠️ Incremental compilation handled gracefully: {}", e),
+                Ok(_) => println!("Incremental compilation succeeded"),
+                Err(e) => println!("Incremental compilation handled gracefully: {}", e),
             }
         }
         
@@ -333,10 +333,10 @@ fn benchmark_incremental_compilation_optimization() {
         let total_incremental: Duration = incremental_compile_times.values().sum();
         let overall_speedup = total_initial.as_nanos() as f64 / total_incremental.as_nanos() as f64;
         
-        println!("  📈 Overall Incremental Compilation Results:");
-        println!("    - Total initial compilation time: {:?}", total_initial);
-        println!("    - Total incremental compilation time: {:?}", total_incremental);
-        println!("    - Overall speedup: {:.2}x", overall_speedup);
+        println!("📈 Overall Incremental Compilation Results:");
+        println!("- Total initial compilation time: {:?}", total_initial);
+        println!("- Total incremental compilation time: {:?}", total_incremental);
+        println!("- Overall speedup: {:.2}x", overall_speedup);
         
         // Verify incremental compilation is effective
         assert!(overall_speedup >= 0.8, 
@@ -347,10 +347,10 @@ fn benchmark_incremental_compilation_optimization() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Incremental compilation overhead eliminated");
+        println!("Production mode: Incremental compilation overhead eliminated");
     }
     
-    println!("✅ Incremental compilation optimization benchmark completed");
+    println!("Incremental compilation optimization benchmark completed");
 }
 
 // ============================================================================
@@ -371,10 +371,10 @@ fn benchmark_memory_usage_optimization() {
         let mut engine = fixture.engine.take().unwrap();
         
         let initial_memory = engine.current_memory_overhead_bytes();
-        println!("  📊 Initial memory overhead: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
+        println!("Initial memory overhead: {:.2} MB", initial_memory as f64 / (1024.0 * 1024.0));
         
         // Phase 1: Component Registration Memory Test
-        println!("  📊 Phase 1: Component Registration Memory Efficiency");
+        println!("Phase 1: Component Registration Memory Efficiency");
         
         let mut memory_checkpoints = Vec::new();
         memory_checkpoints.push(("Initial", initial_memory));
@@ -406,7 +406,7 @@ fn benchmark_memory_usage_optimization() {
                 let current_memory = engine.current_memory_overhead_bytes();
                 memory_checkpoints.push((format!("After {} components", i + 1), current_memory));
                 
-                println!("    📊 Memory after {} components: {:.2} MB", 
+                println!("Memory after {} components: {:.2} MB", 
                     i + 1, current_memory as f64 / (1024.0 * 1024.0));
             }
         }
@@ -414,9 +414,9 @@ fn benchmark_memory_usage_optimization() {
         let memory_after_components = engine.current_memory_overhead_bytes();
         let memory_per_component = (memory_after_components - initial_memory) / 100;
         
-        println!("  📈 Component Registration Results:");
-        println!("    - Memory per component: {:.2} KB", memory_per_component as f64 / 1024.0);
-        println!("    - Total memory after 100 components: {:.2} MB", 
+        println!("📈 Component Registration Results:");
+        println!("- Memory per component: {:.2} KB", memory_per_component as f64 / 1024.0);
+        println!("- Total memory after 100 components: {:.2} MB", 
             memory_after_components as f64 / (1024.0 * 1024.0));
         
         // Should remain under target
@@ -426,7 +426,7 @@ fn benchmark_memory_usage_optimization() {
             memory_after_components as f64 / (1024.0 * 1024.0));
         
         // Phase 2: Interpretation Memory Test
-        println!("  📊 Phase 2: Interpretation Memory Efficiency");
+        println!("Phase 2: Interpretation Memory Efficiency");
         
         let interpretation_start_memory = engine.current_memory_overhead_bytes();
         
@@ -462,7 +462,7 @@ fn benchmark_memory_usage_optimization() {
             // Check memory every 10 interpretations
             if i % 10 == 9 {
                 let current_memory = engine.current_memory_overhead_bytes();
-                println!("    📊 Memory after {} interpretations: {:.2} MB", 
+                println!("Memory after {} interpretations: {:.2} MB", 
                     i + 1, current_memory as f64 / (1024.0 * 1024.0));
             }
         }
@@ -470,10 +470,10 @@ fn benchmark_memory_usage_optimization() {
         let final_memory = engine.current_memory_overhead_bytes();
         let interpretation_memory_growth = final_memory - interpretation_start_memory;
         
-        println!("  📈 Interpretation Memory Results:");
-        println!("    - Memory growth from interpretations: {:.2} KB", 
+        println!("📈 Interpretation Memory Results:");
+        println!("- Memory growth from interpretations: {:.2} KB", 
             interpretation_memory_growth as f64 / 1024.0);
-        println!("    - Final total memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("- Final total memory: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
         
         // Final memory should still be under target
         assert!(final_memory < (fixture.performance_targets.max_memory_overhead_mb as u64) * 1024 * 1024, 
@@ -482,7 +482,7 @@ fn benchmark_memory_usage_optimization() {
             final_memory as f64 / (1024.0 * 1024.0));
         
         // Phase 3: Memory Cleanup Test
-        println!("  📊 Phase 3: Memory Cleanup Efficiency");
+        println!("Phase 3: Memory Cleanup Efficiency");
         
         // Trigger cleanup
         engine.cleanup_components();
@@ -490,17 +490,17 @@ fn benchmark_memory_usage_optimization() {
         let cleanup_memory = engine.current_memory_overhead_bytes();
         let memory_freed = final_memory - cleanup_memory;
         
-        println!("  📈 Cleanup Results:");
-        println!("    - Memory freed: {:.2} KB", memory_freed as f64 / 1024.0);
-        println!("    - Memory after cleanup: {:.2} MB", cleanup_memory as f64 / (1024.0 * 1024.0));
+        println!("📈 Cleanup Results:");
+        println!("- Memory freed: {:.2} KB", memory_freed as f64 / 1024.0);
+        println!("- Memory after cleanup: {:.2} MB", cleanup_memory as f64 / (1024.0 * 1024.0));
         
         // Cleanup should free some memory
         assert!(memory_freed > 0, "Cleanup should free some memory");
         
         // Memory efficiency summary
-        println!("  🏆 Memory Optimization Summary:");
+        println!("Memory Optimization Summary:");
         for (checkpoint_name, memory) in memory_checkpoints {
-            println!("    - {}: {:.2} MB", checkpoint_name, memory as f64 / (1024.0 * 1024.0));
+            println!("- {}: {:.2} MB", checkpoint_name, memory as f64 / (1024.0 * 1024.0));
         }
         
         fixture.engine = Some(engine);
@@ -508,13 +508,13 @@ fn benchmark_memory_usage_optimization() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Memory optimization overhead eliminated");
+        println!("Production mode: Memory optimization overhead eliminated");
         let engine = fixture.engine.as_ref().unwrap();
         assert_eq!(engine.current_memory_overhead_bytes(), 0, 
             "Production mode should have zero memory overhead");
     }
     
-    println!("✅ Memory usage optimization benchmark completed");
+    println!("Memory usage optimization benchmark completed");
 }
 // ============================================================================
 // Benchmark 3: File Watching Performance with Structure-Based Debouncing
@@ -555,7 +555,7 @@ fn benchmark_file_watching_performance() {
             file_paths.insert(file_path.to_string(), full_path);
         }
         
-        println!("  📊 Phase 1: Single File Change Detection");
+        println!("Phase 1: Single File Change Detection");
         
         let mut single_file_times = Vec::new();
         
@@ -575,7 +575,7 @@ fn benchmark_file_watching_performance() {
             
             single_file_times.push(detection_time);
             
-            println!("    📊 {} change detection: {:?}", file_name, detection_time);
+            println!("{} change detection: {:?}", file_name, detection_time);
             
             // Should meet performance target
             assert!(detection_time < Duration::from_millis(fixture.performance_targets.max_total_reload_time_ms), 
@@ -585,18 +585,18 @@ fn benchmark_file_watching_performance() {
             match changes_result {
                 Ok(changes) => {
                     if !changes.is_empty() {
-                        println!("      ✅ Detected {} changes", changes.len());
+                        println!("Detected {} changes", changes.len());
                     }
                 }
-                Err(e) => println!("      ⚠️ Change detection handled gracefully: {}", e),
+                Err(e) => println!("Change detection handled gracefully: {}", e),
             }
         }
         
         let avg_single_file_time = single_file_times.iter().sum::<Duration>() / single_file_times.len() as u32;
-        println!("  📈 Single File Results: Average detection time: {:?}", avg_single_file_time);
+        println!("📈 Single File Results: Average detection time: {:?}", avg_single_file_time);
         
         // Phase 2: Multiple File Changes (Structure-Based Debouncing Test)
-        println!("  📊 Phase 2: Multiple File Changes (Structure-Based Debouncing)");
+        println!("Phase 2: Multiple File Changes (Structure-Based Debouncing)");
         
         let mut batch_modification_times = Vec::new();
         
@@ -626,7 +626,7 @@ fn benchmark_file_watching_performance() {
             
             batch_modification_times.push(batch_time);
             
-            println!("    📊 Batch {} ({} files) detection: {:?}", 
+            println!("Batch {} ({} files) detection: {:?}", 
                 batch, files_to_modify.len(), batch_time);
             
             // Batch processing should still be fast
@@ -636,9 +636,9 @@ fn benchmark_file_watching_performance() {
             
             match changes_result {
                 Ok(changes) => {
-                    println!("      ✅ Processed {} changes in batch", changes.len());
+                    println!("Processed {} changes in batch", changes.len());
                 }
-                Err(e) => println!("      ⚠️ Batch processing handled gracefully: {}", e),
+                Err(e) => println!("Batch processing handled gracefully: {}", e),
             }
             
             // Small delay between batches to test debouncing
@@ -646,10 +646,10 @@ fn benchmark_file_watching_performance() {
         }
         
         let avg_batch_time = batch_modification_times.iter().sum::<Duration>() / batch_modification_times.len() as u32;
-        println!("  📈 Batch Processing Results: Average batch time: {:?}", avg_batch_time);
+        println!("📈 Batch Processing Results: Average batch time: {:?}", avg_batch_time);
         
         // Phase 3: File Type Filtering Test
-        println!("  📊 Phase 3: Intelligent File Filtering");
+        println!("Phase 3: Intelligent File Filtering");
         
         // Create files that should be ignored
         let ignored_files = vec![
@@ -678,7 +678,7 @@ fn benchmark_file_watching_performance() {
         let filtering_result = engine.process_file_changes();
         let filtering_time = filtering_start.elapsed();
         
-        println!("    📊 File filtering time: {:?}", filtering_time);
+        println!("File filtering time: {:?}", filtering_time);
         
         // Filtering should be very fast
         assert!(filtering_time < Duration::from_millis(25), 
@@ -687,7 +687,7 @@ fn benchmark_file_watching_performance() {
         match filtering_result {
             Ok(changes) => {
                 // Should have filtered out irrelevant changes
-                println!("      ✅ Filtered to {} relevant changes", changes.len());
+                println!("Filtered to {} relevant changes", changes.len());
                 
                 // Verify that ignored files are not in the changes
                 for change in &changes {
@@ -700,22 +700,22 @@ fn benchmark_file_watching_performance() {
                         "Should filter out node_modules changes");
                 }
             }
-            Err(e) => println!("      ⚠️ File filtering handled gracefully: {}", e),
+            Err(e) => println!("File filtering handled gracefully: {}", e),
         }
         
         // Phase 4: Performance Summary
-        println!("  🏆 File Watching Performance Summary:");
-        println!("    - Average single file detection: {:?}", avg_single_file_time);
-        println!("    - Average batch processing: {:?}", avg_batch_time);
-        println!("    - File filtering time: {:?}", filtering_time);
+        println!("File Watching Performance Summary:");
+        println!("- Average single file detection: {:?}", avg_single_file_time);
+        println!("- Average batch processing: {:?}", avg_batch_time);
+        println!("- File filtering time: {:?}", filtering_time);
         
         // Calculate overall efficiency
         let max_detection_time = single_file_times.iter().max().unwrap();
         let min_detection_time = single_file_times.iter().min().unwrap();
         
-        println!("    - Fastest detection: {:?}", min_detection_time);
-        println!("    - Slowest detection: {:?}", max_detection_time);
-        println!("    - Detection consistency: {:.1}%", 
+        println!("- Fastest detection: {:?}", min_detection_time);
+        println!("- Slowest detection: {:?}", max_detection_time);
+        println!("- Detection consistency: {:.1}%", 
             (min_detection_time.as_nanos() as f64 / max_detection_time.as_nanos() as f64) * 100.0);
         
         // All times should be under target
@@ -729,10 +729,10 @@ fn benchmark_file_watching_performance() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: File watching overhead eliminated");
+        println!("Production mode: File watching overhead eliminated");
     }
     
-    println!("✅ File watching performance benchmark completed");
+    println!("File watching performance benchmark completed");
 }
 
 // ============================================================================
@@ -746,7 +746,7 @@ fn benchmark_hot_reload_performance() {
     let mut fixture = PerformanceBenchmarkFixture::new();
     fixture.initialize_optimized_engine().expect("Engine initialization should succeed");
     
-    println!("🔥 Benchmarking Hot Reload Performance");
+    println!("Benchmarking Hot Reload Performance");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -766,7 +766,7 @@ fn benchmark_hot_reload_performance() {
                 .expect("Should register component");
         }
         
-        println!("  📊 Phase 1: Sequential Hot Reload Performance");
+        println!("Phase 1: Sequential Hot Reload Performance");
         
         let mut sequential_reload_times = Vec::new();
         
@@ -806,7 +806,7 @@ fn benchmark_hot_reload_performance() {
             let reload_time = reload_start.elapsed();
             sequential_reload_times.push(reload_time);
             
-            println!("    📊 {} hot reload: {:?}", component_name, reload_time);
+            println!("{} hot reload: {:?}", component_name, reload_time);
             
             // Should meet hot reload performance target
             assert!(reload_time < Duration::from_millis(fixture.performance_targets.max_total_reload_time_ms), 
@@ -814,16 +814,16 @@ fn benchmark_hot_reload_performance() {
                 component_name, fixture.performance_targets.max_total_reload_time_ms, reload_time);
             
             match interpretation_result {
-                Ok(_) => println!("      ✅ Hot reload succeeded"),
-                Err(e) => println!("      ⚠️ Hot reload handled gracefully: {}", e),
+                Ok(_) => println!("Hot reload succeeded"),
+                Err(e) => println!("Hot reload handled gracefully: {}", e),
             }
         }
         
         let avg_sequential_time = sequential_reload_times.iter().sum::<Duration>() / sequential_reload_times.len() as u32;
-        println!("  📈 Sequential Hot Reload Results: Average time: {:?}", avg_sequential_time);
+        println!("📈 Sequential Hot Reload Results: Average time: {:?}", avg_sequential_time);
         
         // Phase 2: Parallel Hot Reload Simulation
-        println!("  📊 Phase 2: Parallel Hot Reload Simulation");
+        println!("Phase 2: Parallel Hot Reload Simulation");
         
         let parallel_start = Instant::now();
         
@@ -847,21 +847,21 @@ fn benchmark_hot_reload_performance() {
         
         let parallel_total_time = parallel_start.elapsed();
         
-        println!("    📊 Parallel processing time: {:?}", parallel_total_time);
-        println!("    📊 Components processed: {}", components.len());
+        println!("Parallel processing time: {:?}", parallel_total_time);
+        println!("Components processed: {}", components.len());
         
         // Parallel processing should be more efficient than sequential
         let sequential_total = sequential_reload_times.iter().sum::<Duration>();
         let parallel_efficiency = sequential_total.as_nanos() as f64 / parallel_total_time.as_nanos() as f64;
         
-        println!("    📈 Parallel efficiency: {:.2}x", parallel_efficiency);
+        println!("📈 Parallel efficiency: {:.2}x", parallel_efficiency);
         
         // Verify all parallel updates were processed
         let successful_updates = parallel_results.iter().filter(|r| r.is_ok()).count();
-        println!("    ✅ Successful parallel updates: {}/{}", successful_updates, components.len());
+        println!("Successful parallel updates: {}/{}", successful_updates, components.len());
         
         // Phase 3: Rapid Hot Reload Stress Test
-        println!("  📊 Phase 3: Rapid Hot Reload Stress Test");
+        println!("Phase 3: Rapid Hot Reload Stress Test");
         
         let stress_start = Instant::now();
         let mut stress_reload_times = Vec::new();
@@ -886,7 +886,7 @@ fn benchmark_hot_reload_performance() {
             stress_reload_times.push(rapid_time);
             
             if i % 5 == 4 {
-                println!("    📊 Rapid reload {} ({}): {:?}", i + 1, component_name, rapid_time);
+                println!("Rapid reload {} ({}): {:?}", i + 1, component_name, rapid_time);
             }
             
             match result {
@@ -904,30 +904,30 @@ fn benchmark_hot_reload_performance() {
         let stress_total_time = stress_start.elapsed();
         let avg_stress_time = stress_reload_times.iter().sum::<Duration>() / stress_reload_times.len() as u32;
         
-        println!("  📈 Rapid Hot Reload Stress Results:");
-        println!("    - Total stress test time: {:?}", stress_total_time);
-        println!("    - Average rapid reload: {:?}", avg_stress_time);
-        println!("    - Reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
+        println!("📈 Rapid Hot Reload Stress Results:");
+        println!("- Total stress test time: {:?}", stress_total_time);
+        println!("- Average rapid reload: {:?}", avg_stress_time);
+        println!("- Reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
         
         // Stress test should maintain performance
         assert!(avg_stress_time < Duration::from_millis(fixture.performance_targets.max_total_reload_time_ms), 
             "Average rapid reload should maintain performance target, got {:?}", avg_stress_time);
         
         // Phase 4: Hot Reload Performance Summary
-        println!("  🏆 Hot Reload Performance Summary:");
-        println!("    - Average sequential reload: {:?}", avg_sequential_time);
-        println!("    - Parallel processing efficiency: {:.2}x", parallel_efficiency);
-        println!("    - Average rapid reload: {:?}", avg_stress_time);
-        println!("    - Peak reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
+        println!("Hot Reload Performance Summary:");
+        println!("- Average sequential reload: {:?}", avg_sequential_time);
+        println!("- Parallel processing efficiency: {:.2}x", parallel_efficiency);
+        println!("- Average rapid reload: {:?}", avg_stress_time);
+        println!("- Peak reloads per second: {:.1}", 20.0 / stress_total_time.as_secs_f64());
         
         // Calculate consistency metrics
         let max_reload_time = sequential_reload_times.iter().max().unwrap();
         let min_reload_time = sequential_reload_times.iter().min().unwrap();
         let consistency = (min_reload_time.as_nanos() as f64 / max_reload_time.as_nanos() as f64) * 100.0;
         
-        println!("    - Reload consistency: {:.1}%", consistency);
-        println!("    - Fastest reload: {:?}", min_reload_time);
-        println!("    - Slowest reload: {:?}", max_reload_time);
+        println!("- Reload consistency: {:.1}%", consistency);
+        println!("- Fastest reload: {:?}", min_reload_time);
+        println!("- Slowest reload: {:?}", max_reload_time);
         
         // All performance targets should be met
         assert!(avg_sequential_time < Duration::from_millis(fixture.performance_targets.max_total_reload_time_ms), 
@@ -940,10 +940,10 @@ fn benchmark_hot_reload_performance() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: Hot reload overhead eliminated");
+        println!("Production mode: Hot reload overhead eliminated");
     }
     
-    println!("✅ Hot reload performance benchmark completed");
+    println!("Hot reload performance benchmark completed");
 }
 // ============================================================================
 // Benchmark 5: Production Build Zero-Overhead Verification
@@ -956,7 +956,7 @@ fn benchmark_production_build_zero_overhead_verification() {
     let mut fixture = PerformanceBenchmarkFixture::new();
     fixture.initialize_optimized_engine().expect("Engine initialization should succeed");
     
-    println!("🚀 Benchmarking Production Build Zero-Overhead Verification");
+    println!("Benchmarking Production Build Zero-Overhead Verification");
     
     // Create production test project
     let production_cargo_toml = r#"[package]
@@ -1039,10 +1039,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let workload_time = workload_start.elapsed();
     
     println!("Production benchmark completed:");
-    println!("  - Initialization time: {:?}", initialization_time);
-    println!("  - Workload time (1000 iterations): {:?}", workload_time);
-    println!("  - Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
-    println!("  - Runtime interpreter: {}", engine.has_runtime_interpreter());
+    println!("- Initialization time: {:?}", initialization_time);
+    println!("- Workload time (1000 iterations): {:?}", workload_time);
+    println!("- Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
+    println!("- Runtime interpreter: {}", engine.has_runtime_interpreter());
     
     Ok(())
 }
@@ -1051,22 +1051,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     fixture.create_component_file("src/main.rs", production_main);
     
     // Phase 1: Production Build Verification
-    println!("  📊 Phase 1: Production Build Verification");
+    println!("Phase 1: Production Build Verification");
     
     let verifier = ProductionVerifier::new();
     let verification_start = Instant::now();
     let verification_result = verifier.verify_zero_overhead_build(&fixture.project_path);
     let verification_time = verification_start.elapsed();
     
-    println!("    📊 Verification time: {:?}", verification_time);
+    println!("Verification time: {:?}", verification_time);
     
     match verification_result {
         Ok(results) => {
-            println!("    📊 Production Build Analysis:");
-            println!("      - Zero overhead: {}", results.has_zero_overhead());
-            println!("      - Contains dev features: {}", results.contains_dev_features());
-            println!("      - Size optimized: {}", results.is_size_optimized());
-            println!("      - Security hardened: {}", results.is_security_hardened());
+            println!("Production Build Analysis:");
+            println!("- Zero overhead: {}", results.has_zero_overhead());
+            println!("- Contains dev features: {}", results.contains_dev_features());
+            println!("- Size optimized: {}", results.is_size_optimized());
+            println!("- Security hardened: {}", results.is_security_hardened());
             
             // Verify zero overhead characteristics
             assert!(results.has_zero_overhead(), 
@@ -1076,11 +1076,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             
             // Binary size analysis
             if let Some(binary_results) = results.binary_size_results() {
-                println!("    📊 Binary Size Analysis:");
-                println!("      - Optimized size: {} bytes", binary_results.optimized_size);
-                println!("      - Baseline size: {} bytes", binary_results.baseline_size);
-                println!("      - Size ratio: {:.3}", binary_results.size_ratio());
-                println!("      - Size difference: {} bytes", 
+                println!("Binary Size Analysis:");
+                println!("- Optimized size: {} bytes", binary_results.optimized_size);
+                println!("- Baseline size: {} bytes", binary_results.baseline_size);
+                println!("- Size ratio: {:.3}", binary_results.size_ratio());
+                println!("- Size difference: {} bytes", 
                     binary_results.optimized_size as i64 - binary_results.baseline_size as i64);
                 
                 // Binary should not be significantly larger
@@ -1095,17 +1095,17 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     (binary_results.baseline_size as f64 / binary_results.optimized_size as f64) * 100.0
                 };
                 
-                println!("      - Size efficiency: {:.1}%", size_efficiency);
+                println!("- Size efficiency: {:.1}%", size_efficiency);
                 assert!(size_efficiency >= 90.0, 
                     "Size efficiency should be at least 90%, got {:.1}%", size_efficiency);
             }
             
             // Performance analysis
             if let Some(perf_results) = results.performance_results() {
-                println!("    📊 Performance Analysis:");
-                println!("      - Startup time: {:?}", perf_results.startup_time);
-                println!("      - Memory usage: {} bytes", perf_results.memory_usage);
-                println!("      - Performance ratio: {:.3}", perf_results.performance_ratio());
+                println!("Performance Analysis:");
+                println!("- Startup time: {:?}", perf_results.startup_time);
+                println!("- Memory usage: {} bytes", perf_results.memory_usage);
+                println!("- Performance ratio: {:.3}", perf_results.performance_ratio());
                 
                 // Performance should match native Rust
                 assert!(perf_results.performance_ratio() >= 0.95, 
@@ -1116,13 +1116,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 assert!(perf_results.startup_time < Duration::from_millis(100), 
                     "Startup should be under 100ms, got {:?}", perf_results.startup_time);
                 
-                println!("      - Performance efficiency: {:.1}%", perf_results.performance_ratio() * 100.0);
+                println!("- Performance efficiency: {:.1}%", perf_results.performance_ratio() * 100.0);
             }
             
-            println!("    ✅ Production build verification passed");
+            println!("Production build verification passed");
         }
         Err(e) => {
-            println!("    ⚠️ Production build verification handled gracefully: {}", e);
+            println!("Production build verification handled gracefully: {}", e);
             
             // Even if verification fails, basic production mode should work
             let engine = fixture.engine.as_ref().unwrap();
@@ -1138,18 +1138,18 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     // Phase 2: Development vs Production Comparison
-    println!("  📊 Phase 2: Development vs Production Comparison");
+    println!("Phase 2: Development vs Production Comparison");
     
     let engine = fixture.engine.as_ref().unwrap();
     
     #[cfg(feature = "dev-ui")]
     {
-        println!("    📊 Development Mode Characteristics:");
-        println!("      - Runtime interpreter: {}", engine.has_runtime_interpreter());
-        println!("      - Can interpret changes: {}", engine.can_interpret_changes());
-        println!("      - Performance monitoring: {}", engine.has_performance_monitoring());
-        println!("      - Memory overhead: {:.2} KB", engine.current_memory_overhead_bytes() as f64 / 1024.0);
-        println!("      - JIT compilation: {}", engine.jit_compilation_available());
+        println!("Development Mode Characteristics:");
+        println!("- Runtime interpreter: {}", engine.has_runtime_interpreter());
+        println!("- Can interpret changes: {}", engine.can_interpret_changes());
+        println!("- Performance monitoring: {}", engine.has_performance_monitoring());
+        println!("- Memory overhead: {:.2} KB", engine.current_memory_overhead_bytes() as f64 / 1024.0);
+        println!("- JIT compilation: {}", engine.jit_compilation_available());
         
         // Development mode should have features
         assert!(engine.has_runtime_interpreter(), 
@@ -1166,12 +1166,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("    📊 Production Mode Characteristics:");
-        println!("      - Runtime interpreter: {}", engine.has_runtime_interpreter());
-        println!("      - Can interpret changes: {}", engine.can_interpret_changes());
-        println!("      - Performance monitoring: {}", engine.has_performance_monitoring());
-        println!("      - Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
-        println!("      - JIT compilation: {}", engine.jit_compilation_available());
+        println!("Production Mode Characteristics:");
+        println!("- Runtime interpreter: {}", engine.has_runtime_interpreter());
+        println!("- Can interpret changes: {}", engine.can_interpret_changes());
+        println!("- Performance monitoring: {}", engine.has_performance_monitoring());
+        println!("- Memory overhead: {} bytes", engine.current_memory_overhead_bytes());
+        println!("- JIT compilation: {}", engine.jit_compilation_available());
         
         // Production mode should have zero overhead
         assert!(!engine.has_runtime_interpreter(), 
@@ -1187,35 +1187,35 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     
     // Phase 3: Security and Optimization Verification
-    println!("  📊 Phase 3: Security and Optimization Verification");
+    println!("Phase 3: Security and Optimization Verification");
     
     // Verify conditional compilation worked correctly
     let config = engine.config();
-    println!("    📊 Configuration Analysis:");
-    println!("      - Framework: {:?}", config.framework);
-    println!("      - Watch paths: {} configured", config.watch_paths.len());
+    println!("Configuration Analysis:");
+    println!("- Framework: {:?}", config.framework);
+    println!("- Watch paths: {} configured", config.watch_paths.len());
     
     #[cfg(feature = "dev-ui")]
     {
-        println!("      - Development settings: Available");
-        println!("      - Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
-        println!("      - Performance monitoring: {}", config.development_settings.performance_monitoring);
+        println!("- Development settings: Available");
+        println!("- Interpretation strategy: {:?}", config.development_settings.interpretation_strategy);
+        println!("- Performance monitoring: {}", config.development_settings.performance_monitoring);
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("      - Development settings: Stripped (zero overhead)");
+        println!("- Development settings: Stripped (zero overhead)");
     }
     
     // Platform-specific optimizations
     let platform = engine.platform();
     let platform_config = engine.platform_config();
     
-    println!("    📊 Platform Optimization Analysis:");
-    println!("      - Platform: {:?}", platform);
-    println!("      - Native optimizations: {}", engine.is_using_native_optimizations());
-    println!("      - File watcher backend: {:?}", platform_config.file_watcher_backend);
-    println!("      - JIT capabilities: {}", platform_config.jit_capabilities.cranelift_available);
+    println!("Platform Optimization Analysis:");
+    println!("- Platform: {:?}", platform);
+    println!("- Native optimizations: {}", engine.is_using_native_optimizations());
+    println!("- File watcher backend: {:?}", platform_config.file_watcher_backend);
+    println!("- JIT capabilities: {}", platform_config.jit_capabilities.cranelift_available);
     
     // Verify platform optimizations are appropriate
     match platform {
@@ -1224,45 +1224,45 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 "Supported platforms should have file watching");
         }
         Platform::Unknown => {
-            println!("      ⚠️ Unknown platform - graceful degradation active");
+            println!("Unknown platform - graceful degradation active");
         }
     }
     
     // Phase 4: Comprehensive Performance Summary
-    println!("  🏆 Production Build Zero-Overhead Summary:");
+    println!("Production Build Zero-Overhead Summary:");
     
     #[cfg(feature = "dev-ui")]
     {
         let memory_mb = engine.current_memory_overhead_bytes() as f64 / (1024.0 * 1024.0);
-        println!("    - Development mode memory: {:.2} MB (target: <{} MB)", 
+        println!("- Development mode memory: {:.2} MB (target: <{} MB)", 
             memory_mb, fixture.performance_targets.max_memory_overhead_mb);
-        println!("    - Development features: Available and functional");
-        println!("    - Performance monitoring: Active");
+        println!("- Development features: Available and functional");
+        println!("- Performance monitoring: Active");
         
         if let Some(metrics) = engine.get_performance_metrics() {
-            println!("    - Total operations tracked: {}", metrics.total_operations);
-            println!("    - Average interpretation time: {:?}", metrics.average_interpretation_time);
+            println!("- Total operations tracked: {}", metrics.total_operations);
+            println!("- Average interpretation time: {:?}", metrics.average_interpretation_time);
         }
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("    - Production mode memory: 0 bytes (perfect zero overhead)");
-        println!("    - Development features: Completely stripped");
-        println!("    - Performance monitoring: Eliminated");
-        println!("    - Binary size: Optimized for production");
-        println!("    - Security: Hardened for deployment");
+        println!("- Production mode memory: 0 bytes (perfect zero overhead)");
+        println!("- Development features: Completely stripped");
+        println!("- Performance monitoring: Eliminated");
+        println!("- Binary size: Optimized for production");
+        println!("- Security: Hardened for deployment");
     }
     
-    println!("    - Platform compatibility: {:?}", platform);
-    println!("    - Native optimizations: {}", engine.is_using_native_optimizations());
-    println!("    - System health: {:?}", engine.get_health_status());
+    println!("- Platform compatibility: {:?}", platform);
+    println!("- Native optimizations: {}", engine.is_using_native_optimizations());
+    println!("- System health: {:?}", engine.get_health_status());
     
     // Final verification
     assert!(engine.get_health_status().is_healthy(), 
         "System should be healthy in both modes");
     
-    println!("✅ Production build zero-overhead verification benchmark completed");
+    println!("Production build zero-overhead verification benchmark completed");
 }
 
 // ============================================================================
@@ -1285,7 +1285,7 @@ fn benchmark_comprehensive_integration() {
         let benchmark_start = Instant::now();
         
         // Simulate realistic development session
-        println!("  📊 Simulating Realistic Development Session");
+        println!("Simulating Realistic Development Session");
         
         // Create complex application structure
         let app_components = vec![
@@ -1333,18 +1333,18 @@ fn benchmark_comprehensive_integration() {
                     engine.preserve_component_state(component_name, state)
                         .expect("Should preserve initial state");
                 }
-                Err(e) => println!("    ⚠️ Component {} handled gracefully: {}", component_name, e),
+                Err(e) => println!("Component {} handled gracefully: {}", component_name, e),
             }
         }
         
         let bootstrap_time = bootstrap_start.elapsed();
-        println!("    📊 Application bootstrap: {:?}", bootstrap_time);
+        println!("Application bootstrap: {:?}", bootstrap_time);
         
         // Phase 2: Development Iteration Cycles
         let iteration_start = Instant::now();
         
         for cycle in 0..10 {
-            println!("    🔄 Development cycle {}", cycle + 1);
+            println!("Development cycle {}", cycle + 1);
             
             // Simulate realistic development changes
             for (component_name, _, _) in &app_components {
@@ -1390,13 +1390,13 @@ fn benchmark_comprehensive_integration() {
             // Check memory after each cycle
             let cycle_memory = engine.current_memory_overhead_bytes();
             if cycle % 3 == 2 {
-                println!("      💾 Memory after cycle {}: {:.2} MB", 
+                println!("💾 Memory after cycle {}: {:.2} MB", 
                     cycle + 1, cycle_memory as f64 / (1024.0 * 1024.0));
             }
         }
         
         let iteration_time = iteration_start.elapsed();
-        println!("    📊 Development iterations: {:?}", iteration_time);
+        println!("Development iterations: {:?}", iteration_time);
         
         // Phase 3: Performance Analysis
         let analysis_start = Instant::now();
@@ -1404,20 +1404,20 @@ fn benchmark_comprehensive_integration() {
         let final_memory = engine.current_memory_overhead_bytes();
         let performance_metrics = engine.get_performance_metrics();
         
-        println!("  📈 Comprehensive Performance Analysis:");
-        println!("    - Total benchmark time: {:?}", benchmark_start.elapsed());
-        println!("    - Bootstrap time: {:?}", bootstrap_time);
-        println!("    - Iteration time: {:?}", iteration_time);
-        println!("    - Final memory usage: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
+        println!("📈 Comprehensive Performance Analysis:");
+        println!("- Total benchmark time: {:?}", benchmark_start.elapsed());
+        println!("- Bootstrap time: {:?}", bootstrap_time);
+        println!("- Iteration time: {:?}", iteration_time);
+        println!("- Final memory usage: {:.2} MB", final_memory as f64 / (1024.0 * 1024.0));
         
         if let Some(metrics) = performance_metrics {
-            println!("    - Total operations: {}", metrics.total_operations);
-            println!("    - Average interpretation: {:?}", metrics.average_interpretation_time);
-            println!("    - Max interpretation: {:?}", metrics.max_interpretation_time);
-            println!("    - Target violations: {}", metrics.target_violations);
+            println!("- Total operations: {}", metrics.total_operations);
+            println!("- Average interpretation: {:?}", metrics.average_interpretation_time);
+            println!("- Max interpretation: {:?}", metrics.max_interpretation_time);
+            println!("- Target violations: {}", metrics.target_violations);
             
             let success_rate = ((metrics.total_operations - metrics.target_violations) as f64 / metrics.total_operations as f64) * 100.0;
-            println!("    - Success rate: {:.1}%", success_rate);
+            println!("- Success rate: {:.1}%", success_rate);
             
             // Performance should meet targets
             assert!(metrics.average_interpretation_time < Duration::from_millis(fixture.performance_targets.max_interpretation_time_ms), 
@@ -1438,20 +1438,20 @@ fn benchmark_comprehensive_integration() {
         let max_update_time = session_metrics.values().max().unwrap();
         let min_update_time = session_metrics.values().min().unwrap();
         
-        println!("  🏆 Session Performance Summary:");
-        println!("    - Total updates: {}", total_updates);
-        println!("    - Average update time: {:?}", avg_update_time);
-        println!("    - Fastest update: {:?}", min_update_time);
-        println!("    - Slowest update: {:?}", max_update_time);
-        println!("    - Performance consistency: {:.1}%", 
+        println!("Session Performance Summary:");
+        println!("- Total updates: {}", total_updates);
+        println!("- Average update time: {:?}", avg_update_time);
+        println!("- Fastest update: {:?}", min_update_time);
+        println!("- Slowest update: {:?}", max_update_time);
+        println!("- Performance consistency: {:.1}%", 
             (min_update_time.as_nanos() as f64 / max_update_time.as_nanos() as f64) * 100.0);
         
         let analysis_time = analysis_start.elapsed();
-        println!("    - Analysis overhead: {:?}", analysis_time);
+        println!("- Analysis overhead: {:?}", analysis_time);
         
         // Final system health check
         let health_status = engine.get_health_status();
-        println!("    - Final system health: {:?}", health_status);
+        println!("- Final system health: {:?}", health_status);
         
         assert!(health_status.is_healthy(), 
             "System should remain healthy after comprehensive benchmark");
@@ -1461,7 +1461,7 @@ fn benchmark_comprehensive_integration() {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: All development overhead eliminated");
+        println!("Production mode: All development overhead eliminated");
         let engine = fixture.engine.as_ref().unwrap();
         
         assert_eq!(engine.current_memory_overhead_bytes(), 0);
@@ -1469,8 +1469,8 @@ fn benchmark_comprehensive_integration() {
         assert!(!engine.has_performance_monitoring());
         assert!(engine.get_health_status().is_healthy());
         
-        println!("    ✅ Production mode verification: Perfect zero overhead");
+        println!("Production mode verification: Perfect zero overhead");
     }
     
-    println!("🏆 Comprehensive integration performance benchmark completed successfully!");
+    println!("Comprehensive integration performance benchmark completed successfully!");
 }

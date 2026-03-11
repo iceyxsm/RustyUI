@@ -79,6 +79,16 @@ impl InterpreterError {
         Self::UnsupportedFeature(msg.into())
     }
     
+    /// Create a new execution error
+    pub fn execution(msg: impl Into<String>) -> Self {
+        Self::Generic(msg.into())
+    }
+    
+    /// Create a new compilation error
+    pub fn compilation(msg: impl Into<String>) -> Self {
+        Self::Generic(msg.into())
+    }
+    
     /// Create a new resource limit error (development only)
     #[cfg(feature = "dev-ui")]
     pub fn resource_limit(msg: impl Into<String>) -> Self {

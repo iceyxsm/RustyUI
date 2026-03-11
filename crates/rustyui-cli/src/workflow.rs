@@ -30,7 +30,7 @@ impl WorkflowManager {
     
     /// Detect and configure optimal runtime settings automatically
     pub fn auto_configure_runtime(&mut self) -> CliResult<DualModeConfig> {
-        println!("{} Auto-configuring runtime settings...", style("🔧").blue());
+        println!("{} Auto-configuring runtime settings...", style("").blue());
         
         // Detect platform capabilities
         let platform = Platform::current();
@@ -54,7 +54,7 @@ impl WorkflowManager {
         self.config_manager.save_config(&config)?;
         
         println!("{} Runtime configuration optimized for {}", 
-            style("✅").green(), 
+            style("").green(), 
             style(platform.to_string()).cyan()
         );
         
@@ -144,19 +144,19 @@ impl WorkflowManager {
             config.watch_paths = optimized_paths;
         }
         
-        println!("  {} Optimized for {} source files ({} UI files)", 
-            style("📊").blue(),
+        println!("{} Optimized for {} source files ({} UI files)", 
+            style("").blue(),
             analysis.source_files.len(),
             analysis.source_files.iter().filter(|f| f.has_ui_code).count()
         );
         
         #[cfg(feature = "dev-ui")]
-        println!("  {} Interpretation strategy: {:?}", 
+        println!("{} Interpretation strategy: {:?}", 
             style("🧠").blue(),
             config.development_settings.interpretation_strategy
         );
         
-        println!("  {} Watch paths: {:?}", 
+        println!("{} Watch paths: {:?}", 
             style("👀").blue(),
             config.watch_paths
         );
@@ -204,7 +204,7 @@ impl WorkflowManager {
     /// Handle seamless mode transitions
     pub fn handle_mode_transition(&self, target_mode: DevelopmentMode) -> CliResult<()> {
         println!("{} Transitioning to {} mode...", 
-            style("🔄").blue(),
+            style("").blue(),
             style(target_mode.to_string()).cyan()
         );
         
@@ -217,7 +217,7 @@ impl WorkflowManager {
             }
         }
         
-        println!("{} Mode transition completed", style("✅").green());
+        println!("{} Mode transition completed", style("").green());
         Ok(())
     }
     
@@ -226,7 +226,7 @@ impl WorkflowManager {
         // Ensure dev-ui feature is available
         if !cfg!(feature = "dev-ui") {
             println!("{} Development mode requires dev-ui feature", style("⚠").yellow());
-            println!("  Run with: cargo run --features dev-ui");
+            println!("Run with: cargo run --features dev-ui");
             return Ok(());
         }
         
@@ -236,9 +236,9 @@ impl WorkflowManager {
         // Validate development requirements
         self.validate_development_requirements(&config)?;
         
-        println!("  {} Development mode ready", style("✓").green());
-        println!("  {} Hot reload: enabled", style("🔥").green());
-        println!("  {} State preservation: {}", 
+        println!("{} Development mode ready", style("✓").green());
+        println!("{} Hot reload: enabled", style("").green());
+        println!("{} State preservation: {}", 
             style("💾").blue(),
             if cfg!(feature = "dev-ui") {
                 #[cfg(feature = "dev-ui")]
@@ -266,9 +266,9 @@ impl WorkflowManager {
         // Validate production build requirements
         self.validate_production_requirements()?;
         
-        println!("  {} Production mode ready", style("✓").green());
-        println!("  {} Zero overhead: guaranteed", style("🚀").green());
-        println!("  {} Development features: stripped", style("🔒").blue());
+        println!("{} Production mode ready", style("✓").green());
+        println!("{} Zero overhead: guaranteed", style("").green());
+        println!("{} Development features: stripped", style("🔒").blue());
         
         Ok(())
     }
@@ -282,7 +282,7 @@ impl WorkflowManager {
         // Validate file watcher backend
         let watcher_perf = platform_config.file_watcher_backend.performance_characteristics();
         if watcher_perf.latency_ms > 100 {
-            println!("  {} File watcher latency high ({}ms) - performance may be affected", 
+            println!("{} File watcher latency high ({}ms) - performance may be affected", 
                 style("⚠").yellow(),
                 watcher_perf.latency_ms
             );
@@ -297,7 +297,7 @@ impl WorkflowManager {
                 
                 let jit_caps = platform.jit_capabilities();
                 if !jit_caps.supports_cranelift {
-                    println!("  {} JIT compilation not available - falling back to Rhai interpretation", 
+                    println!("{} JIT compilation not available - falling back to Rhai interpretation", 
                         style("⚠").yellow()
                     );
                 }
@@ -308,7 +308,7 @@ impl WorkflowManager {
         for path in &config.watch_paths {
             let full_path = self.project_path.join(path);
             if !full_path.exists() {
-                println!("  {} Watch path does not exist: {}", 
+                println!("{} Watch path does not exist: {}", 
                     style("⚠").yellow(),
                     path.display()
                 );
@@ -322,16 +322,16 @@ impl WorkflowManager {
     fn validate_production_requirements(&self) -> CliResult<()> {
         // Check that dev-ui feature is not enabled in production
         if cfg!(feature = "dev-ui") {
-            println!("  {} Warning: dev-ui feature is enabled in production build", 
+            println!("{} Warning: dev-ui feature is enabled in production build", 
                 style("⚠").yellow()
             );
-            println!("    For zero overhead, build with: cargo build --release");
+            println!("For zero overhead, build with: cargo build --release");
         }
         
         // Validate Cargo.toml configuration
         let analysis = self.project_manager.analyze_project()?;
         if !analysis.build_system.profile_configurations.contains(&"release".to_string()) {
-            println!("  {} No release profile found - using default optimizations", 
+            println!("{} No release profile found - using default optimizations", 
                 style("ℹ").blue()
             );
         }
@@ -342,9 +342,9 @@ impl WorkflowManager {
     /// Integrate with existing Cargo workflows
     pub fn integrate_cargo_workflow(&self, cargo_command: &str, args: &[String]) -> CliResult<()> {
         println!("{} Integrating with Cargo workflow: {} {}", 
-            style("🔗").blue(),
+            style("").blue(),
             style(cargo_command).cyan(),
-            args.join(" ")
+            args.join("")
         );
         
         match cargo_command {
@@ -374,10 +374,10 @@ impl WorkflowManager {
         let has_dev_ui = args.iter().any(|arg| arg.contains("dev-ui"));
         
         if has_dev_ui {
-            println!("  {} Development mode detected", style("🔥").green());
+            println!("{} Development mode detected", style("").green());
             self.handle_mode_transition(DevelopmentMode::Development)?;
         } else {
-            println!("  {} Production mode detected", style("🚀").blue());
+            println!("{} Production mode detected", style("").blue());
             self.handle_mode_transition(DevelopmentMode::Production)?;
         }
         
@@ -391,10 +391,10 @@ impl WorkflowManager {
         let has_dev_ui = args.iter().any(|arg| arg.contains("dev-ui"));
         
         if is_release && !has_dev_ui {
-            println!("  {} Production build detected", style("🚀").green());
+            println!("{} Production build detected", style("").green());
             self.handle_mode_transition(DevelopmentMode::Production)?;
         } else if has_dev_ui {
-            println!("  {} Development build detected", style("🔥").blue());
+            println!("{} Development build detected", style("").blue());
             self.handle_mode_transition(DevelopmentMode::Development)?;
         }
         
@@ -408,7 +408,7 @@ impl WorkflowManager {
         let has_dev_ui = args.iter().any(|arg| arg.contains("dev-ui"));
         
         if has_dev_ui {
-            println!("  {} Testing with development features", style("🧪").blue());
+            println!("{} Testing with development features", style("🧪").blue());
         }
         
         self.execute_cargo_command("test", args)?;
@@ -421,7 +421,7 @@ impl WorkflowManager {
         let has_dev_ui = args.iter().any(|arg| arg.contains("dev-ui"));
         
         if has_dev_ui {
-            println!("  {} Checking with development features", style("🔍").blue());
+            println!("{} Checking with development features", style("").blue());
         }
         
         self.execute_cargo_command("check", args)?;
@@ -459,25 +459,25 @@ impl WorkflowManager {
         println!("{}", style("RustyUI Workflow Status:").bold());
         
         let current_mode = self.get_current_mode()?;
-        println!("  Current mode: {}", style(current_mode.to_string()).cyan());
+        println!("Current mode: {}", style(current_mode.to_string()).cyan());
         
         let analysis = self.project_manager.analyze_project()?;
-        println!("  Project type: {:?}", analysis.project_type);
+        println!("Project type: {:?}", analysis.project_type);
         
         if let Some(framework) = &analysis.detected_framework {
-            println!("  Framework: {}", style(framework).cyan());
+            println!("Framework: {}", style(framework).cyan());
         }
         
         println!("\n{}", style("Available Commands:").bold());
-        println!("  {} - Start development mode", style("rustyui dev").cyan());
-        println!("  {} - Development with hot reload", style("cargo run --features dev-ui").cyan());
-        println!("  {} - Production build", style("cargo build --release").cyan());
-        println!("  {} - Show configuration", style("rustyui config").cyan());
+        println!("{} - Start development mode", style("rustyui dev").cyan());
+        println!("{} - Development with hot reload", style("cargo run --features dev-ui").cyan());
+        println!("{} - Production build", style("cargo build --release").cyan());
+        println!("{} - Show configuration", style("rustyui config").cyan());
         
         println!("\n{}", style("Workflow Integration:").bold());
-        println!("  {} Automatic mode detection", style("✓").green());
-        println!("  {} Seamless Cargo integration", style("✓").green());
-        println!("  {} Platform-optimized settings", style("✓").green());
+        println!("{} Automatic mode detection", style("✓").green());
+        println!("{} Seamless Cargo integration", style("✓").green());
+        println!("{} Platform-optimized settings", style("✓").green());
         
         Ok(())
     }

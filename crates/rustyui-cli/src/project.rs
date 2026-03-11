@@ -60,7 +60,7 @@ impl ProjectManager {
             ));
         }
         
-        println!("{} Creating new Rust project '{}'...", style("🔧").blue(), name);
+        println!("{} Creating new Rust project '{}'...", style("").blue(), name);
         
         let status = Command::new("cargo")
             .args(&["init", "--name", name])
@@ -368,7 +368,7 @@ dev-ui = [
             return Err(CliError::project("Not a Rust project"));
         }
         
-        println!("{} Building for production...", style("🔧").blue());
+        println!("{} Building for production...", style("").blue());
         
         let mut args = vec!["build"];
         if release {
@@ -397,7 +397,7 @@ dev-ui = [
             return Err(CliError::project("Not a RustyUI project. Run 'rustyui init' first."));
         }
         
-        println!("{} Starting development mode...", style("🚀").blue());
+        println!("{} Starting development mode...", style("").blue());
         
         let args = vec!["run", "--features", "dev-ui"];
         

@@ -4,7 +4,7 @@ use crate::{config::DualModeConfig, error::{Result, RustyUIError}, platform::{Pl
 use std::time::{Duration, Instant};
 
 #[cfg(feature = "dev-ui")]
-use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}};
+use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}, performance_optimization::{LazyOptimizations, StartupMetric, MemoryMetric}};
 
 // Production-compatible stub types
 #[cfg(not(feature = "dev-ui"))]
@@ -100,7 +100,7 @@ impl DualModeEngine {
         platform_config.validate()
             .map_err(|e| RustyUIError::initialization(format!("Platform configuration invalid: {}", e)))?;
         
-        println!("🚀 Initializing RustyUI on {} with {} file watcher", 
+        println!("Initializing RustyUI on {} with {} file watcher", 
             platform_config.platform, 
             match platform_config.file_watcher_backend {
                 crate::platform::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
@@ -160,8 +160,14 @@ impl DualModeEngine {
     
     /// Initialize the dual-mode engine with platform-specific optimizations
     pub fn initialize(&mut self) -> Result<()> {
+        let startup_start = Instant::now();
+        
         #[cfg(feature = "dev-ui")]
         {
+            // Record startup metric for performance optimization
+            let lazy_opts = LazyOptimizations::global();
+            let metrics_collector = lazy_opts.metrics_collector();
+            
             // Check development feature requirements
             PlatformCapabilities::check_dev_features()
                 .map_err(|e| RustyUIError::initialization(format!("Development features not available: {}", e)))?;
@@ -189,8 +195,18 @@ impl DualModeEngine {
             // Initialize component lifecycle manager
             self.component_manager = Some(crate::component_lifecycle::ComponentLifecycleManager::new());
             
-            println!("✅ Development mode initialized with platform optimizations");
-            println!("  File watcher: {} (expected latency: {}ms)", 
+            // Record startup completion
+            let startup_duration = startup_start.elapsed();
+            if let Ok(mut collector) = metrics_collector.lock() {
+                collector.record_startup_metric(StartupMetric {
+                    component: "DualModeEngine".to_string(),
+                    duration: startup_duration,
+                    timestamp: std::time::SystemTime::now(),
+                });
+            }
+            
+            println!("Development mode initialized with platform optimizations");
+            println!("File watcher: {} (expected latency: {}ms)", 
                 match self.platform_config.file_watcher_backend {
                     crate::platform::FileWatcherBackend::ReadDirectoryChanges => "ReadDirectoryChanges",
                     crate::platform::FileWatcherBackend::FSEvents => "FSEvents", 
@@ -199,10 +215,11 @@ impl DualModeEngine {
                 },
                 self.platform_config.file_watcher_backend.performance_characteristics().latency_ms
             );
-            println!("  JIT compilation: {}", 
+            println!("JIT compilation: {}", 
                 if self.platform_config.use_jit_compilation { "enabled" } else { "disabled" }
             );
-            println!("  Thread count: {}", self.platform_config.thread_count);
+            println!("Thread count: {}", self.platform_config.thread_count);
+            println!("Startup time: {:?} (target: <100ms)", startup_duration);
         }
         
         self.initialized = true;
@@ -335,20 +352,20 @@ impl DualModeEngine {
             
             let changes = monitor.check_changes();
             if !changes.is_empty() {
-                println!("🔍 Analyzing {} file changes with 2026 intelligent classification", changes.len());
+                println!("Analyzing {} file changes with intelligent classification", changes.len());
                 let analysis = analyzer.analyze_changes(changes);
                 
                 // Log analysis results
-                println!("📊 Analysis completed in {:?}", analysis.analysis_time);
-                println!("  Priority changes: {}", 
+                println!("Analysis completed in {:?}", analysis.analysis_time);
+                println!("Priority changes: {}", 
                     analysis.analyzed_changes.iter()
                         .filter(|c| matches!(c.classification.priority, 
                             crate::change_analyzer::ChangePriority::Critical | 
                             crate::change_analyzer::ChangePriority::High))
                         .count()
                 );
-                println!("  Requires full reload: {}", analysis.requires_full_reload);
-                println!("  Cascade updates: {}", analysis.cascade_updates.len());
+                println!("Requires full reload: {}", analysis.requires_full_reload);
+                println!("Cascade updates: {}", analysis.cascade_updates.len());
                 
                 return Ok(Some(analysis));
             }
@@ -378,9 +395,9 @@ impl DualModeEngine {
         
         let execution_time = start_time.elapsed();
         
-        println!("🔄 Interpreted UI change ({} chars) in {:?}", code.len(), execution_time);
+        println!("Interpreted UI change ({} chars) in {:?}", code.len(), execution_time);
         if let Some(id) = component_id {
-            println!("  Component: {}", id);
+            println!("Component: {}", id);
         }
         
         Ok(InterpretationResult {
@@ -487,16 +504,16 @@ impl DualModeEngine {
             // Log recovery attempt
             match &result {
                 crate::error_recovery::RecoveryResult::Success { strategy, message, .. } => {
-                    println!("✅ Error recovery successful: {} (strategy: {:?})", message, strategy);
+                    println!("Error recovery successful: {} (strategy: {:?})", message, strategy);
                 }
                 crate::error_recovery::RecoveryResult::PartialRecovery { strategy, message, limitations } => {
-                    println!("⚠️ Partial error recovery: {} (strategy: {:?})", message, strategy);
+                    println!("Partial error recovery: {} (strategy: {:?})", message, strategy);
                     for limitation in limitations {
-                        println!("  - {}", limitation);
+                        println!("- {}", limitation);
                     }
                 }
                 crate::error_recovery::RecoveryResult::Failed { strategy, message } => {
-                    println!("❌ Error recovery failed: {} (strategy: {:?})", message, strategy);
+                    println!("Error recovery failed: {} (strategy: {:?})", message, strategy);
                 }
             }
             

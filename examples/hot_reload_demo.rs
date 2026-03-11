@@ -119,7 +119,7 @@ impl HotReloadDemo {
                 }
                 
                 self.engine = Some(engine);
-                println!(" RustyUI hot reload enabled!");
+                println!("RustyUI hot reload enabled!");
             }
             Err(e) => {
                 eprintln!("Failed to create RustyUI engine: {}", e);

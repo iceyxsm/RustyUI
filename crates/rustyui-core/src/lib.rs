@@ -33,6 +33,9 @@ pub mod performance;
 #[cfg(feature = "dev-ui")]
 pub mod component_lifecycle;
 
+#[cfg(feature = "dev-ui")]
+pub mod performance_optimization;
+
 #[cfg(all(test, feature = "dev-ui"))]
 mod error_recovery_test;
 
@@ -74,6 +77,9 @@ pub use performance::{PerformanceMonitor, PerformanceTargets, PerformanceMetrics
 
 #[cfg(feature = "dev-ui")]
 pub use component_lifecycle::{ComponentLifecycleManager, ComponentLifecycle, ComponentState, ComponentStatistics};
+
+#[cfg(feature = "dev-ui")]
+pub use performance_optimization::{LazyOptimizations, RegexCache, MemoryPoolManager, JitCompilationCache, PerformanceMetricsCollector, CacheFriendlyComponentStore, ProfileGuidedOptimization};
 
 /// Trait for framework-agnostic rendering context
 pub trait RenderContext {

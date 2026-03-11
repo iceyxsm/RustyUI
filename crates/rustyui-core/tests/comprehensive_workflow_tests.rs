@@ -184,12 +184,12 @@ impl Default for AppState {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🚀 Starting Comprehensive Test Application");
+    println!("Starting Comprehensive Test Application");
     
     let mut app_state = AppState::default();
     
     // Simulate application lifecycle
-    println!("📊 Initial state: {} todos, counter: {}", 
+    println!("Initial state: {} todos, counter: {}", 
         app_state.todos.len(), app_state.counter);
     
     // Simulate user interactions
@@ -203,7 +203,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             .as_secs(),
     });
     
-    println!("📊 Updated state: {} todos, counter: {}", 
+    println!("Updated state: {} todos, counter: {}", 
         app_state.todos.len(), app_state.counter);
     
     // Serialize state for persistence testing
@@ -230,20 +230,20 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 fn test_complete_workflow_init_dev_build_production() {
     let mut fixture = ComprehensiveWorkflowFixture::new();
     
-    println!("🔄 Testing Complete Workflow: init → dev → build → production");
+    println!("Testing Complete Workflow: init → dev → build → production");
     
     // Phase 1: Project Initialization (`rustyui init`)
-    println!("  📊 Phase 1: Project Initialization (rustyui init)");
+    println!("Phase 1: Project Initialization (rustyui init)");
     
     // Create base Rust project
     fixture.create_realistic_rust_project().expect("Should create Rust project");
     
     // Analyze existing project
     let analysis = fixture.project_manager.analyze_project().expect("Should analyze project");
-    println!("    📊 Project analysis:");
-    println!("      - Is Rust project: {}", analysis.is_rust_project);
-    println!("      - Has RustyUI config: {}", analysis.has_rustyui_config);
-    println!("      - Detected framework: {:?}", analysis.detected_framework);
+    println!("Project analysis:");
+    println!("- Is Rust project: {}", analysis.is_rust_project);
+    println!("- Has RustyUI config: {}", analysis.has_rustyui_config);
+    println!("- Detected framework: {:?}", analysis.detected_framework);
     
     assert!(analysis.is_rust_project, "Should detect Rust project");
     assert!(!analysis.is_rustyui_project, "Should not be RustyUI project yet");
@@ -271,7 +271,7 @@ fn test_complete_workflow_init_dev_build_production() {
         .expect("Should generate README");
     
     let init_time = init_start.elapsed();
-    println!("    📊 Initialization time: {:?}", init_time);
+    println!("Initialization time: {:?}", init_time);
     
     // Verify initialization results
     let post_init_analysis = fixture.project_manager.analyze_project()
@@ -286,10 +286,10 @@ fn test_complete_workflow_init_dev_build_production() {
     assert!(fixture.project_path.join(".gitignore").exists(), "Should create .gitignore");
     assert!(fixture.project_path.join("README.md").exists(), "Should create README.md");
     
-    println!("    ✅ Project initialization completed successfully");
+    println!("Project initialization completed successfully");
     
     // Phase 2: Development Mode (`rustyui dev`)
-    println!("  📊 Phase 2: Development Mode (rustyui dev)");
+    println!("Phase 2: Development Mode (rustyui dev)");
     
     let dev_start = Instant::now();
     
@@ -306,11 +306,11 @@ fn test_complete_workflow_init_dev_build_production() {
     {
         engine.start_development_mode().expect("Should start development mode");
         
-        println!("    📊 Development mode capabilities:");
-        println!("      - Runtime interpreter: {}", engine.has_runtime_interpreter());
-        println!("      - Can interpret changes: {}", engine.can_interpret_changes());
-        println!("      - Performance monitoring: {}", engine.has_performance_monitoring());
-        println!("      - Memory overhead: {:.2} KB", engine.current_memory_overhead_bytes() as f64 / 1024.0);
+        println!("Development mode capabilities:");
+        println!("- Runtime interpreter: {}", engine.has_runtime_interpreter());
+        println!("- Can interpret changes: {}", engine.can_interpret_changes());
+        println!("- Performance monitoring: {}", engine.has_performance_monitoring());
+        println!("- Memory overhead: {:.2} KB", engine.current_memory_overhead_bytes() as f64 / 1024.0);
         
         // Verify development mode features
         assert!(engine.has_runtime_interpreter(), "Should have runtime interpreter");
@@ -358,20 +358,20 @@ fn test_complete_workflow_init_dev_build_production() {
             
             hot_reload_times.push(reload_time);
             
-            println!("    📊 Hot reload for {}: {:?}", component_id, reload_time);
+            println!("Hot reload for {}: {:?}", component_id, reload_time);
             
             // Hot reload should be fast
             assert!(reload_time < Duration::from_millis(100), 
                 "Hot reload should be under 100ms, got {:?}", reload_time);
             
             match result {
-                Ok(_) => println!("      ✅ Hot reload succeeded"),
-                Err(e) => println!("      ⚠️ Hot reload handled gracefully: {}", e),
+                Ok(_) => println!("Hot reload succeeded"),
+                Err(e) => println!("Hot reload handled gracefully: {}", e),
             }
         }
         
         let avg_hot_reload_time = hot_reload_times.iter().sum::<Duration>() / hot_reload_times.len() as u32;
-        println!("    📈 Average hot reload time: {:?}", avg_hot_reload_time);
+        println!("📈 Average hot reload time: {:?}", avg_hot_reload_time);
         
         // Test file watching
         let file_watch_start = Instant::now();
@@ -422,7 +422,7 @@ impl TodoComponent {
         let changes_result = engine.process_file_changes();
         let file_watch_time = file_watch_start.elapsed();
         
-        println!("    📊 File watching time: {:?}", file_watch_time);
+        println!("File watching time: {:?}", file_watch_time);
         
         // File watching should be fast
         assert!(file_watch_time < Duration::from_millis(50), 
@@ -430,21 +430,21 @@ impl TodoComponent {
         
         match changes_result {
             Ok(changes) => {
-                println!("      ✅ File changes detected: {} files", changes.len());
+                println!("File changes detected: {} files", changes.len());
             }
-            Err(e) => println!("      ⚠️ File watching handled gracefully: {}", e),
+            Err(e) => println!("File watching handled gracefully: {}", e),
         }
     }
     
     let dev_time = dev_start.elapsed();
-    println!("    📊 Development mode setup time: {:?}", dev_time);
+    println!("Development mode setup time: {:?}", dev_time);
     
     fixture.engine = Some(engine);
     
-    println!("    ✅ Development mode completed successfully");
+    println!("Development mode completed successfully");
     
     // Phase 3: Build Process
-    println!("  📊 Phase 3: Build Process");
+    println!("Phase 3: Build Process");
     
     let build_start = Instant::now();
     
@@ -452,27 +452,27 @@ impl TodoComponent {
     let build_result = fixture.workflow_manager.execute_build_workflow(&loaded_config);
     let build_time = build_start.elapsed();
     
-    println!("    📊 Build time: {:?}", build_time);
+    println!("Build time: {:?}", build_time);
     
     match build_result {
         Ok(build_info) => {
-            println!("    📊 Build results:");
-            println!("      - Build succeeded: {}", build_info.success);
-            println!("      - Artifacts created: {}", build_info.artifacts.len());
-            println!("      - Warnings: {}", build_info.warnings.len());
-            println!("      - Build type: {:?}", build_info.build_type);
+            println!("Build results:");
+            println!("- Build succeeded: {}", build_info.success);
+            println!("- Artifacts created: {}", build_info.artifacts.len());
+            println!("- Warnings: {}", build_info.warnings.len());
+            println!("- Build type: {:?}", build_info.build_type);
             
             assert!(build_info.success, "Build should succeed");
         }
         Err(e) => {
-            println!("    ⚠️ Build handled gracefully: {}", e);
+            println!("Build handled gracefully: {}", e);
         }
     }
     
-    println!("    ✅ Build process completed");
+    println!("Build process completed");
     
     // Phase 4: Production Verification
-    println!("  📊 Phase 4: Production Build Verification");
+    println!("Phase 4: Production Build Verification");
     
     let production_start = Instant::now();
     
@@ -480,24 +480,24 @@ impl TodoComponent {
     let verification_result = verifier.verify_zero_overhead_build(&fixture.project_path);
     let production_time = production_start.elapsed();
     
-    println!("    📊 Production verification time: {:?}", production_time);
+    println!("Production verification time: {:?}", production_time);
     
     match verification_result {
         Ok(results) => {
-            println!("    📊 Production verification results:");
-            println!("      - Zero overhead: {}", results.has_zero_overhead());
-            println!("      - Contains dev features: {}", results.contains_dev_features());
-            println!("      - Size optimized: {}", results.is_size_optimized());
-            println!("      - Security hardened: {}", results.is_security_hardened());
+            println!("Production verification results:");
+            println!("- Zero overhead: {}", results.has_zero_overhead());
+            println!("- Contains dev features: {}", results.contains_dev_features());
+            println!("- Size optimized: {}", results.is_size_optimized());
+            println!("- Security hardened: {}", results.is_security_hardened());
             
             // Production build should have zero overhead
             assert!(results.has_zero_overhead(), "Production build should have zero overhead");
             assert!(!results.contains_dev_features(), "Production build should not contain dev features");
             
             if let Some(perf_results) = results.performance_results() {
-                println!("      - Startup time: {:?}", perf_results.startup_time);
-                println!("      - Memory usage: {} bytes", perf_results.memory_usage);
-                println!("      - Performance ratio: {:.3}", perf_results.performance_ratio());
+                println!("- Startup time: {:?}", perf_results.startup_time);
+                println!("- Memory usage: {} bytes", perf_results.memory_usage);
+                println!("- Performance ratio: {:.3}", perf_results.performance_ratio());
                 
                 // Performance should match native Rust
                 assert!(perf_results.performance_ratio() >= 0.95, 
@@ -505,27 +505,27 @@ impl TodoComponent {
             }
         }
         Err(e) => {
-            println!("    ⚠️ Production verification handled gracefully: {}", e);
+            println!("Production verification handled gracefully: {}", e);
         }
     }
     
-    println!("    ✅ Production verification completed");
+    println!("Production verification completed");
     
     // Phase 5: Workflow Summary
     let total_workflow_time = init_time + dev_time + build_time + production_time;
     
-    println!("  🏆 Complete Workflow Summary:");
-    println!("    - Initialization: {:?}", init_time);
-    println!("    - Development setup: {:?}", dev_time);
-    println!("    - Build process: {:?}", build_time);
-    println!("    - Production verification: {:?}", production_time);
-    println!("    - Total workflow time: {:?}", total_workflow_time);
+    println!("Complete Workflow Summary:");
+    println!("- Initialization: {:?}", init_time);
+    println!("- Development setup: {:?}", dev_time);
+    println!("- Build process: {:?}", build_time);
+    println!("- Production verification: {:?}", production_time);
+    println!("- Total workflow time: {:?}", total_workflow_time);
     
     // Entire workflow should complete in reasonable time
     assert!(total_workflow_time < Duration::from_secs(30), 
         "Complete workflow should finish under 30 seconds, got {:?}", total_workflow_time);
     
-    println!("✅ Complete workflow integration test passed!");
+    println!("Complete workflow integration test passed!");
 }
 // ============================================================================
 // Test 2: Advanced State Preservation Across Complex Interpretation Cycles
@@ -540,7 +540,7 @@ fn test_advanced_state_preservation_complex_scenarios() {
     let mut fixture = ComprehensiveWorkflowFixture::new();
     fixture.create_realistic_rust_project().expect("Should create project");
     
-    println!("🔄 Testing Advanced State Preservation Across Complex Scenarios");
+    println!("Testing Advanced State Preservation Across Complex Scenarios");
     
     let config = fixture.config_manager.create_default_config(UIFramework::Egui)
         .expect("Should create config");
@@ -553,7 +553,7 @@ fn test_advanced_state_preservation_complex_scenarios() {
         engine.start_development_mode().expect("Should start development mode");
         
         // Phase 1: Complex Nested State Preservation
-        println!("  📊 Phase 1: Complex Nested State Preservation");
+        println!("Phase 1: Complex Nested State Preservation");
         
         // Create complex application state
         let complex_state = json!({
@@ -621,11 +621,11 @@ fn test_advanced_state_preservation_complex_scenarios() {
             .expect("Should preserve complex state");
         let preserve_time = preserve_start.elapsed();
         
-        println!("    📊 Complex state preservation time: {:?}", preserve_time);
+        println!("Complex state preservation time: {:?}", preserve_time);
         
         // Simulate multiple interpretation cycles with state changes
         for cycle in 0..10 {
-            println!("    🔄 Interpretation cycle {}", cycle + 1);
+            println!("Interpretation cycle {}", cycle + 1);
             
             // Modify different parts of the state
             let state_modification = match cycle % 4 {
@@ -704,14 +704,14 @@ fn test_advanced_state_preservation_complex_scenarios() {
                         assert!(state["app"].get("todos").is_some(), "Should preserve todos structure");
                     }
                 }
-                Err(e) => println!("      ⚠️ Cycle {} handled gracefully: {}", cycle, e),
+                Err(e) => println!("Cycle {} handled gracefully: {}", cycle, e),
             }
         }
         
-        println!("    ✅ Complex nested state preservation completed");
+        println!("Complex nested state preservation completed");
         
         // Phase 2: Concurrent State Preservation Test
-        println!("  📊 Phase 2: Concurrent State Preservation");
+        println!("Phase 2: Concurrent State Preservation");
         
         // Create multiple components with concurrent state changes
         let concurrent_components = vec![
@@ -756,7 +756,7 @@ fn test_advanced_state_preservation_complex_scenarios() {
         }
         
         let concurrent_time = concurrent_start.elapsed();
-        println!("    📊 Concurrent state preservation time: {:?}", concurrent_time);
+        println!("Concurrent state preservation time: {:?}", concurrent_time);
         
         // Verify all concurrent states are preserved
         for (component_id, _) in &concurrent_components {
@@ -764,10 +764,10 @@ fn test_advanced_state_preservation_complex_scenarios() {
             assert!(restored.is_some(), "Should restore concurrent state for {}", component_id);
         }
         
-        println!("    ✅ Concurrent state preservation completed");
+        println!("Concurrent state preservation completed");
         
         // Phase 3: Error Recovery During State Preservation
-        println!("  📊 Phase 3: Error Recovery During State Preservation");
+        println!("Phase 3: Error Recovery During State Preservation");
         
         // Test state preservation with invalid data
         let invalid_states = vec![
@@ -786,17 +786,17 @@ fn test_advanced_state_preservation_complex_scenarios() {
             
             match error_result {
                 Ok(_) => {
-                    println!("    ✅ Error case '{}' handled gracefully", test_name);
+                    println!("Error case '{}' handled gracefully", test_name);
                     
                     // Try to restore
                     let restored = engine.restore_component_state(&error_component);
                     match restored {
-                        Some(_) => println!("      ✅ State restored successfully"),
-                        None => println!("      ⚠️ State restoration failed gracefully"),
+                        Some(_) => println!("State restored successfully"),
+                        None => println!("State restoration failed gracefully"),
                     }
                 }
                 Err(e) => {
-                    println!("    ✅ Error case '{}' failed gracefully: {}", test_name, e);
+                    println!("Error case '{}' failed gracefully: {}", test_name, e);
                 }
             }
             
@@ -805,13 +805,13 @@ fn test_advanced_state_preservation_complex_scenarios() {
                 "System should remain healthy after error case '{}'", test_name);
         }
         
-        println!("    ✅ Error recovery during state preservation completed");
+        println!("Error recovery during state preservation completed");
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("  🚀 Production mode: State preservation overhead eliminated");
+        println!("Production mode: State preservation overhead eliminated");
     }
     
-    println!("✅ Advanced state preservation test completed!");
+    println!("Advanced state preservation test completed!");
 }

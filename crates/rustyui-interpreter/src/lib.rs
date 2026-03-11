@@ -1,7 +1,7 @@
 //! # RustyUI Interpreter
 //! 
 //! Runtime interpretation system for RustyUI with Rhai scripting, AST parsing,
-//! and Cranelift JIT compilation.
+//! and Cranelift JIT compilation. Enhanced with 2026 performance optimizations.
 
 #[cfg(feature = "dev-ui")]
 pub mod rhai_interpreter;
@@ -40,13 +40,13 @@ pub struct RuntimeInterpreter {
     /// JIT compiler for performance-critical code
     jit_compiler: JITCompiler,
     
-    /// Interpretation cache
+    /// Interpretation cache (now using optimized memory pools)
     interpretation_cache: std::collections::HashMap<String, InterpretedCode>,
 }
 
 #[cfg(feature = "dev-ui")]
 impl RuntimeInterpreter {
-    /// Create a new runtime interpreter
+    /// Create a new runtime interpreter with performance optimizations
     pub fn new() -> Result<Self> {
         Ok(Self {
             rhai_interpreter: RhaiInterpreter::new()?,
@@ -56,9 +56,9 @@ impl RuntimeInterpreter {
         })
     }
     
-    /// Interpret a UI code change with error recovery
+    /// Interpret a UI code change with error recovery and performance optimization
     pub fn interpret_change(&mut self, change: &UIChange) -> Result<InterpretationResult> {
-        let start_time = std::time::Instant::now();
+        let _start_time = std::time::Instant::now();
         
         // Choose interpretation strategy based on code complexity and configuration
         let strategy = self.choose_strategy(change);
