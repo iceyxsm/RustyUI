@@ -140,7 +140,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Ok(result) => {
                 println!("✓ Complex UI interpretation: {:?}", result.execution_time);
                 if result.execution_time > std::time::Duration::from_millis(100) {
-                    println!("  ⚠ Warning: Interpretation took longer than 100ms target");
+                    println!("  WARNING: Interpretation took longer than 100ms target");
                 } else {
                     println!("  ✓ Performance target met (<100ms)");
                 }

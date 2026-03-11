@@ -308,7 +308,7 @@ impl DualModeEngine {
     
     /// Get performance metrics (production mode)
     #[cfg(not(feature = "dev-ui"))]
-    pub fn get_performance_metrics(&self) -> Option<&crate::performance::PerformanceMetrics> {
+    pub fn get_performance_metrics(&self) -> Option<()> {
         None
     }
     

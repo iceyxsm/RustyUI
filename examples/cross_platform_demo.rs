@@ -10,29 +10,29 @@ use rustyui_core::{
 use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🚀 RustyUI Cross-Platform Capabilities Demo");
+    println!("RustyUI Cross-Platform Capabilities Demo");
     println!("============================================\n");
     
     // Detect current platform
     let platform = Platform::current();
-    println!("📱 Detected Platform: {}", platform);
+    println!("Detected Platform: {}", platform);
     
     // Check if platform is supported
     if platform.is_supported() {
-        println!("✅ Platform is fully supported");
+        println!(" Platform is fully supported");
     } else {
-        println!("⚠️  Platform has limited support");
+        println!(" Platform has limited support");
     }
     
     // Check minimum requirements
     match PlatformCapabilities::check_minimum_requirements() {
-        Ok(()) => println!("✅ All minimum requirements met"),
-        Err(e) => println!("❌ Requirements not met: {}", e),
+        Ok(()) => println!(" All minimum requirements met"),
+        Err(e) => println!("Requirements not met: {}", e),
     }
     
     // Get platform configuration
     let platform_config = PlatformConfig::auto_detect();
-    println!("\n🔧 Platform Configuration:");
+    println!("\n Platform Configuration:");
     println!("  File Watcher Backend: {:?}", platform_config.file_watcher_backend);
     println!("  Thread Count: {}", platform_config.thread_count);
     println!("  JIT Compilation: {}", platform_config.use_jit_compilation);
@@ -41,7 +41,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Show file watcher performance characteristics
     let watcher_perf = platform_config.file_watcher_backend.performance_characteristics();
-    println!("\n📊 File Watcher Performance:");
+    println!("\n File Watcher Performance:");
     println!("  Expected Latency: {}ms", watcher_perf.latency_ms);
     println!("  CPU Overhead: {:.2}%", watcher_perf.cpu_overhead);
     println!("  Memory Overhead: {}KB", watcher_perf.memory_overhead_kb);
@@ -49,7 +49,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Show JIT capabilities
     let jit_caps = platform.jit_capabilities();
-    println!("\n⚡ JIT Compilation Capabilities:");
+    println!("\n JIT Compilation Capabilities:");
     println!("  Cranelift Support: {}", jit_caps.supports_cranelift);
     println!("  Wasmtime Support: {}", jit_caps.supports_wasmtime);
     println!("  Memory Protection: {}", jit_caps.memory_protection);
@@ -57,14 +57,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Show platform-specific optimizations
     let optimizations = platform.optimizations();
-    println!("\n🚀 Platform Optimizations:");
+    println!("\n Platform Optimizations:");
     println!("  Native File Watching: {}", optimizations.use_native_file_watching);
     println!("  Memory Mapped Files: {}", optimizations.use_memory_mapped_files);
     println!("  Vectorized Operations: {}", optimizations.use_vectorized_operations);
     println!("  Preferred Threads: {}", optimizations.preferred_thread_count);
     
     // Demonstrate dual-mode engine with platform optimization
-    println!("\n🔄 Initializing Dual-Mode Engine...");
+    println!("\n Initializing Dual-Mode Engine...");
     
     let config = DualModeConfig::default();
     let mut engine = DualModeEngine::new(config)?;
@@ -76,10 +76,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     // Initialize the engine
     engine.initialize()?;
-    println!("✅ Engine initialized successfully with platform optimizations");
+    println!(" Engine initialized successfully with platform optimizations");
     
     // Show platform-specific recommendations
-    println!("\n💡 Platform-Specific Recommendations:");
+    println!("\n Platform-Specific Recommendations:");
     match platform {
         Platform::Windows => {
             println!("  • Use ReadDirectoryChanges for optimal file watching");
@@ -111,10 +111,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     #[cfg(feature = "dev-ui")]
     {
         // Check development features
-        println!("\n🛠️  Development Features:");
+        println!("\n  Development Features:");
         match PlatformCapabilities::check_dev_features() {
             Ok(()) => {
-                println!("✅ All development features available");
+                println!(" All development features available");
                 println!("  • Runtime interpretation enabled");
                 println!("  • File watching active");
                 println!("  • State preservation ready");
@@ -123,28 +123,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             Err(e) => {
-                println!("❌ Development features limited: {}", e);
+                println!(" Development features limited: {}", e);
             }
         }
     }
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("\n🏭 Production Mode:");
-        println!("✅ All development features stripped for zero overhead");
+        println!("\n Production Mode:");
+        println!(" All development features stripped for zero overhead");
         println!("  • Binary size optimized");
         println!("  • Runtime performance maximized");
         println!("  • Memory usage minimized");
     }
     
-    println!("\n🎉 Cross-platform demo completed successfully!");
+    println!("\n Cross-platform demo completed successfully!");
     
     Ok(())
 }
 
 /// Demonstrate platform-specific file watcher backends
 fn demonstrate_file_watcher_backends() {
-    println!("\n📁 File Watcher Backend Comparison:");
+    println!("\n File Watcher Backend Comparison:");
     
     let backends = [
         FileWatcherBackend::ReadDirectoryChanges,
@@ -165,7 +165,7 @@ fn demonstrate_file_watcher_backends() {
 
 /// Show cross-platform compatibility matrix
 fn show_compatibility_matrix() {
-    println!("\n📋 Cross-Platform Compatibility Matrix:");
+    println!("\n Cross-Platform Compatibility Matrix:");
     println!("┌─────────────┬─────────┬─────────┬─────────┬─────────┐");
     println!("│ Feature     │ Windows │ macOS   │ Linux   │ Other   │");
     println!("├─────────────┼─────────┼─────────┼─────────┼─────────┤");

@@ -105,12 +105,12 @@ impl RuntimeInterpreter {
             match result {
                 Ok(interpretation_result) => {
                     if attempts > 1 {
-                        println!("✅ Interpretation succeeded after {} attempts using {:?}", attempts, strategy);
+                        println!("SUCCESS: Interpretation succeeded after {} attempts using {:?}", attempts, strategy);
                     }
                     return Ok(interpretation_result);
                 }
                 Err(error) if attempts < max_attempts => {
-                    println!("⚠️ Interpretation failed with {:?}, attempting fallback: {}", strategy, error);
+                    println!("WARNING: Interpretation failed with {:?}, attempting fallback: {}", strategy, error);
                     
                     // Try fallback strategy
                     strategy = match strategy {
@@ -127,7 +127,7 @@ impl RuntimeInterpreter {
                     };
                 }
                 Err(error) => {
-                    println!("❌ All interpretation strategies failed after {} attempts", attempts);
+                    println!("FAILED: All interpretation strategies failed after {} attempts", attempts);
                     return Ok(InterpretationResult {
                         execution_time: std::time::Instant::now().duration_since(std::time::Instant::now()),
                         success: false,
@@ -272,7 +272,7 @@ impl RuntimeInterpreter {
             Ok(result) => Ok(result),
             Err(error) => {
                 // Isolate error and provide graceful degradation
-                println!("🛡️ Error isolated for component {:?}: {}", component_id, error);
+                println!("Error isolated for component {:?}: {}", component_id, error);
                 
                 Ok(InterpretationResult {
                     execution_time: std::time::Duration::from_millis(0),
@@ -288,7 +288,7 @@ impl RuntimeInterpreter {
         match self.interpret_change(change) {
             Ok(result) => result,
             Err(error) => {
-                println!("🛡️ Error isolated during interpretation: {}", error);
+                println!("Error isolated during interpretation: {}", error);
                 
                 // Return safe fallback result
                 InterpretationResult {

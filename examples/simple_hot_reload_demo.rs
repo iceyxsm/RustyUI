@@ -49,18 +49,18 @@ impl SimpleButton {
     fn click(&mut self) {
         if self.state.enabled {
             self.state.click_count += 1;
-            println!("🖱️ Button '{}' clicked! Count: {}", self.id, self.state.click_count);
+            println!("Button '{}' clicked! Count: {}", self.id, self.state.click_count);
         }
     }
     
     fn set_text(&mut self, text: String) {
         self.state.text = text;
-        println!("📝 Button '{}' text changed to: '{}'", self.id, self.state.text);
+        println!("Button '{}' text changed to: '{}'", self.id, self.state.text);
     }
     
     fn toggle_enabled(&mut self) {
         self.state.enabled = !self.state.enabled;
-        println!("🔄 Button '{}' enabled: {}", self.id, self.state.enabled);
+        println!("Button '{}' enabled: {}", self.id, self.state.enabled);
     }
 }
 
@@ -83,7 +83,7 @@ impl UIComponent for SimpleButton {
     #[cfg(feature = "dev-ui")]
     fn restore_state(&mut self, state: Self::State) -> rustyui_core::Result<()> {
         self.state = state;
-        println!("🔄 Button '{}' state restored: {:?}", self.id, self.state);
+        println!("Button '{}' state restored: {:?}", self.id, self.state);
         Ok(())
     }
     
@@ -122,8 +122,8 @@ impl HotReloadApp {
         let mut engine = DualModeEngine::new(config)?;
         engine.initialize()?;
         
-        println!("🚀 RustyUI Hot Reload Demo initialized!");
-        println!("📁 Watching paths: {:?}", engine.config().watch_paths);
+        println!("RustyUI Hot Reload Demo initialized!");
+        println!("Watching paths: {:?}", engine.config().watch_paths);
         
         let mut app = Self {
             engine,
@@ -163,12 +163,12 @@ impl HotReloadApp {
             self.components.insert(id.to_string(), button);
         }
         
-        println!("✅ Created {} demo components", self.components.len());
+        println!("Created {} demo components", self.components.len());
         Ok(())
     }
     
     fn simulate_user_interactions(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🎮 Simulating user interactions...");
+        println!("\nSimulating user interactions...");
         
         // Simulate clicking buttons - need to separate the operations to avoid borrow checker issues
         if self.components.contains_key("primary_button") {
@@ -209,13 +209,13 @@ impl HotReloadApp {
     }
     
     fn simulate_hot_reload(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🔥 Simulating hot reload...");
+        println!("\nSimulating hot reload...");
         
         // Simulate file change detection
         let updated_components = self.engine.process_file_change_and_update("examples/simple_hot_reload_demo.rs")?;
         
         if !updated_components.is_empty() {
-            println!("📝 File change detected, updating components: {:?}", updated_components);
+            println!("File change detected, updating components: {:?}", updated_components);
             
             // Restore state for affected components
             for component_id in &updated_components {
@@ -228,14 +228,14 @@ impl HotReloadApp {
                 }
             }
         } else {
-            println!("📝 File change processed, no components affected");
+            println!("File change processed, no components affected");
         }
         
         Ok(())
     }
     
     fn display_statistics(&self) {
-        println!("\n📊 RustyUI Statistics:");
+        println!("\nRustyUI Statistics:");
         
         // Component statistics
         if let Some(stats) = self.engine.get_component_statistics() {
@@ -264,7 +264,7 @@ impl HotReloadApp {
     }
     
     fn run_demo(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🎬 Starting Hot Reload Demo...");
+        println!("\nStarting Hot Reload Demo...");
         
         // Initial state
         self.display_statistics();
@@ -285,16 +285,16 @@ impl HotReloadApp {
         thread::sleep(Duration::from_millis(500));
         self.display_statistics();
         
-        println!("\n✅ Demo completed successfully!");
-        println!("💡 In a real application, file changes would trigger automatic reloads");
-        println!("🔄 Component state would be preserved across code changes");
+        println!("\nDemo completed successfully!");
+        println!("In a real application, file changes would trigger automatic reloads");
+        println!("Component state would be preserved across code changes");
         
         Ok(())
     }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔥 RustyUI Simple Hot Reload Demo");
+    println!("RustyUI Simple Hot Reload Demo");
     println!("==================================");
     
     let mut app = HotReloadApp::new()?;

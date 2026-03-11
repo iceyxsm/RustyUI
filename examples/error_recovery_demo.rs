@@ -17,7 +17,7 @@ use rustyui_core::{
 use std::collections::HashMap;
 
 fn main() -> Result<()> {
-    println!("🛡️ RustyUI Error Recovery and Handling Demo");
+    println!("RustyUI Error Recovery and Handling Demo");
     println!("============================================");
     
     // Create dual-mode engine with error handling
@@ -25,7 +25,7 @@ fn main() -> Result<()> {
     let mut engine = DualModeEngine::new(config)?;
     engine.initialize()?;
     
-    println!("✅ Engine initialized with error recovery system");
+    println!("Engine initialized with error recovery system");
     
     #[cfg(feature = "dev-ui")]
     {
@@ -37,7 +37,7 @@ fn main() -> Result<()> {
     
     #[cfg(not(feature = "dev-ui"))]
     {
-        println!("ℹ️ Error recovery features are only available in development mode");
+        println!("INFO: Error recovery features are only available in development mode");
         println!("   Run with: cargo run --features dev-ui --example error_recovery_demo");
     }
     
@@ -46,7 +46,7 @@ fn main() -> Result<()> {
 
 #[cfg(feature = "dev-ui")]
 fn demonstrate_error_recovery(engine: &mut DualModeEngine) -> Result<()> {
-    println!("\n🔧 Demonstrating Error Recovery Mechanisms");
+    println!("\nDemonstrating Error Recovery Mechanisms");
     println!("-------------------------------------------");
     
     // Simulate various types of errors and recovery
@@ -64,16 +64,16 @@ fn demonstrate_error_recovery(engine: &mut DualModeEngine) -> Result<()> {
         
         match result {
             RecoveryResult::Success { strategy, message, .. } => {
-                println!("✅ Recovery successful: {} (strategy: {:?})", message, strategy);
+                println!("SUCCESS: Recovery successful: {} (strategy: {:?})", message, strategy);
             }
             RecoveryResult::PartialRecovery { strategy, message, limitations } => {
-                println!("⚠️ Partial recovery: {} (strategy: {:?})", message, strategy);
+                println!("WARNING: Partial recovery: {} (strategy: {:?})", message, strategy);
                 for limitation in limitations {
                     println!("   - Limitation: {}", limitation);
                 }
             }
             RecoveryResult::Failed { strategy, message } => {
-                println!("❌ Recovery failed: {} (strategy: {:?})", message, strategy);
+                println!("FAILED: Recovery failed: {} (strategy: {:?})", message, strategy);
             }
         }
     }
@@ -83,7 +83,7 @@ fn demonstrate_error_recovery(engine: &mut DualModeEngine) -> Result<()> {
 
 #[cfg(feature = "dev-ui")]
 fn demonstrate_error_reporting(engine: &mut DualModeEngine) -> Result<()> {
-    println!("\n📊 Demonstrating Error Reporting System");
+    println!("\nDemonstrating Error Reporting System");
     println!("---------------------------------------");
     
     // Generate some errors for reporting
@@ -107,12 +107,12 @@ fn demonstrate_error_reporting(engine: &mut DualModeEngine) -> Result<()> {
         println!("   Medium severity errors: {}", metrics.medium_errors);
         println!("   Low severity errors: {}", metrics.low_errors);
         
-        println!("\n📋 Error breakdown by type:");
+        println!("\nError breakdown by type:");
         for (error_type, count) in &metrics.error_type_counts {
             println!("   {}: {}", error_type.as_str(), count);
         }
         
-        println!("\n🔍 Component error breakdown:");
+        println!("\nComponent error breakdown:");
         for (component, count) in &metrics.component_error_counts {
             println!("   {}: {}", component, count);
         }
@@ -135,7 +135,7 @@ fn demonstrate_error_reporting(engine: &mut DualModeEngine) -> Result<()> {
 
 #[cfg(feature = "dev-ui")]
 fn demonstrate_graceful_degradation(engine: &mut DualModeEngine) -> Result<()> {
-    println!("\n🛡️ Demonstrating Graceful Degradation");
+    println!("\nDemonstrating Graceful Degradation");
     println!("-------------------------------------");
     
     // Store some fallback state
@@ -158,13 +158,13 @@ fn demonstrate_graceful_degradation(engine: &mut DualModeEngine) -> Result<()> {
     
     match result {
         RecoveryResult::Success { message, fallback_data, .. } => {
-            println!("✅ Graceful degradation successful: {}", message);
+            println!("SUCCESS: Graceful degradation successful: {}", message);
             if let Some(data) = fallback_data {
                 println!("   Restored to fallback state: {}", data.component_id);
             }
         }
         _ => {
-            println!("⚠️ Graceful degradation had issues, but system remains stable");
+            println!("WARNING: Graceful degradation had issues, but system remains stable");
         }
     }
     
@@ -175,14 +175,14 @@ fn demonstrate_graceful_degradation(engine: &mut DualModeEngine) -> Result<()> {
     
     match isolation_result {
         RecoveryResult::PartialRecovery { message, limitations, .. } => {
-            println!("🛡️ Error isolated: {}", message);
+            println!("Error isolated: {}", message);
             for limitation in limitations {
                 println!("   - {}", limitation);
             }
-            println!("   ✅ Main application continues running normally");
+            println!("   Main application continues running normally");
         }
         _ => {
-            println!("🛡️ Error isolation mechanism activated");
+            println!("Error isolation mechanism activated");
         }
     }
     
@@ -200,19 +200,19 @@ fn demonstrate_health_monitoring(engine: &mut DualModeEngine) -> Result<()> {
     
     match health_status {
         HealthStatus::Healthy => {
-            println!("   ✅ All systems operating normally");
+            println!("   All systems operating normally");
         }
         HealthStatus::Recovering => {
-            println!("   🔄 System is recovering from recent errors");
+            println!("   System is recovering from recent errors");
         }
         HealthStatus::Degraded => {
-            println!("   ⚠️ System is in degraded mode due to persistent errors");
+            println!("   System is in degraded mode due to persistent errors");
         }
     }
     
     // Get recovery metrics
     if let Some(recovery_metrics) = engine.get_error_recovery_metrics() {
-        println!("\n📊 Recovery Performance:");
+        println!("\nRecovery Performance:");
         println!("   Total errors handled: {}", recovery_metrics.total_errors);
         println!("   Successful recoveries: {}", recovery_metrics.successful_recoveries);
         println!("   Partial recoveries: {}", recovery_metrics.partial_recoveries);
@@ -222,7 +222,7 @@ fn demonstrate_health_monitoring(engine: &mut DualModeEngine) -> Result<()> {
     }
     
     // Demonstrate system resilience
-    println!("\n🏋️ Testing System Resilience");
+    println!("\nTesting System Resilience");
     for i in 0..5 {
         let stress_error = RustyUIError::interpretation(format!("Stress test error #{}", i + 1));
         engine.handle_error(&stress_error, Operation::Interpretation, Some(format!("stress_component_{}", i)));
@@ -232,9 +232,9 @@ fn demonstrate_health_monitoring(engine: &mut DualModeEngine) -> Result<()> {
     println!("🏥 Health after stress test: {:?}", final_health);
     
     if final_health == HealthStatus::Healthy || final_health == HealthStatus::Recovering {
-        println!("   ✅ System maintained stability under stress");
+        println!("   System maintained stability under stress");
     } else {
-        println!("   ⚠️ System entered degraded mode - recovery mechanisms active");
+        println!("   System entered degraded mode - recovery mechanisms active");
     }
     
     Ok(())
@@ -253,9 +253,9 @@ fn demonstrate_unsupported_features() -> Result<()> {
     ];
     
     for feature in unsupported_features {
-        println!("🚫 Unsupported feature detected: {}", feature);
-        println!("   ✅ Gracefully disabled, fallback mechanisms active");
-        println!("   💡 Suggestion: Use alternative implementation or update library");
+        println!("BLOCKED: Unsupported feature detected: {}", feature);
+        println!("   Gracefully disabled, fallback mechanisms active");
+        println!("   Suggestion: Use alternative implementation or update library");
     }
     
     Ok(())

@@ -69,7 +69,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             // Show performance statistics every 5 seconds
             if start_time.elapsed().as_secs() % 5 == 0 && start_time.elapsed().as_millis() % 5000 < 100 {
                 if let Some(stats) = engine.get_file_watching_stats() {
-                    println!("\n📊 Performance Stats:");
+                    println!("\nPerformance Stats:");
                     println!("  Events processed: {}", stats.total_events);
                     println!("  Average processing time: {:?}", stats.average_processing_time());
                     println!("  Meets 2026 targets (<50ms): {}", stats.meets_performance_targets());
@@ -92,9 +92,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("  Total runtime: {:?}", stats.start_time.elapsed());
             
             if stats.meets_performance_targets() {
-                println!("  🎯 Excellent! Meeting 2026 performance standards");
+                println!("  EXCELLENT: Meeting 2026 performance standards");
             } else {
-                println!("  ⚠️  Performance could be improved");
+                println!("  WARNING: Performance could be improved");
             }
         }
     }

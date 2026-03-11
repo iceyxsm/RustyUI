@@ -8,7 +8,7 @@
 //! - Integration with multiple UI component types
 
 use rustyui_core::{
-    DualModeEngine, DualModeConfig, UIFramework, UIComponent,
+    DualModeEngine, DualModeConfig, UIFramework, UIComponent, RenderContext,
     component_lifecycle::{ComponentState, ComponentStatistics},
 };
 use serde::{Serialize, Deserialize};
@@ -60,24 +60,24 @@ impl DemoComponent {
         match &mut self.data {
             ComponentData::Button { clicks, .. } => {
                 *clicks += 1;
-                println!("🖱️ Button '{}' clicked! Total clicks: {}", self.id, clicks);
+                println!("Button '{}' clicked! Total clicks: {}", self.id, clicks);
             }
             ComponentData::TextInput { value, .. } => {
                 value.push_str(" (edited)");
-                println!("📝 TextInput '{}' modified: '{}'", self.id, value);
+                println!("TextInput '{}' modified: '{}'", self.id, value);
             }
             ComponentData::Slider { value, max, .. } => {
                 *value = (*value + 10.0).min(*max);
-                println!("🎚️ Slider '{}' adjusted to: {:.1}", self.id, value);
+                println!("Slider '{}' adjusted to: {:.1}", self.id, value);
             }
             ComponentData::Checkbox { checked, .. } => {
                 *checked = !*checked;
-                println!("☑️ Checkbox '{}' toggled: {}", self.id, checked);
+                println!("Checkbox '{}' toggled: {}", self.id, checked);
             }
             ComponentData::List { items, selected } => {
                 items.push(format!("Item {}", items.len() + 1));
                 *selected = Some(items.len() - 1);
-                println!("📋 List '{}' item added. Total items: {}", self.id, items.len());
+                println!("List '{}' item added. Total items: {}", self.id, items.len());
             }
         }
     }
@@ -95,7 +95,7 @@ impl DemoComponent {
                 format!("Slider '{}': {:.1} ({:.1}-{:.1})", self.id, value, min, max)
             }
             ComponentData::Checkbox { checked, label } => {
-                format!("Checkbox '{}': {} '{}'", self.id, if *checked { "✅" } else { "❌" }, label)
+                format!("Checkbox '{}': {} '{}'", self.id, if *checked { "ON" } else { "OFF" }, label)
             }
             ComponentData::List { items, selected } => {
                 let selected_info = selected.map(|i| format!(" (selected: {})", i + 1))
@@ -117,6 +117,11 @@ impl UIComponent for DemoComponent {
         &self.component_type
     }
     
+    fn render(&mut self, _ctx: &mut dyn RenderContext) {
+        // Simulate rendering the component
+        println!(" Rendering component '{}': {}", self.id, self.get_display_info());
+    }
+    
     #[cfg(feature = "dev-ui")]
     fn hot_reload_state(&self) -> rustyui_core::Result<Self::State> {
         Ok(self.data.clone())
@@ -125,7 +130,7 @@ impl UIComponent for DemoComponent {
     #[cfg(feature = "dev-ui")]
     fn restore_state(&mut self, state: Self::State) -> rustyui_core::Result<()> {
         self.data = state;
-        println!("🔄 Component '{}' state restored", self.id);
+        println!(" Component '{}' state restored", self.id);
         Ok(())
     }
     
@@ -151,7 +156,7 @@ struct ComprehensiveDemo {
 
 impl ComprehensiveDemo {
     fn new() -> Result<Self, Box<dyn std::error::Error>> {
-        println!("🚀 Initializing Comprehensive RustyUI Demo...");
+        println!(" Initializing Comprehensive RustyUI Demo...");
         
         // Create configuration with extensive monitoring
         let config = DualModeConfig {
@@ -176,7 +181,7 @@ impl ComprehensiveDemo {
         engine.initialize()?;
         engine.start_development_mode()?;
         
-        println!("✅ RustyUI engine initialized successfully");
+        println!(" RustyUI engine initialized successfully");
         
         Ok(Self {
             engine,
@@ -187,7 +192,7 @@ impl ComprehensiveDemo {
     }
     
     fn create_demo_components(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🏗️ Creating diverse UI components...");
+        println!("\n Creating diverse UI components...");
         
         let component_specs = vec![
             ("main_button", "Button", ComponentData::Button {
@@ -237,16 +242,16 @@ impl ComprehensiveDemo {
             let state_json = serde_json::to_value(&component.data)?;
             self.engine.preserve_component_state(id, state_json)?;
             
-            println!("  ✅ Created: {}", component.get_display_info());
+            println!("  Created: {}", component.get_display_info());
             self.components.insert(id.to_string(), component);
         }
         
-        println!("🎉 Created {} components successfully", self.components.len());
+        println!(" Created {} components successfully", self.components.len());
         Ok(())
     }
     
     fn simulate_user_session(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🎮 Simulating realistic user session...");
+        println!("\n Simulating realistic user session...");
         
         let interaction_sequence = vec![
             "main_button", "search_input", "volume_slider", 
@@ -278,12 +283,12 @@ impl ComprehensiveDemo {
             }
         }
         
-        println!("\n✅ User session completed: {} interactions", self.interaction_count);
+        println!("\n User session completed: {} interactions", self.interaction_count);
         Ok(())
     }
     
     fn simulate_hot_reload_cycle(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🔥 Simulating hot reload cycle...");
+        println!("\n Simulating hot reload cycle...");
         
         // Simulate multiple file changes
         let files_to_update = vec![
@@ -293,12 +298,12 @@ impl ComprehensiveDemo {
         ];
         
         for (_i, file_path) in files_to_update.iter().enumerate() {
-            println!("\n  🔄 Processing file change: {}", file_path);
+            println!("\n   Processing file change: {}", file_path);
             
             let updated_components = self.engine.process_file_change_and_update(file_path)?;
             
             if !updated_components.is_empty() {
-                println!("    📝 Components affected: {:?}", updated_components);
+                println!("     Components affected: {:?}", updated_components);
                 
                 // Restore state for affected components
                 for component_id in &updated_components {
@@ -311,19 +316,19 @@ impl ComprehensiveDemo {
                     }
                 }
             } else {
-                println!("    ℹ️ No components affected by this change");
+                println!("    ℹ No components affected by this change");
             }
             
             // Simulate processing time
             thread::sleep(Duration::from_millis(100));
         }
         
-        println!("✅ Hot reload cycle completed");
+        println!(" Hot reload cycle completed");
         Ok(())
     }
     
     fn demonstrate_error_recovery(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("\n🛡️ Demonstrating error recovery...");
+        println!("\n Demonstrating error recovery...");
         
         // Simulate various error scenarios
         let error_scenarios = vec![
@@ -333,7 +338,7 @@ impl ComprehensiveDemo {
         ];
         
         for (component_id, error_msg) in error_scenarios {
-            println!("  ⚠️ Simulating error in '{}': {}", component_id, error_msg);
+            println!("   Simulating error in '{}': {}", component_id, error_msg);
             
             // Create a mock error
             let error = rustyui_core::RustyUIError::generic(error_msg);
@@ -344,31 +349,31 @@ impl ComprehensiveDemo {
             
             match recovery_result {
                 rustyui_core::error_recovery::RecoveryResult::Success { strategy, message, .. } => {
-                    println!("    ✅ Recovery successful: {} (strategy: {:?})", message, strategy);
+                    println!("     Recovery successful: {} (strategy: {:?})", message, strategy);
                 }
                 rustyui_core::error_recovery::RecoveryResult::PartialRecovery { strategy, message, .. } => {
-                    println!("    ⚠️ Partial recovery: {} (strategy: {:?})", message, strategy);
+                    println!("     Partial recovery: {} (strategy: {:?})", message, strategy);
                 }
                 rustyui_core::error_recovery::RecoveryResult::Failed { strategy, message } => {
-                    println!("    ❌ Recovery failed: {} (strategy: {:?})", message, strategy);
+                    println!("     Recovery failed: {} (strategy: {:?})", message, strategy);
                 }
             }
             
             thread::sleep(Duration::from_millis(150));
         }
         
-        println!("✅ Error recovery demonstration completed");
+        println!(" Error recovery demonstration completed");
         Ok(())
     }
     
     fn display_comprehensive_statistics(&self) {
-        println!("\n📊 Comprehensive RustyUI Statistics");
+        println!("\n Comprehensive RustyUI Statistics");
         println!("=====================================");
         
         // Runtime statistics
         let runtime = self.start_time.elapsed();
-        println!("⏱️ Runtime: {:.2}s", runtime.as_secs_f32());
-        println!("🎮 Total interactions: {}", self.interaction_count);
+        println!(" Runtime: {:.2}s", runtime.as_secs_f32());
+        println!(" Total interactions: {}", self.interaction_count);
         
         // Component statistics
         if let Some(stats) = self.engine.get_component_statistics() {
@@ -389,7 +394,7 @@ impl ComprehensiveDemo {
     }
     
     fn display_component_stats(&self, stats: &ComponentStatistics) {
-        println!("\n🧩 Component Statistics:");
+        println!("\n Component Statistics:");
         println!("  Total components: {}", stats.total_components);
         println!("  Active components: {}", stats.active_components);
         println!("  Total updates: {}", stats.total_updates);
@@ -407,7 +412,7 @@ impl ComprehensiveDemo {
     }
     
     fn display_performance_stats(&self) {
-        println!("\n⚡ Performance Statistics:");
+        println!("\n Performance Statistics:");
         let memory_overhead = self.engine.memory_overhead();
         println!("  Memory overhead: {:.1} KB", memory_overhead as f32 / 1024.0);
         println!("  Expected memory overhead: {:.1} KB", 
@@ -428,7 +433,7 @@ impl ComprehensiveDemo {
     }
     
     fn display_engine_status(&self) {
-        println!("\n🔧 Engine Status:");
+        println!("\nEngine Status:");
         println!("  Initialized: {}", self.engine.is_initialized());
         println!("  Hot reload active: {}", self.engine.has_runtime_interpreter());
         println!("  Can interpret changes: {}", self.engine.can_interpret_changes());
@@ -441,7 +446,7 @@ impl ComprehensiveDemo {
     }
     
     fn display_component_details(&self) {
-        println!("\n📋 Component Details:");
+        println!("\n Component Details:");
         let active_components = self.engine.get_active_components();
         
         for component_lifecycle in active_components {
@@ -457,7 +462,7 @@ impl ComprehensiveDemo {
     }
     
     fn display_error_recovery_status(&self) {
-        println!("\n🛡️ Error Recovery Status:");
+        println!("\n Error Recovery Status:");
         
         if let Some(recovery_metrics) = self.engine.get_error_recovery_metrics() {
             println!("  Total errors handled: {}", recovery_metrics.total_errors);
@@ -475,7 +480,7 @@ impl ComprehensiveDemo {
     }
     
     fn run_comprehensive_demo(&mut self) -> Result<(), Box<dyn std::error::Error>> {
-        println!("🎬 Starting Comprehensive RustyUI Demo");
+        println!(" Starting Comprehensive RustyUI Demo");
         println!("======================================");
         
         // Phase 1: Component creation
@@ -497,8 +502,8 @@ impl ComprehensiveDemo {
         // Phase 5: Final statistics
         self.display_comprehensive_statistics();
         
-        println!("\n🎉 Comprehensive Demo Completed Successfully!");
-        println!("💡 This demo showcased:");
+        println!("\n Comprehensive Demo Completed Successfully!");
+        println!(" This demo showcased:");
         println!("   • Component lifecycle management");
         println!("   • State preservation across hot reloads");
         println!("   • File change monitoring and analysis");
@@ -511,7 +516,7 @@ impl ComprehensiveDemo {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🔥 RustyUI Comprehensive Demo");
+    println!(" RustyUI Comprehensive Demo");
     println!("=============================");
     println!("This demo showcases the complete RustyUI hot reload system\n");
     

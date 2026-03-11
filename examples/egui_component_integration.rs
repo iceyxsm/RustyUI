@@ -10,7 +10,7 @@ use rustyui_adapters::{
 use rustyui_core::DualModeEngine;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    println!("🚀 Starting egui component integration example");
+    println!("Starting egui component integration example");
     
     // Initialize the dual-mode engine for development
     let config = create_development_config();
@@ -25,22 +25,22 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut app = ExampleEguiApp::new();
     
     // Demonstrate component rendering
-    println!("\n📋 Rendering initial UI components...");
+    println!("\nRendering initial UI components...");
     app.render_ui(&mut adapter)?;
     
     // Demonstrate hot reload state preservation
-    println!("\n🔄 Demonstrating state preservation...");
+    println!("\nDemonstrating state preservation...");
     app.demonstrate_state_preservation(&mut adapter)?;
     
     // Demonstrate runtime updates
-    println!("\n⚡ Demonstrating runtime updates...");
+    println!("\nDemonstrating runtime updates...");
     app.demonstrate_runtime_updates(&mut adapter)?;
     
     // Demonstrate component composition
-    println!("\n🏗️ Demonstrating component composition...");
+    println!("\nDemonstrating component composition...");
     app.demonstrate_component_composition(&mut adapter)?;
     
-    println!("\n✅ egui component integration example completed successfully!");
+    println!("\negui component integration example completed successfully!");
     
     Ok(())
 }

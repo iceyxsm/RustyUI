@@ -152,7 +152,7 @@ impl HotReloadDemo {
             if let Some(state_json) = engine.restore_component_state("app_state") {
                 if let Ok(restored_state) = serde_json::from_value::<AppState>(state_json) {
                     self.state = restored_state;
-                    println!("🔄 State restored from hot reload");
+                    println!("State restored from hot reload");
                 }
             }
         }
@@ -251,7 +251,7 @@ impl HotReloadDemo {
             for (index, item) in self.state.items.iter().enumerate() {
                 ui.horizontal(|ui| {
                     ui.label(format!("{}. {}", index + 1, item));
-                    if ui.small_button("❌").clicked() {
+                    if ui.small_button("X").clicked() {
                         to_remove = Some(index);
                     }
                 });
@@ -292,7 +292,7 @@ impl HotReloadDemo {
                     ui.label(" Overview Tab");
                     ui.label(format!("Counter: {}", self.state.counter));
                     ui.label(format!("Items: {}", self.state.items.len()));
-                    ui.label(format!("Checkbox: {}", if self.state.checkbox_enabled { "✅" } else { "❌" }));
+                    ui.label(format!("Checkbox: {}", if self.state.checkbox_enabled { "ON" } else { "OFF" }));
                 }
                 1 => {
                     ui.label(" Settings Tab");
@@ -472,7 +472,7 @@ impl eframe::App for HotReloadDemo {
             // Check for file changes and update components
             if let Ok(updated_components) = engine.process_file_change_and_update("examples/hot_reload_demo.rs") {
                 if !updated_components.is_empty() {
-                    println!("🔄 Hot reload triggered for components: {:?}", updated_components);
+                    println!("Hot reload triggered for components: {:?}", updated_components);
                     ctx.request_repaint();
                 }
             }

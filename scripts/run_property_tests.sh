@@ -44,9 +44,9 @@ run_crate_tests() {
     fi
     
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✅ $test_name passed${NC}"
+        echo -e "${GREEN}PASS: $test_name passed${NC}"
     else
-        echo -e "${RED}❌ $test_name failed${NC}"
+        echo -e "${RED}FAIL: $test_name failed${NC}"
         return 1
     fi
     echo ""
@@ -68,9 +68,9 @@ run_specific_property() {
     fi
     
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}✅ $description passed${NC}"
+        echo -e "${GREEN}PASS: $description passed${NC}"
     else
-        echo -e "${RED}❌ $description failed${NC}"
+        echo -e "${RED}FAIL: $description failed${NC}"
         return 1
     fi
     echo ""
@@ -106,7 +106,7 @@ main() {
     echo -e "${YELLOW}=== RustyUI Macros Tests ===${NC}"
     run_crate_tests "rustyui-macros" "" "Macros"
     
-    echo -e "${GREEN}🎉 All Property-Based Tests Completed Successfully!${NC}"
+    echo -e "${GREEN}SUCCESS: All Property-Based Tests Completed Successfully!${NC}"
     echo ""
     
     # Run specific critical properties
@@ -128,7 +128,7 @@ main() {
     run_specific_property "rustyui-adapters" "dev-ui" "property_runtime_update_handling" "Runtime Update Handling"
     run_specific_property "rustyui-adapters" "dev-ui" "property_adapter_error_handling" "Adapter Error Handling"
     
-    echo -e "${GREEN}🚀 All Critical Properties Validated!${NC}"
+    echo -e "${GREEN}SUCCESS: All Critical Properties Validated!${NC}"
 }
 
 # Performance benchmarking
