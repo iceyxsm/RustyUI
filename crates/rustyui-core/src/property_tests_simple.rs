@@ -78,17 +78,83 @@ mod tests {
             prop_assert!(!error.to_string().is_empty(), "Error should have a message");
         }
 
-        /// Basic performance bounds test
+        /// **Validates: Requirements 7.2, 7.3, 7.4, 7.6**
+        /// 
+        /// Property 8: Performance Bounds Compliance
+        /// For any development session, the system should maintain memory overhead under 50MB, 
+        /// achieve interpretation performance within 2x of compiled Rust for UI operations, 
+        /// JIT compilation under 100ms, and provide performance monitoring with accurate metrics reporting.
         #[test]
         fn property_basic_performance_bounds(
-            _config in simple_dual_mode_config_strategy()
+            config in simple_dual_mode_config_strategy()
         ) {
-            let build_config = BuildConfig::development();
-            let memory_overhead = build_config.estimated_memory_overhead_bytes();
+            let mut test_config = config;
             
-            // Memory overhead should be reasonable
-            prop_assert!(memory_overhead < 100 * 1024 * 1024, 
-                "Memory overhead should be under 100MB");
+            #[cfg(feature = "dev-ui")]
+            {
+                test_config.development_settings.performance_monitoring = true;
+            }
+            
+            let engine_result = DualModeEngine::new(test_config);
+            prop_assert!(engine_result.is_ok(), "Engine creation should succeed");
+            
+            let mut engine = engine_result.unwrap();
+            
+            // Initialize the engine to set up performance monitoring
+            let init_result = engine.initialize();
+            prop_assert!(init_result.is_ok(), "Engine initialization should succeed");
+            
+            #[cfg(feature = "dev-ui")]
+            {
+                // Requirement 7.3: Memory overhead should be under 50MB
+                let memory_overhead = engine.current_memory_overhead_bytes();
+                prop_assert!(memory_overhead < 50 * 1024 * 1024, 
+                    "Development mode memory overhead should be under 50MB, got {} bytes", 
+                    memory_overhead);
+                
+                // Requirement 7.6: Performance monitoring should be available
+                prop_assert!(engine.has_performance_monitoring(), 
+                    "Performance monitoring should be available in development mode");
+                
+                // Requirement 7.6: Metrics should be accurate and up-to-date
+                let metrics = engine.get_performance_metrics();
+                prop_assert!(metrics.is_some(), 
+                    "Performance metrics should be available");
+                
+                if let Some(metrics) = metrics {
+                    // Requirement 7.2: JIT compilation should be under 100ms
+                    // We check max interpretation time as a proxy for JIT compilation time
+                    prop_assert!(metrics.max_interpretation_time <= std::time::Duration::from_millis(100), 
+                        "Maximum interpretation time should be under 100ms, got {:?}", 
+                        metrics.max_interpretation_time);
+                    
+                    // Requirement 7.4: Runtime interpreter performance within 2x of compiled Rust
+                    // We simulate this by checking that average interpretation time is reasonable
+                    // For property testing, we assume compiled Rust baseline of ~1ms for UI operations
+                    let baseline_rust_performance = std::time::Duration::from_millis(1);
+                    let max_acceptable_time = baseline_rust_performance * 2;
+                    prop_assert!(metrics.average_interpretation_time <= max_acceptable_time, 
+                        "Average interpretation time should be within 2x of compiled Rust (~2ms), got {:?}", 
+                        metrics.average_interpretation_time);
+                    
+                    // Requirement 7.6: Performance monitoring should track violations
+                    // This validates that the monitoring system is working
+                    prop_assert!(metrics.target_violations <= metrics.total_operations, 
+                        "Target violations should not exceed total operations");
+                }
+            }
+            
+            #[cfg(not(feature = "dev-ui"))]
+            {
+                // In production mode, there should be no performance monitoring overhead
+                prop_assert!(!engine.has_performance_monitoring(), 
+                    "Performance monitoring should not be available in production mode");
+                
+                // Memory overhead should be zero in production
+                let memory_overhead = engine.current_memory_overhead_bytes();
+                prop_assert_eq!(memory_overhead, 0, 
+                    "Production mode should have zero memory overhead");
+            }
         }
 
         /// Basic cross-platform compatibility test

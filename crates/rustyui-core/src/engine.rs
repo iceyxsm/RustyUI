@@ -288,6 +288,35 @@ impl DualModeEngine {
         self.change_analyzer.as_ref().map(|analyzer| analyzer.get_stats())
     }
     
+    /// Check if performance monitoring is available (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn has_performance_monitoring(&self) -> bool {
+        self.performance_monitor.is_some()
+    }
+    
+    /// Check if performance monitoring is available (production mode)
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn has_performance_monitoring(&self) -> bool {
+        false
+    }
+    
+    /// Get performance metrics (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_performance_metrics(&self) -> Option<&crate::performance::PerformanceMetrics> {
+        self.performance_monitor.as_ref().map(|monitor| monitor.get_metrics())
+    }
+    
+    /// Get performance metrics (production mode)
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn get_performance_metrics(&self) -> Option<&crate::performance::PerformanceMetrics> {
+        None
+    }
+    
+    /// Get current memory overhead in bytes
+    pub fn current_memory_overhead_bytes(&self) -> u64 {
+        self.memory_overhead() as u64
+    }
+    
     /// Process pending file changes with intelligent analysis (development only)
     #[cfg(feature = "dev-ui")]
     pub fn process_file_changes(&mut self) -> Result<Vec<crate::change_monitor::FileChange>> {

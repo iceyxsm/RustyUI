@@ -722,7 +722,7 @@ mod tests {
         let input = InputComponent::new("input1".to_string(), "Test".to_string());
         
         // Input should have higher priority than button
-        assert!(input.state_preservation_priority() > button.state_preservation_priority());
+        assert!(UIComponent::state_preservation_priority(&input) > UIComponent::state_preservation_priority(&button));
     }
     
     #[cfg(feature = "dev-ui")]

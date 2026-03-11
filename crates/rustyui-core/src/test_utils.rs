@@ -312,6 +312,7 @@ pub mod test_helpers {
                         state_preservation: true,
                         performance_monitoring: development_mode,
                         change_detection_delay_ms: 50,
+                        max_memory_overhead_mb: Some(50),
                     },
                     production_settings: ProductionSettings {
                         strip_dev_features: !development_mode,
