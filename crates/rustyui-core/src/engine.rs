@@ -1,7 +1,7 @@
 //! Dual-mode engine implementation with cross-platform optimization
 
 use crate::{config::DualModeConfig, error::{Result, RustyUIError}, platform::{Platform, PlatformConfig, PlatformCapabilities}};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 #[cfg(feature = "dev-ui")]
 use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}};
