@@ -32,3 +32,7 @@ iced-adapter = [] # ["iced"] - disabled for Phase 1
 slint-adapter = [] # ["slint"] - disabled for Phase 1
 tauri-adapter = [] # ["tauri"] - disabled for Phase 1
 all-adapters = ["egui-adapter", "iced-adapter", "slint-adapter", "tauri-adapter"]
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.0"
+criterion = { workspace = true }

@@ -314,6 +314,26 @@ impl ErrorRecoveryManager {
             HealthStatus::Healthy
         }
     }
+    
+    /// Check if system has error logs
+    pub fn has_error_logs(&self) -> bool {
+        if let Ok(history) = self.error_history.lock() {
+            !history.is_empty()
+        } else {
+            false
+        }
+    }
+    
+    /// Get system health for property testing
+    pub fn system_health(&self) -> SystemHealth {
+        SystemHealth {
+            stable: !self.is_degraded_mode(),
+            error_count: self.metrics.total_errors as u32,
+            last_error: self.error_history.lock()
+                .ok()
+                .and_then(|history| history.last().map(|e| e.timestamp)),
+        }
+    }
 }
 
 /// Production builds have minimal error recovery
@@ -390,6 +410,13 @@ pub enum RecoveryResult {
         strategy: RecoveryStrategy,
         message: String,
     },
+}
+
+impl RecoveryResult {
+    /// Check if recovery was successful
+    pub fn is_ok(&self) -> bool {
+        matches!(self, RecoveryResult::Success { .. } | RecoveryResult::PartialRecovery { .. })
+    }
 }
 
 /// Context information for error recovery
@@ -496,6 +523,20 @@ pub enum HealthStatus {
     Healthy,
     Recovering,
     Degraded,
+}
+
+/// System health information for property testing
+#[derive(Debug, Clone)]
+pub struct SystemHealth {
+    pub stable: bool,
+    pub error_count: u32,
+    pub last_error: Option<SystemTime>,
+}
+
+impl SystemHealth {
+    pub fn is_stable(&self) -> bool {
+        self.stable
+    }
 }
 
 #[cfg(test)]

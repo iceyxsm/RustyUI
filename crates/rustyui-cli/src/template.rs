@@ -35,8 +35,11 @@ impl TemplateManager {
         let main_rs_content = r#"//! RustyUI egui example with hot reload support
 
 use eframe::egui;
+
+#[cfg(feature = "dev-ui")]
 use rustyui_core::{DualModeEngine, DualModeConfig};
-use rustyui_adapters::egui::EguiAdapter;
+
+#[cfg(feature = "dev-ui")]
 use rustyui_macros::HotReloadable;
 
 fn main() -> Result<(), eframe::Error> {

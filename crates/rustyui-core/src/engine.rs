@@ -3,7 +3,41 @@
 use crate::{config::DualModeConfig, error::{Result, RustyUIError}, platform::{Platform, PlatformConfig, PlatformCapabilities}};
 
 #[cfg(feature = "dev-ui")]
-use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}};
+use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}};
+
+// Production-compatible stub types
+#[cfg(not(feature = "dev-ui"))]
+#[derive(Debug, Clone)]
+pub enum Operation {
+    Interpretation,
+    StatePreservation,
+    FileWatching,
+    ComponentRendering,
+    JITCompilation,
+    RhaiExecution,
+    ASTParsing,
+    FrameworkIntegration,
+}
+
+#[cfg(not(feature = "dev-ui"))]
+pub mod error_recovery {
+    use serde::{Serialize, Deserialize};
+    
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum RecoveryResult {
+        Failed { strategy: RecoveryStrategy, message: String },
+    }
+    
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum RecoveryStrategy {
+        IsolateAndContinue,
+    }
+    
+    #[derive(Debug, Clone, Serialize, Deserialize)]
+    pub enum HealthStatus {
+        Healthy,
+    }
+}
 
 // Production-compatible InterpretationResult
 #[derive(Debug)]
@@ -40,6 +74,10 @@ pub struct DualModeEngine {
     /// Error reporter for comprehensive logging (development only)
     #[cfg(feature = "dev-ui")]
     error_reporter: Option<ErrorReporter>,
+    
+    /// Performance monitor for tracking metrics and targets (development only)
+    #[cfg(feature = "dev-ui")]
+    performance_monitor: Option<PerformanceMonitor>,
     
     /// Engine initialization state
     initialized: bool,
@@ -80,6 +118,8 @@ impl DualModeEngine {
             error_recovery: None,
             #[cfg(feature = "dev-ui")]
             error_reporter: None,
+            #[cfg(feature = "dev-ui")]
+            performance_monitor: None,
             initialized: false,
         })
     }
@@ -103,6 +143,8 @@ impl DualModeEngine {
             error_recovery: None,
             #[cfg(feature = "dev-ui")]
             error_reporter: None,
+            #[cfg(feature = "dev-ui")]
+            performance_monitor: None,
             initialized: false,
         })
     }
@@ -124,6 +166,16 @@ impl DualModeEngine {
             self.state_preservor = Some(StatePreservor::new());
             self.error_recovery = Some(ErrorRecoveryManager::new());
             self.error_reporter = Some(ErrorReporter::new());
+            
+            // Initialize performance monitor with targets from config
+            let performance_targets = PerformanceTargets {
+                max_interpretation_time_ms: 100,  // Requirement 7.2
+                max_file_change_time_ms: 50,      // Requirement 7.2
+                max_memory_overhead_mb: self.config.development_settings.max_memory_overhead_mb.unwrap_or(50),
+                max_jit_compilation_time_ms: self.config.development_settings.jit_compilation_threshold as u64,
+                max_state_preservation_time_ms: 10,
+            };
+            self.performance_monitor = Some(PerformanceMonitor::with_targets(performance_targets));
             
             println!("✅ Development mode initialized with platform optimizations");
             println!("  File watcher: {} (expected latency: {}ms)", 
@@ -460,9 +512,9 @@ impl DualModeEngine {
     
     /// Handle an error (no-op in production builds)
     #[cfg(not(feature = "dev-ui"))]
-    pub fn handle_error(&mut self, _error: &RustyUIError, _operation: Operation, _component_id: Option<String>) -> crate::error_recovery::RecoveryResult {
-        crate::error_recovery::RecoveryResult::Failed {
-            strategy: crate::error_recovery::RecoveryStrategy::IsolateAndContinue,
+    pub fn handle_error(&mut self, _error: &RustyUIError, _operation: Operation, _component_id: Option<String>) -> error_recovery::RecoveryResult {
+        error_recovery::RecoveryResult::Failed {
+            strategy: error_recovery::RecoveryStrategy::IsolateAndContinue,
             message: "Error recovery not available in production builds".to_string(),
         }
     }
@@ -485,8 +537,8 @@ impl DualModeEngine {
     
     /// Get system health status (always healthy in production)
     #[cfg(not(feature = "dev-ui"))]
-    pub fn get_health_status(&self) -> crate::error_recovery::HealthStatus {
-        crate::error_recovery::HealthStatus::Healthy
+    pub fn get_health_status(&self) -> error_recovery::HealthStatus {
+        error_recovery::HealthStatus::Healthy
     }
     
     /// Store fallback state for error recovery (development only)

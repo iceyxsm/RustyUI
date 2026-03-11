@@ -14,6 +14,9 @@ pub mod jit_compiler;
 
 pub mod error;
 
+#[cfg(test)]
+mod property_tests;
+
 pub use error::{InterpreterError, Result};
 
 #[cfg(feature = "dev-ui")]

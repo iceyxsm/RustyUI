@@ -16,7 +16,7 @@ use crate::error::CliResult;
 #[derive(Parser)]
 #[command(name = "rustyui")]
 #[command(about = "Revolutionary dual-mode UI development system for Rust")]
-#[command(version = "0.1.0")]
+#[command(version = env!("CARGO_PKG_VERSION"))]
 #[command(long_about = "
 RustyUI provides instant UI feedback during development through runtime interpretation
 while maintaining zero overhead in production builds. Inspired by Flutter's JIT/AOT

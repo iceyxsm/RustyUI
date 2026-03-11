@@ -53,3 +53,7 @@ macos-jit = ["mach"]
 
 # Cross-platform JIT bundle
 cross-platform-jit = ["windows-jit", "unix-jit", "macos-jit"]
+[dev-dependencies]
+proptest = { workspace = true }
+tempfile = "3.0"
+criterion = { workspace = true }

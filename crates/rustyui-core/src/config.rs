@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
+use std::collections::HashMap;
 
 /// Configuration for dual-mode engine operation
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,6 +17,9 @@ pub struct DualModeConfig {
     /// Production mode settings
     pub production_settings: ProductionSettings,
     
+    /// Conditional compilation configuration
+    pub conditional_compilation: ConditionalCompilation,
+    
     /// Paths to watch for changes
     pub watch_paths: Vec<PathBuf>,
 }
@@ -27,6 +31,7 @@ impl Default for DualModeConfig {
             #[cfg(feature = "dev-ui")]
             development_settings: DevelopmentSettings::default(),
             production_settings: ProductionSettings::default(),
+            conditional_compilation: ConditionalCompilation::default(),
             watch_paths: vec![PathBuf::from("src")],
         }
     }
@@ -60,6 +65,9 @@ pub struct DevelopmentSettings {
     
     /// Delay before processing file changes (in milliseconds)
     pub change_detection_delay_ms: u64,
+    
+    /// Maximum memory overhead in MB (optional)
+    pub max_memory_overhead_mb: Option<u64>,
 }
 
 #[cfg(feature = "dev-ui")]
@@ -74,6 +82,7 @@ impl Default for DevelopmentSettings {
             state_preservation: true,
             performance_monitoring: true,
             change_detection_delay_ms: 50,
+            max_memory_overhead_mb: Some(50),
         }
     }
 }
@@ -125,4 +134,27 @@ pub enum OptimizationLevel {
     Debug,
     Release,
     ReleaseLTO,
+}
+
+/// Conditional compilation configuration
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ConditionalCompilation {
+    /// Development feature flag name
+    pub dev_feature_flag: String,
+    
+    /// Conditional compilation attributes
+    pub cfg_attributes: Vec<String>,
+    
+    /// Feature gates configuration
+    pub feature_gates: HashMap<String, bool>,
+}
+
+impl Default for ConditionalCompilation {
+    fn default() -> Self {
+        Self {
+            dev_feature_flag: "dev-ui".to_string(),
+            cfg_attributes: vec!["feature = \"dev-ui\"".to_string()],
+            feature_gates: HashMap::new(),
+        }
+    }
 }

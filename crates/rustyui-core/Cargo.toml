@@ -55,5 +55,6 @@ macos-native = ["core-foundation", "core-services"]
 # Cross-platform feature bundle
 cross-platform = ["windows-native", "unix-native", "macos-native"]
 [dev-dependencies]
-proptest = "1.0"
+proptest = { workspace = true }
 tempfile = "3.0"
+criterion = { workspace = true }

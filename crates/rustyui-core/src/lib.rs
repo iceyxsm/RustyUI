@@ -25,15 +25,27 @@ pub mod error_recovery;
 #[cfg(feature = "dev-ui")]
 pub mod error_reporting;
 
+#[cfg(feature = "dev-ui")]
+pub mod performance;
+
 #[cfg(all(test, feature = "dev-ui"))]
 mod error_recovery_test;
 
-pub use config::DualModeConfig;
+#[cfg(test)]
+mod property_tests_simple;
+
+#[cfg(test)]
+mod test_utils;
+
+pub use config::{DualModeConfig, UIFramework, ProductionSettings, ConditionalCompilation};
 pub use engine::DualModeEngine;
 pub use error::{RustyUIError, Result};
 pub use build_config::{BuildConfig, BuildInfo, OptimizationLevel};
 pub use ui_component::{UIComponent, UIComponentExt, UIComponentDyn, ComponentStateManager};
 pub use platform::{Platform, PlatformConfig, PlatformCapabilities, FileWatcherBackend, JITCapabilities};
+
+#[cfg(feature = "dev-ui")]
+pub use config::{DevelopmentSettings, InterpretationStrategy};
 
 #[cfg(feature = "dev-ui")]
 pub use change_monitor::ChangeMonitor;
@@ -49,6 +61,9 @@ pub use error_recovery::{ErrorRecoveryManager, RecoveryResult, ErrorContext, Ope
 
 #[cfg(feature = "dev-ui")]
 pub use error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation, ErrorSeverity};
+
+#[cfg(feature = "dev-ui")]
+pub use performance::{PerformanceMonitor, PerformanceTargets, PerformanceMetrics, PerformanceMeasurement};
 
 /// Trait for framework-agnostic rendering context
 pub trait RenderContext {

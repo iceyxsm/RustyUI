@@ -26,6 +26,32 @@ impl ProjectManager {
         self.project_path.join("rustyui.toml").exists()
     }
     
+    /// Check if this project is a workspace member
+    fn is_workspace_member(&self) -> CliResult<bool> {
+        // Check if there's a parent Cargo.toml with workspace configuration
+        let mut current_path = self.project_path.clone();
+        
+        // Go up directories looking for a workspace root
+        while let Some(parent) = current_path.parent() {
+            let parent_cargo = parent.join("Cargo.toml");
+            if parent_cargo.exists() {
+                let cargo_content = std::fs::read_to_string(&parent_cargo)?;
+                if cargo_content.contains("[workspace]") {
+                    // Check if our project is listed as a member
+                    let relative_path = self.project_path.strip_prefix(parent)
+                        .map_err(|_| CliError::project("Failed to determine workspace membership"))?;
+                    
+                    if cargo_content.contains(&format!("\"{}\"", relative_path.display())) {
+                        return Ok(true);
+                    }
+                }
+            }
+            current_path = parent.to_path_buf();
+        }
+        
+        Ok(false)
+    }
+    
     /// Create a new Rust project using cargo
     pub fn create_rust_project(&self, name: &str) -> CliResult<()> {
         if self.project_path.exists() {
@@ -72,9 +98,6 @@ impl ProjectManager {
         // Add or update features section for dual-mode support
         cargo_content = self.add_dual_mode_features(&cargo_content)?;
         
-        // Add or update profile configurations for optimal dual-mode builds
-        cargo_content = self.add_dual_mode_profiles(&cargo_content)?;
-        
         // Add conditional compilation configuration
         cargo_content = self.add_conditional_compilation_config(&cargo_content)?;
         
@@ -116,14 +139,23 @@ impl ProjectManager {
     }
     
     /// Generate dual-mode dependencies for the specified framework
-    fn generate_dual_mode_dependencies(&self, framework: &str, _analysis: &CargoTomlAnalysis) -> CliResult<String> {
+    fn generate_dual_mode_dependencies(&self, framework: &str, analysis: &CargoTomlAnalysis) -> CliResult<String> {
         let mut deps = String::new();
+        
+        // Check if this is a workspace member
+        let is_workspace_member = self.is_workspace_member()?;
         
         // Core RustyUI dependencies with dual-mode support
         deps.push_str("\n# RustyUI Core Dependencies (Dual-Mode Support)\n");
-        deps.push_str("rustyui-core = { path = \"../rustyui-core\", features = [] }\n");
-        deps.push_str("rustyui-adapters = { path = \"../rustyui-adapters\", optional = true }\n");
-        deps.push_str("rustyui-macros = { path = \"../rustyui-macros\", optional = true }\n");
+        if is_workspace_member {
+            deps.push_str("rustyui-core = { path = \"../crates/rustyui-core\", features = [] }\n");
+            deps.push_str("rustyui-adapters = { path = \"../crates/rustyui-adapters\", optional = true }\n");
+            deps.push_str("rustyui-macros = { path = \"../crates/rustyui-macros\", optional = true }\n");
+        } else {
+            deps.push_str("rustyui-core = { version = \"0.1.0\", features = [] }\n");
+            deps.push_str("rustyui-adapters = { version = \"0.1.0\", optional = true }\n");
+            deps.push_str("rustyui-macros = { version = \"0.1.0\", optional = true }\n");
+        }
         deps.push_str("\n");
         
         // Development-only dependencies (conditionally compiled)
@@ -141,6 +173,7 @@ impl ProjectManager {
                 deps.push_str("# egui Framework Dependencies\n");
                 deps.push_str("egui = \"0.24\"\n");
                 deps.push_str("eframe = { version = \"0.24\", features = [\"default_fonts\"] }\n");
+                deps.push_str("winapi = { version = \"0.3\", features = [\"winuser\", \"windef\"] }\n");
             }
             "iced" => {
                 deps.push_str("# iced Framework Dependencies\n");
@@ -205,12 +238,6 @@ dev-ui = [
     "wasmtime",
     "notify",
 ]
-
-# Production mode (default) - zero overhead
-production = ["rustyui-core/production"]
-
-# Performance monitoring (development only)
-perf-monitor = ["dev-ui", "rustyui-core/perf-monitor"]
 
 # JIT compilation support (development only)
 jit-support = ["dev-ui", "cranelift-jit"]
@@ -301,8 +328,7 @@ codegen-units = 1
 [package.metadata.rustyui]
 # Dual-mode configuration metadata
 dual-mode = true
-development-features = ["dev-ui", "perf-monitor"]
-production-features = ["production"]
+development-features = ["dev-ui"]
 conditional-compilation = true
 
 # Hot reload configuration

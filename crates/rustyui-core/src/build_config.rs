@@ -49,6 +49,24 @@ impl BuildConfig {
         matches!(self.optimization_level, OptimizationLevel::Release)
     }
     
+    /// Estimate memory overhead in bytes
+    pub fn estimated_memory_overhead_bytes(&self) -> u64 {
+        if self.development_mode && cfg!(feature = "dev-ui") {
+            25 * 1024 * 1024 // 25MB for development features
+        } else {
+            0 // Zero overhead in production
+        }
+    }
+    
+    /// Get performance ratio compared to native Rust
+    pub fn performance_ratio_to_native(&self) -> f64 {
+        if self.development_mode && cfg!(feature = "dev-ui") {
+            0.8 // ~20% slower due to interpretation overhead
+        } else {
+            1.0 // Native performance in production
+        }
+    }
+    
     /// Get recommended Cargo build flags
     pub fn cargo_flags(&self) -> Vec<String> {
         let mut flags = Vec::new();

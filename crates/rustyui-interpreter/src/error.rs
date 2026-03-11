@@ -36,6 +36,11 @@ pub enum InterpreterError {
     /// Generic interpretation errors
     #[error("Interpretation error: {0}")]
     Generic(String),
+    
+    /// Resource limit exceeded errors
+    #[cfg(feature = "dev-ui")]
+    #[error("Resource limit exceeded: {0}")]
+    ResourceLimit(String),
 }
 
 impl InterpreterError {
@@ -74,6 +79,12 @@ impl InterpreterError {
         Self::UnsupportedFeature(msg.into())
     }
     
+    /// Create a new resource limit error (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn resource_limit(msg: impl Into<String>) -> Self {
+        Self::ResourceLimit(msg.into())
+    }
+    
     /// Check if this error is recoverable
     pub fn is_recoverable(&self) -> bool {
         match self {
@@ -85,6 +96,8 @@ impl InterpreterError {
             InterpreterError::JIT(_) => true,   // Can fallback to AST
             #[cfg(feature = "dev-ui")]
             InterpreterError::UnsupportedFeature(_) => true, // Can disable feature
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::ResourceLimit(_) => true, // Can reduce resource usage
             #[cfg(feature = "dev-ui")]
             InterpreterError::Recovery(_) => false, // Recovery itself failed
             InterpreterError::Generic(_) => true,   // Can try isolation
@@ -102,6 +115,8 @@ impl InterpreterError {
             InterpreterError::JIT(_) => "FallbackToAST",
             #[cfg(feature = "dev-ui")]
             InterpreterError::UnsupportedFeature(_) => "DisableFeature",
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::ResourceLimit(_) => "ReduceResourceUsage",
             #[cfg(feature = "dev-ui")]
             InterpreterError::Recovery(_) => "IsolateAndContinue",
             InterpreterError::Generic(_) => "IsolateAndContinue",

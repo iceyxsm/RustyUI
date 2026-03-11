@@ -48,3 +48,5 @@ dev-ui = [
 
 [dev-dependencies]
 tempfile = "3.8"
+proptest = { workspace = true }
+criterion = { workspace = true }
