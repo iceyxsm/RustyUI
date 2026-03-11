@@ -1,6 +1,5 @@
 //! Start development mode with hot reload
 
-use crate::config::ConfigManager;
 use crate::error::{CliError, CliResult};
 use crate::project::ProjectManager;
 use console::style;
@@ -30,6 +29,9 @@ impl DevCommand {
     pub fn execute(&mut self) -> CliResult<()> {
         println!("{} Starting RustyUI development mode...", style("🚀").blue());
         
+        // Initialize workflow manager for seamless integration
+        let mut workflow_manager = crate::workflow::WorkflowManager::new(self.path.clone())?;
+        
         // Check if it's a RustyUI project
         let project_manager = ProjectManager::new(self.path.clone())?;
         if !project_manager.is_rustyui_project() {
@@ -38,15 +40,14 @@ impl DevCommand {
             ));
         }
         
-        // Load configuration
-        let config_manager = ConfigManager::new(self.path.clone())?;
-        let config = config_manager.load_config()?;
-        
-        // Validate configuration
-        config_manager.validate_config(&config)?;
+        // Auto-configure runtime settings for optimal performance
+        let config = workflow_manager.auto_configure_runtime()?;
         
         // Show development mode info
         self.show_dev_info(&config)?;
+        
+        // Handle seamless mode transition to development
+        workflow_manager.handle_mode_transition(crate::workflow::DevelopmentMode::Development)?;
         
         // Start development mode with dual-mode engine integration
         self.start_development_mode_with_engine(&config)?;
@@ -176,6 +177,9 @@ impl DevCommand {
             }
         }
         
+        // Show mode-specific information
+        self.show_mode_information(&engine)?;
+        
         // Create shared engine for thread communication
         let engine_arc = Arc::new(Mutex::new(engine));
         let (shutdown_tx, shutdown_rx) = mpsc::channel();
@@ -189,6 +193,59 @@ impl DevCommand {
         
         // Start the development server loop
         self.run_development_loop(engine_arc, shutdown_rx)?;
+        
+        Ok(())
+    }
+    
+    /// Show mode-specific information and capabilities
+    #[cfg(feature = "dev-ui")]
+    fn show_mode_information(&self, engine: &rustyui_core::DualModeEngine) -> CliResult<()> {
+        println!("\n{} Mode Information:", style("ℹ️").blue());
+        
+        // Current mode
+        println!("  Current mode: {}", style("Development").green());
+        println!("  Runtime interpreter: {}", 
+            if engine.has_runtime_interpreter() { 
+                style("active").green() 
+            } else { 
+                style("inactive").red() 
+            }
+        );
+        
+        // Platform capabilities
+        println!("  Platform: {:?}", engine.platform());
+        println!("  Native optimizations: {}", 
+            if engine.is_using_native_optimizations() { 
+                style("enabled").green() 
+            } else { 
+                style("disabled").yellow() 
+            }
+        );
+        println!("  JIT compilation: {}", 
+            if engine.jit_compilation_available() { 
+                style("available").green() 
+            } else { 
+                style("unavailable").yellow() 
+            }
+        );
+        
+        // Memory and performance
+        let memory_mb = engine.memory_overhead() as f64 / (1024.0 * 1024.0);
+        println!("  Memory overhead: {:.1} MB", memory_mb);
+        
+        let expected_mb = engine.expected_memory_overhead() as f64 / (1024.0 * 1024.0);
+        println!("  Expected overhead: {:.1} MB", expected_mb);
+        
+        // Health status
+        let health = engine.get_health_status();
+        println!("  System health: {:?}", health);
+        
+        // Configuration validation
+        if engine.can_interpret_changes() {
+            println!("  {} Ready for hot reload", style("✓").green());
+        } else {
+            println!("  {} Hot reload not available", style("⚠").yellow());
+        }
         
         Ok(())
     }

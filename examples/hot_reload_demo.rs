@@ -289,19 +289,19 @@ impl HotReloadDemo {
             
             match self.state.selected_tab {
                 0 => {
-                    ui.label("📊 Overview Tab");
+                    ui.label(" Overview Tab");
                     ui.label(format!("Counter: {}", self.state.counter));
                     ui.label(format!("Items: {}", self.state.items.len()));
                     ui.label(format!("Checkbox: {}", if self.state.checkbox_enabled { "✅" } else { "❌" }));
                 }
                 1 => {
-                    ui.label("⚙️ Settings Tab");
+                    ui.label(" Settings Tab");
                     ui.label(format!("Slider Value: {:.1}%", self.state.slider_value));
                     ui.label(format!("Color: RGB({:.2}, {:.2}, {:.2})", 
                         self.state.color[0], self.state.color[1], self.state.color[2]));
                 }
                 2 => {
-                    ui.label("ℹ️ About Tab");
+                    ui.label(" About Tab");
                     ui.label("RustyUI Hot Reload Demo");
                     ui.label("This application demonstrates real-time UI updates");
                     ui.label("with state preservation across reloads.");
@@ -316,7 +316,7 @@ impl HotReloadDemo {
         #[cfg(feature = "dev-ui")]
         if let Some(ref engine) = self.engine {
             ui.group(|ui| {
-                ui.label("🚀 RustyUI Performance");
+                ui.label(" RustyUI Performance");
                 
                 if let Some(stats) = engine.get_component_statistics() {
                     ui.label(format!("Active Components: {}", stats.active_components));
@@ -330,9 +330,9 @@ impl HotReloadDemo {
                 ui.label(format!("Memory Overhead: {:.1} KB", memory_overhead as f32 / 1024.0));
                 
                 if engine.has_runtime_interpreter() {
-                    ui.label("🔥 Hot Reload: Active");
+                    ui.label(" Hot Reload: Active");
                 } else {
-                    ui.label("❄️ Hot Reload: Inactive");
+                    ui.label(" Hot Reload: Inactive");
                 }
             });
         }
@@ -340,7 +340,7 @@ impl HotReloadDemo {
         #[cfg(not(feature = "dev-ui"))]
         {
             ui.group(|ui| {
-                ui.label("🏭 Production Mode");
+                ui.label(" Production Mode");
                 ui.label("Hot reload disabled for optimal performance");
             });
         }
@@ -437,7 +437,7 @@ impl eframe::App for HotReloadDemo {
         }
         
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("🔥 RustyUI Hot Reload Demo");
+            ui.heading(" RustyUI Hot Reload Demo");
             ui.separator();
             
             egui::ScrollArea::vertical().show(ui, |ui| {

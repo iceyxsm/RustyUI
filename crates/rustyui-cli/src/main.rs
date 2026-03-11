@@ -5,6 +5,7 @@ mod config;
 mod error;
 mod project;
 mod template;
+mod workflow;
 
 use clap::{Parser, Subcommand};
 use console::style;
@@ -111,6 +112,21 @@ enum Commands {
         #[arg(long, default_value = ".")]
         path: PathBuf,
     },
+    
+    /// Show workflow status and integration
+    Workflow {
+        /// Project directory
+        #[arg(long, default_value = ".")]
+        path: PathBuf,
+        
+        /// Cargo command to integrate with
+        #[arg(long)]
+        cargo_command: Option<String>,
+        
+        /// Arguments for cargo command
+        #[arg(long)]
+        cargo_args: Vec<String>,
+    },
 }
 
 fn main() -> CliResult<()> {
@@ -140,6 +156,9 @@ fn main() -> CliResult<()> {
         }
         Commands::Config { path } => {
             show_config(&path)?;
+        }
+        Commands::Workflow { path, cargo_command, cargo_args } => {
+            handle_workflow(&path, cargo_command, cargo_args)?;
         }
     }
     
@@ -208,11 +227,35 @@ fn check_platform_compatibility(verbose: bool) -> CliResult<()> {
 /// Build project for production
 fn build_project(path: &PathBuf, release: bool) -> CliResult<()> {
     use crate::project::ProjectManager;
+    use crate::workflow::WorkflowManager;
+    
+    // Initialize workflow manager for seamless integration
+    let workflow_manager = WorkflowManager::new(path.clone())?;
+    
+    // Handle mode transition to production
+    workflow_manager.handle_mode_transition(crate::workflow::DevelopmentMode::Production)?;
     
     let project_manager = ProjectManager::new(path.clone())?;
     project_manager.build_production(release)?;
     
     println!("{} Production build completed", style("✓").green());
+    
+    Ok(())
+}
+
+/// Handle workflow integration and status
+fn handle_workflow(path: &PathBuf, cargo_command: Option<String>, cargo_args: Vec<String>) -> CliResult<()> {
+    use crate::workflow::WorkflowManager;
+    
+    let workflow_manager = WorkflowManager::new(path.clone())?;
+    
+    if let Some(command) = cargo_command {
+        // Integrate with specific cargo command
+        workflow_manager.integrate_cargo_workflow(&command, &cargo_args)?;
+    } else {
+        // Show workflow status
+        workflow_manager.show_workflow_status()?;
+    }
     
     Ok(())
 }

@@ -8,8 +8,10 @@ pub mod config;
 pub mod error;
 pub mod project;
 pub mod template;
+pub mod workflow;
 
 pub use error::{CliError, CliResult};
 pub use config::ConfigManager;
 pub use project::ProjectManager;
 pub use template::TemplateManager;
+pub use workflow::WorkflowManager;
