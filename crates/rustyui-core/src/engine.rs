@@ -386,7 +386,7 @@ impl DualModeEngine {
         {
             let base_overhead = self.memory_overhead();
             let platform_overhead = self.platform_config.file_watcher_backend
-                .performance_characteristics().memory_overhead_kb as usize * 1024;
+                .performance_characteristics().memory_overhead_bytes as usize;
             base_overhead + platform_overhead
         }
         

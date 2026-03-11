@@ -20,19 +20,20 @@ log = "0.4"
 
 # Development-only dependencies (conditionally compiled)
 rhai = { version = "1.16", optional = true }
-notify = { version = "6.1", optional = true }
-notify-debouncer-mini = { version = "0.4", optional = true }
+notify = { workspace = true, optional = true }
+notify-debouncer-mini = { workspace = true, optional = true }
+num_cpus = { workspace = true }
 
 # Cross-platform system dependencies
 [target.'cfg(windows)'.dependencies]
-winapi = { version = "0.3", features = ["winuser", "processthreadsapi", "handleapi"], optional = true }
+winapi = { workspace = true, optional = true }
 
 [target.'cfg(unix)'.dependencies]
-libc = { version = "0.2", optional = true }
+libc = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "macos")'.dependencies]
-core-foundation = { version = "0.9", optional = true }
-core-services = { version = "0.2", optional = true }
+core-foundation = { workspace = true, optional = true }
+core-services = { workspace = true, optional = true }
 
 # Internal dependencies
 rustyui-interpreter = { path = "../rustyui-interpreter", optional = true }

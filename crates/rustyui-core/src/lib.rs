@@ -9,6 +9,7 @@ pub mod error;
 pub mod build_config;
 pub mod ui_component;
 pub mod platform;
+pub mod cross_platform;
 
 #[cfg(feature = "dev-ui")]
 pub mod change_monitor;
@@ -42,7 +43,8 @@ pub use engine::DualModeEngine;
 pub use error::{RustyUIError, Result};
 pub use build_config::{BuildConfig, BuildInfo, OptimizationLevel};
 pub use ui_component::{UIComponent, UIComponentExt, UIComponentDyn, ComponentStateManager};
-pub use platform::{Platform, PlatformConfig, PlatformCapabilities, FileWatcherBackend, JITCapabilities};
+pub use platform::{Platform, PlatformConfig, PlatformCapabilities, FileWatcherBackend, JitCapabilities};
+pub use cross_platform::{CrossPlatformConfig, CrossPlatformLayer, FeatureFlags, FileWatcherConfig};
 
 #[cfg(feature = "dev-ui")]
 pub use config::{DevelopmentSettings, InterpretationStrategy};

@@ -44,6 +44,18 @@ criterion = "0.5"
 
 # Cross-platform dependencies
 num_cpus = "1.16"
+notify = "6.1"
+notify-debouncer-mini = "0.4"
+
+# Platform-specific dependencies - Windows
+winapi = { version = "0.3", features = ["winuser", "processthreadsapi", "handleapi", "fileapi", "winnt"] }
+
+# Platform-specific dependencies - Unix/Linux
+libc = "0.2"
+
+# Platform-specific dependencies - macOS
+core-foundation = "0.9"
+core-services = "0.2"
 
 [profile.dev]
 opt-level = 0

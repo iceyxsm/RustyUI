@@ -137,7 +137,7 @@ impl ChangeMonitor {
         let watcher_perf = platform_config.file_watcher_backend.performance_characteristics();
         
         // Base timeout on platform latency characteristics
-        let base_timeout = Duration::from_millis(watcher_perf.latency_ms.max(10));
+        let base_timeout = Duration::from_millis(watcher_perf.latency_ms.max(10) as u64);
         
         // Adjust based on platform optimizations
         if platform_config.use_native_apis {
@@ -162,8 +162,12 @@ impl ChangeMonitor {
         // Watch all configured paths
         for path in &self.watch_paths {
             if path.exists() {
-                let recursive_mode = if self.platform_config.file_watcher_backend
-                    .performance_characteristics().supports_recursive {
+                let recursive_mode = if matches!(
+                    self.platform_config.file_watcher_backend,
+                    FileWatcherBackend::ReadDirectoryChanges | 
+                    FileWatcherBackend::FSEvents | 
+                    FileWatcherBackend::INotify
+                ) {
                     RecursiveMode::Recursive
                 } else {
                     RecursiveMode::NonRecursive
@@ -187,7 +191,7 @@ impl ChangeMonitor {
         let mut config = Config::default();
         
         // Set poll interval based on platform latency characteristics
-        let poll_interval = Duration::from_millis(watcher_perf.latency_ms.min(100));
+        let poll_interval = Duration::from_millis(watcher_perf.latency_ms.min(100) as u64);
         config = config.with_poll_interval(poll_interval);
         
         // Disable content comparison for better performance on most platforms
