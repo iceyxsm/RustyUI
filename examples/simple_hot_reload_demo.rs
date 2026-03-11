@@ -83,8 +83,12 @@ impl UIComponent for SimpleButton {
     #[cfg(feature = "dev-ui")]
     fn restore_state(&mut self, state: Self::State) -> rustyui_core::Result<()> {
         self.state = state;
-        println!("Button '{}' state restored: {:?}", self.id, self.state);
         Ok(())
+    }
+    
+    fn render(&mut self, _ctx: &mut dyn rustyui_core::RenderContext) {
+        println!("Rendering SimpleButton: {} (clicked {} times)", 
+                 self.id, self.state.click_count);
     }
     
     #[cfg(feature = "dev-ui")]

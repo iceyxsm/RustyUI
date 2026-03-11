@@ -73,7 +73,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     println!("Events processed: {}", stats.total_events);
                     println!("Average processing time: {:?}", stats.average_processing_time());
                     println!("Meets 2026 targets (<50ms): {}", stats.meets_performance_targets());
-                    println!("Errors: {}\n", stats.error_count);
+                    println!("Debounced events: {}\n", stats.debounced_events);
                 }
             }
             
@@ -89,7 +89,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Total events: {}", stats.total_events);
             println!("Average response time: {:?}", stats.average_processing_time());
             println!("Performance target met: {}", stats.meets_performance_targets());
-            println!("Total runtime: {:?}", stats.start_time.elapsed());
+            println!("Total runtime: {:?}", start_time.elapsed());
             
             if stats.meets_performance_targets() {
                 println!("EXCELLENT: Meeting 2026 performance standards");

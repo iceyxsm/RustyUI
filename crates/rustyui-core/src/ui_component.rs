@@ -478,6 +478,10 @@ impl InputComponent {
     pub fn set_focused(&mut self, focused: bool) {
         self.focused = focused;
     }
+    
+    pub fn is_focused(&self) -> bool {
+        self.focused
+    }
 }
 
 impl UIComponent for InputComponent {

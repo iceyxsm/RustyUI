@@ -48,7 +48,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
         input1.set_value("john_doe".to_string());
         input1.set_focused(true);
-        println!("Username input: '{}' (focused: {})", input1.get_value(), input1.focused);
+        println!("Username input: '{}' (focused: {})", input1.get_value(), input1.is_focused());
         
         input2.set_value("secret123".to_string());
         println!("Password input: '{}' characters", input2.get_value().len());
