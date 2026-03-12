@@ -37,8 +37,45 @@ impl Default for DualModeConfig {
     }
 }
 
+impl DualModeConfig {
+    /// Create a new configuration with development mode enabled
+    #[cfg(feature = "dev-ui")]
+    pub fn development(framework: UIFramework) -> Self {
+        Self {
+            framework,
+            development_settings: DevelopmentSettings::default(),
+            production_settings: ProductionSettings::default(),
+            conditional_compilation: ConditionalCompilation::default(),
+            watch_paths: vec![PathBuf::from("src")],
+        }
+    }
+    
+    /// Create a new configuration with production mode
+    pub fn production(framework: UIFramework) -> Self {
+        Self {
+            framework,
+            #[cfg(feature = "dev-ui")]
+            development_settings: DevelopmentSettings::default(),
+            production_settings: ProductionSettings::default(),
+            conditional_compilation: ConditionalCompilation::default(),
+            watch_paths: vec![PathBuf::from("src")],
+        }
+    }
+    
+    /// Check if development mode is enabled
+    #[cfg(feature = "dev-ui")]
+    pub fn development_mode(&self) -> bool {
+        true // Always true when dev-ui feature is enabled
+    }
+    
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn development_mode(&self) -> bool {
+        false // Always false when dev-ui feature is disabled
+    }
+}
+
 /// Supported UI frameworks
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum UIFramework {
     Egui,
     Iced,
@@ -89,7 +126,7 @@ impl Default for DevelopmentSettings {
 
 /// Runtime interpretation strategies (development only)
 #[cfg(feature = "dev-ui")]
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum InterpretationStrategy {
     /// Use only Rhai scripting
     RhaiOnly,

@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc f9b34e3db658174dfc7a330c5ea2ff4e739c2af8cf4fbc3ef6b4e4e3ae2e2ce0 # shrinks to ui_change = UIChange { content: "label.visible = true;", interpretation_strategy: Some(Rhai), component_id: Some("DS"), change_type: ComponentUpdate, complexity_score: Some(460), timestamp: Some(SystemTime { intervals: 134177876134473302 }) }
+cc 43d7c74a92ce2508328d6f889962c7d0bd2991377aff90920efc35356a843208 # shrinks to ui_change = UIChange { content: "button.text = \"Hello World\";", interpretation_strategy: Some(Rhai), component_id: Some("a"), change_type: ComponentUpdate, complexity_score: Some(1), timestamp: Some(SystemTime { intervals: 134177876135215265 }) }
+cc 3ff53301baeb4d6aa53ef0f8bcd7ec84ab2eb94b07274ff4226cbcf3c3844d80 # shrinks to ui_change = UIChange { content: "button.text = \"Hello World\";", interpretation_strategy: Some(Rhai), component_id: Some("A"), change_type: ComponentUpdate, complexity_score: Some(1), timestamp: Some(SystemTime { intervals: 134177876135472392 }) }, strategy = Rhai

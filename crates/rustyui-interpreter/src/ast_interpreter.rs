@@ -58,6 +58,8 @@ impl ASTInterpreter {
         // Check local AST cache first
         if let Some(cached_ast) = self.ast_cache.get(&code_hash) {
             let execution_result = self.execute_ast_resilient(&cached_ast.ast);
+            let success = execution_result.is_ok();
+            let error_message = execution_result.err().map(|e| e.to_string());
             
             // Update cache statistics
             if let Some(cached_ast) = self.ast_cache.get_mut(&code_hash) {
@@ -68,8 +70,12 @@ impl ASTInterpreter {
             
             return Ok(crate::InterpretationResult {
                 execution_time: start_time.elapsed(),
-                success: execution_result.is_ok(),
-                error_message: execution_result.err().map(|e| e.to_string()),
+                success,
+                error_message,
+                memory_usage_bytes: Some(code.len() as u64 * 16), // AST uses more memory
+                ui_updates: Some(if success { vec!["AST interpreted".to_string()] } else { vec![] }),
+                used_strategy: Some(crate::InterpretationStrategy::AST),
+                required_compilation: Some(false),
             });
         }
         
@@ -90,11 +96,17 @@ impl ASTInterpreter {
                         execution_time: start_time.elapsed(),
                         success: false,
                         error_message: Some(format!("AST depth {} exceeds maximum {}", ast_depth, self.max_ast_depth)),
+                        memory_usage_bytes: Some(0),
+                        ui_updates: Some(vec![]),
+                        used_strategy: Some(crate::InterpretationStrategy::AST),
+                        required_compilation: Some(false),
                     });
                 }
                 
                 // Execute the AST with resilient error handling
                 let execution_result = self.execute_ast_resilient(&ast);
+                let success = execution_result.is_ok();
+                let error_message = execution_result.err().map(|e| e.to_string());
                 
                 // Cache the parsed AST for future use
                 self.ast_cache.insert(code_hash, CachedAST {
@@ -115,8 +127,12 @@ impl ASTInterpreter {
                 
                 Ok(crate::InterpretationResult {
                     execution_time: start_time.elapsed(),
-                    success: execution_result.is_ok(),
-                    error_message: execution_result.err().map(|e| e.to_string()),
+                    success,
+                    error_message,
+                    memory_usage_bytes: Some(code.len() as u64 * 16), // AST uses more memory
+                    ui_updates: Some(if success { vec!["AST interpreted".to_string()] } else { vec![] }),
+                    used_strategy: Some(crate::InterpretationStrategy::AST),
+                    required_compilation: Some(false),
                 })
             }
             Err(partial_result) => {
@@ -133,6 +149,10 @@ impl ASTInterpreter {
                     execution_time: start_time.elapsed(),
                     success: false, // Parsing had errors, so mark as unsuccessful
                     error_message: Some(format!("Partial recovery: {}", partial_result.error_message)),
+                    memory_usage_bytes: Some(code.len() as u64 * 8), // Partial AST uses less memory
+                    ui_updates: Some(vec![]),
+                    used_strategy: Some(crate::InterpretationStrategy::AST),
+                    required_compilation: Some(false),
                 })
             }
         }

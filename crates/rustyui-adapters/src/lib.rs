@@ -7,6 +7,9 @@ pub mod traits;
 #[cfg(test)]
 mod property_tests;
 
+#[cfg(test)]
+mod property_tests_framework_integration;
+
 #[cfg(feature = "egui-adapter")]
 pub mod egui_adapter;
 

@@ -6,7 +6,7 @@ use thiserror::Error;
 pub type Result<T> = std::result::Result<T, InterpreterError>;
 
 /// Interpreter error types
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone)]
 pub enum InterpreterError {
     /// Rhai script interpretation errors
     #[cfg(feature = "dev-ui")]
@@ -130,6 +130,35 @@ impl InterpreterError {
             #[cfg(feature = "dev-ui")]
             InterpreterError::Recovery(_) => "IsolateAndContinue",
             InterpreterError::Generic(_) => "IsolateAndContinue",
+        }
+    }
+    
+    /// Check if this error requires compilation (for property tests)
+    pub fn requires_compilation(&self) -> bool {
+        match self {
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::JIT(_) => true,
+            _ => false,
+        }
+    }
+    
+    /// Check if this error causes system instability (for property tests)
+    pub fn causes_system_instability(&self) -> bool {
+        match self {
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::Recovery(_) => true, // Recovery failure is serious
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::ResourceLimit(_) => true, // Resource exhaustion
+            _ => false,
+        }
+    }
+    
+    /// Check if this is a resource limit error (for property tests)
+    pub fn is_resource_limit_error(&self) -> bool {
+        match self {
+            #[cfg(feature = "dev-ui")]
+            InterpreterError::ResourceLimit(_) => true,
+            _ => false,
         }
     }
 }

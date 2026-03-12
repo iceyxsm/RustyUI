@@ -61,3 +61,6 @@ cross-platform-jit = ["windows-jit", "unix-jit", "macos-jit"]
 proptest = { workspace = true }
 tempfile = "3.0"
 criterion = { workspace = true }
+[[bench]]
+name = "interpretation_performance"
+harness = false

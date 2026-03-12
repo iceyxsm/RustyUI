@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc e5170923a5cae0834040d10414810366f90cd1c019044f3125919f11ccf47528 # shrinks to framework = Egui
+cc 3f7f5ce654cdec52d4b4159fed01999c2f59a9d120983c591f34af5f425145a2 # shrinks to codebase = TestCodebase { name: "A00", components: [TestUIComponent { name: "a_A", component_type: Button, complexity: 0, has_state: false }], framework: Egui }

@@ -1,0 +1,11 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc c8b1c5a921d7187bdb6497e9329776223e834a64a6beb41a7ae81603680c8486 # shrinks to scenario = PerformanceTestScenario { operation_count: 1, concurrent_operations: 1, data_size_bytes: 0, memory_pressure: false, operation_type: StatePreservation }
+cc c4da2209f7bb985addb57f03211a24b76347715553c400425a9d41ef3c9296d0 # shrinks to scenario = PerformanceTestScenario { operation_count: 1, concurrent_operations: 1, data_size_bytes: 0, memory_pressure: false, operation_type: StatePreservation }
+cc 24ac48ef7084f179b7f25cbc7f84289876a34b518dc117b62a74672fad84da41 # shrinks to scenario = PerformanceTestScenario { operation_count: 1, concurrent_operations: 1, data_size_bytes: 0, memory_pressure: true, operation_type: StatePreservation }
+cc 24da511cca8e8f036017c318a6325912b7725cac9c0bac31d0bf466d3aa7a91b # shrinks to base_scenario = PerformanceTestScenario { operation_count: 1, concurrent_operations: 1, data_size_bytes: 0, memory_pressure: false, operation_type: StatePreservation }, load_multiplier = 1
+cc 57632db6d8ed649beafdeb59ee6df250d21cee5551c0b51680df664938f53618 # shrinks to workload = WorkloadPattern { scenarios: [PerformanceTestScenario { operation_count: 1, concurrent_operations: 1, data_size_bytes: 0, memory_pressure: false, operation_type: StatePreservation }], load_type: Burst, duration_seconds: 1 }

@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 7471de4dd1ee6055c4a2fc283026b5b8c36b0843f9ffee07b164da7ed0206960 # shrinks to component_id = "AA0", state = Bool(false)
+cc 1cf83145f7e96070bbf7cf6dfe2e9f5fdd6ffdd09d4ed999143eaf200901922c # shrinks to component_id = "A_A", initial_state = Object {}, updated_state = Object {}

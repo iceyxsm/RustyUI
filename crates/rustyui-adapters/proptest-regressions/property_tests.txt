@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 5f0520635a536661592d8c3f725bf55565385ab76b5d396e5391561dfb346766 # shrinks to config = FrameworkConfig { settings: Object {"animations": Bool(false), "font_size": Number(12), "theme": String("light")}, development_mode: false, optimization_level: 0 }, update = RuntimeUpdate { component_id: "A", update_type: ComponentChange, data: Object {"text": String("Updated Text")}, timestamp: SystemTime { intervals: 134177864840028962 } }

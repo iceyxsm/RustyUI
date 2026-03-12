@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 8acc3795bb6828474f33f32767c62fb1dcab8b2cd2850f74092a012631217b36 # shrinks to config = ProductionTestConfig { framework: Egui, optimization_level: Debug, binary_size_optimization: true, security_hardening: false }, codebase = TestCodebase { project_name: "A0_", components: [TestComponent { name: "Aa0", component_type: Button, lines_of_code: 0, has_state: false }], complexity_score: 1, uses_state: false, uses_async: false }

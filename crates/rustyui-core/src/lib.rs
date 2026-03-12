@@ -43,6 +43,21 @@ mod error_recovery_test;
 mod property_tests_simple;
 
 #[cfg(test)]
+mod property_tests_dual_mode;
+
+#[cfg(test)]
+mod property_tests_state_preservation;
+
+#[cfg(test)]
+mod property_tests_performance_bounds;
+
+#[cfg(test)]
+mod property_tests_zero_overhead;
+
+#[cfg(test)]
+mod property_tests_cross_platform;
+
+#[cfg(test)]
 mod test_utils;
 
 pub use config::{DualModeConfig, UIFramework, ProductionSettings, ConditionalCompilation};

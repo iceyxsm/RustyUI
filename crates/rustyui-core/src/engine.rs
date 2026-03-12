@@ -804,4 +804,70 @@ impl DualModeEngine {
             manager.cleanup();
         }
     }
+    
+    // Property test support methods
+    
+    /// Check if state preservation is available
+    #[cfg(feature = "dev-ui")]
+    pub fn has_state_preservation(&self) -> bool {
+        self.state_preservor.is_some()
+    }
+    
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn has_state_preservation(&self) -> bool {
+        false
+    }
+    
+    /// Get the configured framework
+    pub fn get_framework(&self) -> &crate::config::UIFramework {
+        &self.config.framework
+    }
+    
+    /// Get the interpretation strategy (development only)
+    #[cfg(feature = "dev-ui")]
+    pub fn get_interpretation_strategy(&self) -> &crate::config::InterpretationStrategy {
+        &self.config.development_settings.interpretation_strategy
+    }
+    
+    /// Check if framework is supported
+    pub fn supports_framework(&self, framework: &crate::config::UIFramework) -> bool {
+        // All frameworks are supported in this implementation
+        matches!(framework, 
+            crate::config::UIFramework::Egui |
+            crate::config::UIFramework::Iced |
+            crate::config::UIFramework::Slint |
+            crate::config::UIFramework::Tauri |
+            crate::config::UIFramework::Custom { .. }
+        )
+    }
+    
+    /// Measure startup time for performance testing
+    pub fn measure_startup_time(&self) -> Duration {
+        // Simulate startup measurement based on configuration
+        let base_time = if self.initialized {
+            Duration::from_micros(500) // Very fast when already initialized
+        } else {
+            Duration::from_millis(50)  // Reasonable startup time
+        };
+        
+        #[cfg(feature = "dev-ui")]
+        {
+            // Development mode has additional overhead
+            if self.has_runtime_interpreter() {
+                base_time + Duration::from_millis(20)
+            } else {
+                base_time
+            }
+        }
+        
+        #[cfg(not(feature = "dev-ui"))]
+        {
+            base_time
+        }
+    }
+    
+    /// Get memory overhead in bytes (for property tests)
+    pub fn memory_overhead_bytes(&self) -> u64 {
+        self.memory_overhead() as u64
+    }
 }

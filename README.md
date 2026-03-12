@@ -235,11 +235,20 @@ cargo test --all-features
 # Run all tests including property-based tests
 cargo test --all-features
 
-# Run benchmarks
-cargo bench
+# Run comprehensive benchmarks
+./scripts/run_benchmarks.sh
+
+# Run production vs development performance comparison
+cargo bench --package rustyui-core
+
+# Run interpreter performance benchmarks
+cargo bench --package rustyui-interpreter --features dev-ui
 
 # Test specific framework adapters
 cargo test --features egui-adapter
+
+# Run property-based tests
+./scripts/run_property_tests.sh
 ```
 
 ## License

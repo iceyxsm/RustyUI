@@ -1,0 +1,12 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 3b757d77d56afd2f312916f9f894abdfd2b8a92225a08d4bf752e630306af232 # shrinks to target_platform = MacOS
+cc 4f500ba689a230aebae430a59215fa96d97272187f5054b97ee02f7d04651c1a # shrinks to scenario = CrossPlatformScenario { platform: Windows, operations: [TestOperation { operation_type: FileWatching, complexity: 0, data: "" }], native_apis_available: false, jit_available: false, thread_count: 4 }
+cc 857c11af041ce4a575f669f431485677e203c7b709e29edbe40a096fc3bcf9c2 # shrinks to scenario = CrossPlatformScenario { platform: Windows, operations: [TestOperation { operation_type: FileWatching, complexity: 0, data: "" }], native_apis_available: false, jit_available: false, thread_count: 1 }
+cc 6fe4bd5da10d214250ede3e1d2932da2feed76acdd47fbd2372ec57438ca80b7 # shrinks to scenario = CrossPlatformScenario { platform: MacOS, operations: [TestOperation { operation_type: FileWatching, complexity: 0, data: "" }], native_apis_available: false, jit_available: false, thread_count: 1 }
+cc 5058af764e8926a6f3830c9abbdb661f80eca105c6e557cbb1f221eb11ad97d5 # shrinks to scenario = CrossPlatformScenario { platform: MacOS, operations: [TestOperation { operation_type: FileWatching, complexity: 0, data: "" }], native_apis_available: false, jit_available: false, thread_count: 1 }
+cc 090a0038a66da707718c0f594bc5b34052b71aa7590651b77bad6cc58eeb1361 # shrinks to scenario = CrossPlatformScenario { platform: MacOS, operations: [TestOperation { operation_type: FileWatching, complexity: 0, data: "" }], native_apis_available: false, jit_available: false, thread_count: 1 }

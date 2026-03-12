@@ -37,6 +37,8 @@ impl JITCompiler {
         if let Some(cached_function) = self.compilation_cache.get(&code_hash) {
             // Execute cached function (simulated)
             let execution_result = self.execute_compiled_function(&cached_function.compiled_code);
+            let success = execution_result.is_ok();
+            let error_message = execution_result.err().map(|e| e.to_string());
             
             // Update cache statistics (need to get mutable reference after immutable borrow ends)
             if let Some(cached_function) = self.compilation_cache.get_mut(&code_hash) {
@@ -46,8 +48,12 @@ impl JITCompiler {
             
             return Ok(crate::InterpretationResult {
                 execution_time: start_time.elapsed(),
-                success: execution_result.is_ok(),
-                error_message: execution_result.err().map(|e| e.to_string()),
+                success,
+                error_message,
+                memory_usage_bytes: Some(code.len() as u64 * 32), // JIT uses most memory
+                ui_updates: Some(if success { vec!["JIT compiled and executed".to_string()] } else { vec![] }),
+                used_strategy: Some(crate::InterpretationStrategy::JIT),
+                required_compilation: Some(true),
             });
         }
         
@@ -60,6 +66,8 @@ impl JITCompiler {
         
         // Execute the newly compiled function
         let execution_result = self.execute_compiled_function(&compiled_function);
+        let success = execution_result.is_ok();
+        let error_message = execution_result.err().map(|e| e.to_string());
         
         // Cache the compiled function
         self.compilation_cache.insert(code_hash, CompiledFunction {
@@ -75,8 +83,12 @@ impl JITCompiler {
         
         Ok(crate::InterpretationResult {
             execution_time: start_time.elapsed(),
-            success: execution_result.is_ok(),
-            error_message: execution_result.err().map(|e| e.to_string()),
+            success,
+            error_message,
+            memory_usage_bytes: Some(code.len() as u64 * 32), // JIT uses most memory
+            ui_updates: Some(if success { vec!["JIT compiled and executed".to_string()] } else { vec![] }),
+            used_strategy: Some(crate::InterpretationStrategy::JIT),
+            required_compilation: Some(true),
         })
     }
     

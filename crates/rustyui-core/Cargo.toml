@@ -61,3 +61,7 @@ cross-platform = ["windows-native", "unix-native", "macos-native"]
 [dev-dependencies]
 proptest = { workspace = true }
 criterion = { workspace = true }
+
+[[bench]]
+name = "production_vs_development"
+harness = false
