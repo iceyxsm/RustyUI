@@ -37,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Safe Rust patterns throughout
 - No unsafe code in interpretation layer
 
-## [0.1.0] - 2024-XX-XX
+## [0.1.0] - 2026-03-12
 
 ### Initial Release
 - Phase 1 foundation complete
