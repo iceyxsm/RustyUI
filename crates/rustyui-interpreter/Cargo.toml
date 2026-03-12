@@ -24,7 +24,10 @@ thiserror = { workspace = true }
 # Development-only dependencies (conditionally compiled)
 rhai = { version = "1.16", optional = true }
 syn = { version = "2.0", features = ["full"], optional = true }
-cranelift-jit = { version = "0.101", optional = true }
+cranelift-jit = { version = "0.119", optional = true }
+cranelift-module = { version = "0.119", optional = true }
+cranelift-codegen = { version = "0.119", optional = true }
+cranelift-frontend = { version = "0.119", optional = true }
 wasmtime = { version = "13.0", optional = true }
 regex = { version = "1.10", optional = true }
 quote = { version = "1.0", optional = true }
@@ -45,6 +48,9 @@ dev-ui = [
     "rhai",
     "syn",
     "cranelift-jit",
+    "cranelift-module", 
+    "cranelift-codegen",
+    "cranelift-frontend",
     "wasmtime",
     "regex",
     "quote"

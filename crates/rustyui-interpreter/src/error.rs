@@ -86,6 +86,23 @@ impl InterpreterError {
     
     /// Create a new compilation error
     pub fn compilation(msg: impl Into<String>) -> Self {
+        #[cfg(feature = "dev-ui")]
+        {
+            Self::JIT(msg.into())
+        }
+        #[cfg(not(feature = "dev-ui"))]
+        {
+            Self::Generic(msg.into())
+        }
+    }
+    
+    /// Create a new validation error
+    pub fn validation(msg: impl Into<String>) -> Self {
+        Self::Generic(msg.into())
+    }
+    
+    /// Create a new initialization error
+    pub fn initialization(msg: impl Into<String>) -> Self {
         Self::Generic(msg.into())
     }
     
