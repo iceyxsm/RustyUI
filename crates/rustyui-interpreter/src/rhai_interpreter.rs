@@ -6,7 +6,7 @@
 //! - Memory-efficient data structures with cache-friendly layout
 
 use crate::{InterpreterError, Result};
-use rhai::{Engine, Dynamic, AST, EvalAltResult};
+use rhai::{Engine, Dynamic, AST};
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
@@ -744,8 +744,7 @@ mod tests {
         let mut interpreter = RhaiInterpreter::new().unwrap();
         
         // Test syntax error handling
-        let re
-sult = interpreter.interpret("let x = 5 +; // Invalid syntax");
+        let result = interpreter.interpret("let x = 5 +; // Invalid syntax");
         assert!(result.is_err(), "Invalid syntax should be rejected");
         
         // Test runtime error handling
