@@ -139,7 +139,7 @@ impl ProjectManager {
     }
     
     /// Generate dual-mode dependencies for the specified framework
-    fn generate_dual_mode_dependencies(&self, framework: &str, analysis: &CargoTomlAnalysis) -> CliResult<String> {
+    fn generate_dual_mode_dependencies(&self, framework: &str, _analysis: &CargoTomlAnalysis) -> CliResult<String> {
         let mut deps = String::new();
         
         // Check if this is a workspace member
@@ -265,60 +265,6 @@ wasm-runtime = ["dev-ui", "wasmtime"]
         Ok(result)
     }
     
-    /// Add dual-mode profile configurations
-    fn add_dual_mode_profiles(&self, content: &str) -> CliResult<String> {
-        let mut result = content.to_string();
-        
-        let _profiles_section = r#"
-# Development profile optimized for fast compilation and hot reload
-[profile.dev]
-opt-level = 0
-debug = true
-incremental = true
-codegen-units = 256
-
-# Release profile with maximum optimization and zero development overhead
-[profile.release]
-opt-level = 3
-lto = true
-codegen-units = 1
-panic = "abort"
-strip = true
-
-# Development release profile for testing production performance
-[profile.dev-release]
-inherits = "release"
-debug = true
-strip = false
-
-# Profile for benchmarking dual-mode performance
-[profile.bench]
-opt-level = 3
-debug = false
-lto = true
-codegen-units = 1
-"#;
-        
-        // Check if profiles already exist and add only missing ones
-        if !result.contains("[profile.dev]") {
-            result.push_str("\n[profile.dev]\nopt-level = 0\ndebug = true\nincremental = true\ncodegen-units = 256\n");
-        }
-        
-        if !result.contains("[profile.release]") {
-            result.push_str("\n[profile.release]\nopt-level = 3\nlto = true\ncodegen-units = 1\npanic = \"abort\"\nstrip = true\n");
-        }
-        
-        if !result.contains("[profile.dev-release]") {
-            result.push_str("\n[profile.dev-release]\ninherits = \"release\"\ndebug = true\nstrip = false\n");
-        }
-        
-        if !result.contains("[profile.bench]") {
-            result.push_str("\n[profile.bench]\nopt-level = 3\ndebug = false\nlto = true\ncodegen-units = 1\n");
-        }
-        
-        Ok(result)
-    }
-    
     /// Add conditional compilation configuration
     fn add_conditional_compilation_config(&self, content: &str) -> CliResult<String> {
         let mut result = content.to_string();
@@ -344,24 +290,6 @@ interpretation-strategy = "hybrid"
         Ok(result)
     }
     
-    /// Generate RustyUI dependencies for Cargo.toml (legacy method for compatibility)
-    fn generate_rustyui_dependencies(&self, framework: &str) -> CliResult<String> {
-        let analysis = CargoTomlAnalysis::default();
-        self.generate_dual_mode_dependencies(framework, &analysis)
-    }
-    
-    /// Generate features section for Cargo.toml (legacy method for compatibility)
-    fn generate_features_section(&self) -> CliResult<String> {
-        Ok(r#"
-[features]
-default = []
-dev-ui = [
-    "rustyui-core/dev-ui",
-    "rustyui-adapters/dev-ui",
-]
-"#.to_string())
-    }
-    
     /// Build project for production
     pub fn build_production(&self, release: bool) -> CliResult<()> {
         if !self.is_rust_project() {
@@ -382,32 +310,6 @@ dev-ui = [
         
         if !status.success() {
             return Err(CliError::build("Production build failed"));
-        }
-        
-        Ok(())
-    }
-    
-    /// Run project in development mode
-    pub fn run_development(&self, _watch: bool) -> CliResult<()> {
-        if !self.is_rust_project() {
-            return Err(CliError::project("Not a Rust project"));
-        }
-        
-        if !self.is_rustyui_project() {
-            return Err(CliError::project("Not a RustyUI project. Run 'rustyui init' first."));
-        }
-        
-        println!("{} Starting development mode...", style("").blue());
-        
-        let args = vec!["run", "--features", "dev-ui"];
-        
-        let status = Command::new("cargo")
-            .args(&args)
-            .current_dir(&self.project_path)
-            .status()?;
-        
-        if !status.success() {
-            return Err(CliError::dev_mode("Failed to start development mode"));
         }
         
         Ok(())
@@ -677,8 +579,8 @@ dev-ui = [
             Some("toml") => SourceFileType::Toml,
             Some("json") => SourceFileType::Json,
             Some("yaml") | Some("yml") => SourceFileType::Yaml,
-            Some(ext) => SourceFileType::Other(ext.to_string()),
-            None => SourceFileType::Other("unknown".to_string()),
+            Some(_ext) => SourceFileType::Other(()),
+            None => SourceFileType::Other(()),
         };
         
         let mut has_ui_code = false;
@@ -747,11 +649,6 @@ dev-ui = [
         }
         
         Ok(config_files)
-    }
-    
-    /// Get project path
-    pub fn project_path(&self) -> &Path {
-        &self.project_path
     }
 }
 
@@ -827,5 +724,5 @@ pub enum SourceFileType {
     Toml,
     Json,
     Yaml,
-    Other(String),
+    Other(()),
 }

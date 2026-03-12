@@ -1,7 +1,6 @@
 //! Optimized JIT compiler implementation using Cranelift
 
-
-use crate::Result;
+use crate::{InterpreterError, Result};
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
@@ -84,6 +83,11 @@ impl JITCompiler {
     /// Compile Rust-like code to optimized machine code
     /// This is a simplified implementation - real version would use Cranelift
     fn compile_function(&mut self, code: &str) -> Result<Vec<u8>> {
+        // Pre-validate code before compilation
+        if let Err(validation_error) = self.validate_code_for_jit(code) {
+            return Err(InterpreterError::compilation(format!("JIT validation failed: {}", validation_error)));
+        }
+        
         // Simulate Cranelift compilation process
         // In real implementation, this would:
         // 1. Parse Rust syntax to Cranelift IR
@@ -98,6 +102,45 @@ impl JITCompiler {
         
         // Return simulated compiled code
         Ok(code.as_bytes().to_vec())
+    }
+    
+    /// Validate code for JIT compilation
+    fn validate_code_for_jit(&self, code: &str) -> Result<()> {
+        // Check for balanced braces and parentheses
+        let mut brace_count = 0;
+        let mut paren_count = 0;
+        
+        for ch in code.chars() {
+            match ch {
+                '{' => brace_count += 1,
+                '}' => brace_count -= 1,
+                '(' => paren_count += 1,
+                ')' => paren_count -= 1,
+                _ => {}
+            }
+            
+            if brace_count < 0 || paren_count < 0 {
+                return Err(InterpreterError::compilation("Unbalanced braces or parentheses"));
+            }
+        }
+        
+        if brace_count != 0 {
+            return Err(InterpreterError::compilation("Unbalanced braces"));
+        }
+        
+        if paren_count != 0 {
+            return Err(InterpreterError::compilation("Unbalanced parentheses"));
+        }
+        
+        // Check for function syntax if present
+        if code.contains("fn ") {
+            let fn_pattern = regex::Regex::new(r"fn\s+\w+\s*\(").unwrap();
+            if !fn_pattern.is_match(code) {
+                return Err(InterpreterError::compilation("Function definition missing parameters"));
+            }
+        }
+        
+        Ok(())
     }
     
     /// Execute a newly compiled function
@@ -296,18 +339,18 @@ pub struct AdvancedJITFeatures {
     pgo_data: HashMap<String, ProfileData>,
     
     /// Adaptive optimization based on runtime behavior
-    adaptive_optimization: bool,
+    _adaptive_optimization: bool,
     
     /// Speculative optimization for predicted hot paths
-    speculative_optimization: bool,
+    _speculative_optimization: bool,
 }
 
 impl AdvancedJITFeatures {
     pub fn new() -> Self {
         Self {
             pgo_data: HashMap::new(),
-            adaptive_optimization: true,
-            speculative_optimization: true,
+            _adaptive_optimization: true,
+            _speculative_optimization: true,
         }
     }
     

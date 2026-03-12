@@ -412,8 +412,8 @@ impl ProductionVerifier {
         
         Ok(BuildResult {
             binary_path,
-            features: features.iter().map(|s| s.to_string()).collect(),
-            build_output: String::from_utf8_lossy(&output.stdout).to_string(),
+            _features: features.iter().map(|s| s.to_string()).collect(),
+            _build_output: String::from_utf8_lossy(&output.stdout).to_string(),
         })
     }
     
@@ -493,8 +493,8 @@ panic = "abort"
         
         Ok(BuildResult {
             binary_path,
-            features: vec![],
-            build_output: String::from_utf8_lossy(&output.stdout).to_string(),
+            _features: vec![],
+            _build_output: String::from_utf8_lossy(&output.stdout).to_string(),
         })
     }
     
@@ -634,8 +634,8 @@ panic = "abort"
 #[derive(Debug, Clone)]
 struct BuildResult {
     binary_path: std::path::PathBuf,
-    features: Vec<String>,
-    build_output: String,
+    _features: Vec<String>,
+    _build_output: String,
 }
 
 impl Default for VerificationResults {

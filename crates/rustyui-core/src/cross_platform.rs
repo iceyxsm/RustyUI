@@ -62,7 +62,7 @@ pub struct FeatureFlags {
 
 /// Cross-platform compatibility layer
 pub struct CrossPlatformLayer {
-    config: CrossPlatformConfig,
+    _config: CrossPlatformConfig,
     current_platform: Platform,
     runtime_config: PlatformConfig,
 }
@@ -294,7 +294,7 @@ impl CrossPlatformLayer {
         let runtime_config = PlatformConfig::auto_detect();
         
         Self {
-            config,
+            _config: config,
             current_platform,
             runtime_config,
         }

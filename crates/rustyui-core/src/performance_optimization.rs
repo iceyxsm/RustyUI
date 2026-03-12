@@ -564,7 +564,7 @@ pub struct ProfileGuidedOptimization {
     hot_paths: Mutex<Vec<HotPath>>,
     
     /// Optimization recommendations
-    recommendations: Mutex<Vec<OptimizationRecommendation>>,
+    _recommendations: Mutex<Vec<OptimizationRecommendation>>,
 }
 
 impl ProfileGuidedOptimization {
@@ -572,7 +572,7 @@ impl ProfileGuidedOptimization {
         Self {
             function_frequencies: Mutex::new(HashMap::new()),
             hot_paths: Mutex::new(Vec::new()),
-            recommendations: Mutex::new(Vec::new()),
+            _recommendations: Mutex::new(Vec::new()),
         }
     }
     

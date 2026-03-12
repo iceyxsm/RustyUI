@@ -375,7 +375,7 @@ impl PerformanceMonitor {
     }
     
     /// Update running average duration (kept for compatibility)
-    fn update_average_duration(&self, current_avg: &mut Duration, new_duration: Duration) {
+    fn _update_average_duration(&self, current_avg: &mut Duration, new_duration: Duration) {
         let total_ops = self.metrics.total_operations;
         Self::update_average_duration_static(current_avg, new_duration, total_ops);
     }

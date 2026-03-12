@@ -128,17 +128,6 @@ impl DevCommand {
         }
     }
     
-    /// Start the development mode (legacy fallback)
-    fn start_development_mode(&self, project_manager: &ProjectManager) -> CliResult<()> {
-        println!("\n{} Launching development server...", style("").blue());
-        
-        // For now, delegate to the project manager to run with dev-ui feature
-        // In the future, this will integrate directly with the DualModeEngine
-        project_manager.run_development(self.watch)?;
-        
-        Ok(())
-    }
-    
     /// Start the dual-mode engine (enhanced implementation)
     #[cfg(feature = "dev-ui")]
     fn start_dual_mode_engine(&self, config: &rustyui_core::DualModeConfig) -> CliResult<()> {

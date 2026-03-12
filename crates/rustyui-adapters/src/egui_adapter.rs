@@ -251,13 +251,13 @@ impl UIFrameworkAdapter for EguiAdapter {
 /// for hot reload operations during development.
 struct EguiContext {
     /// Framework configuration
-    config: FrameworkConfig,
+    _config: FrameworkConfig,
     
     /// egui-specific state (placeholder for actual egui::Context integration)
     state: EguiState,
     
     /// Style configuration
-    style_config: ComponentStyle,
+    _style_config: ComponentStyle,
 }
 
 /// egui-specific state representation
@@ -285,9 +285,9 @@ impl Default for EguiState {
 impl EguiContext {
     fn new(config: &FrameworkConfig) -> AdapterResult<Self> {
         Ok(Self {
-            config: config.clone(),
+            _config: config.clone(),
             state: EguiState::default(),
-            style_config: ComponentStyle {
+            _style_config: ComponentStyle {
                 background_color: None,
                 text_color: None,
                 font_size: None,
@@ -343,10 +343,10 @@ impl EguiContext {
 /// the hot reload system for development-time updates.
 pub struct EguiRenderContext {
     /// Reference to egui context
-    context: Option<EguiContextRef>,
+    _context: Option<EguiContextRef>,
     
     /// Framework configuration
-    config: Option<FrameworkConfig>,
+    _config: Option<FrameworkConfig>,
     
     /// Rendered elements (for Phase 1 simulation and testing)
     rendered_elements: Vec<RenderedElement>,
@@ -365,25 +365,25 @@ pub struct EguiRenderContext {
 /// Information about a rendered element
 #[derive(Debug, Clone)]
 struct RenderedElement {
-    element_type: String,
-    content: String,
-    style: Option<ComponentStyle>,
-    timestamp: std::time::SystemTime,
+    _element_type: String,
+    _content: String,
+    _style: Option<ComponentStyle>,
+    _timestamp: std::time::SystemTime,
 }
 
 /// Layout information for the layout stack
 #[derive(Debug, Clone)]
 struct LayoutInfo {
-    layout_type: String,
-    bounds: Rect,
+    _layout_type: String,
+    _bounds: Rect,
     child_count: u32,
 }
 
 impl EguiRenderContext {
     fn new(context: Option<&EguiContext>, config: Option<&FrameworkConfig>) -> Self {
         Self {
-            context: context.map(|_| EguiContextRef),
-            config: config.cloned(),
+            _context: context.map(|_| EguiContextRef),
+            _config: config.cloned(),
             rendered_elements: Vec::new(),
             layout_stack: Vec::new(),
             #[cfg(feature = "dev-ui")]
@@ -395,10 +395,10 @@ impl EguiRenderContext {
     /// Add a rendered element to the tracking list
     fn add_rendered_element(&mut self, element_type: &str, content: &str) {
         let element = RenderedElement {
-            element_type: element_type.to_string(),
-            content: content.to_string(),
-            style: self.current_style.clone(),
-            timestamp: std::time::SystemTime::now(),
+            _element_type: element_type.to_string(),
+            _content: content.to_string(),
+            _style: self.current_style.clone(),
+            _timestamp: std::time::SystemTime::now(),
         };
         
         self.rendered_elements.push(element);
@@ -432,8 +432,8 @@ impl RenderContext for EguiRenderContext {
     fn begin_horizontal_layout(&mut self) {
         let bounds = Rect::new(0.0, 0.0, 800.0, 600.0);
         let layout_info = LayoutInfo {
-            layout_type: "Horizontal".to_string(),
-            bounds,
+            _layout_type: "Horizontal".to_string(),
+            _bounds: bounds,
             child_count: 0,
         };
         
@@ -451,8 +451,8 @@ impl RenderContext for EguiRenderContext {
     fn begin_vertical_layout(&mut self) {
         let bounds = Rect::new(0.0, 0.0, 800.0, 600.0);
         let layout_info = LayoutInfo {
-            layout_type: "Vertical".to_string(),
-            bounds,
+            _layout_type: "Vertical".to_string(),
+            _bounds: bounds,
             child_count: 0,
         };
         

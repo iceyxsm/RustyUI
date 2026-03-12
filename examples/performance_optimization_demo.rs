@@ -30,6 +30,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // Demonstrate cache-friendly data structures
     demonstrate_cache_friendly_structures()?;
     
+    // Demonstrate profile-guided optimization
+    #[cfg(feature = "dev-ui")]
+    demonstrate_profile_guided_optimization()?;
+    
+    // Benchmark optimization impact
+    benchmark_optimization_impact()?;
+    
     println!("\nPerformance optimization demo completed successfully!");
     
     Ok(())
@@ -139,7 +146,7 @@ fn demonstrate_jit_caching() -> Result<(), Box<dyn std::error::Error>> {
         
         // Test code for JIT compilation
         let test_code = r#"
-            fn calculate_fibonacci(n: u32) -> u32 {
+            fn calculate_fibonacci(n) {
                 if n <= 1 {
                     n
                 } else {

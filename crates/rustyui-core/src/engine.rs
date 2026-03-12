@@ -4,7 +4,7 @@ use crate::{config::DualModeConfig, error::{Result, RustyUIError}, platform::{Pl
 use std::time::{Duration, Instant};
 
 #[cfg(feature = "dev-ui")]
-use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}, performance_optimization::{LazyOptimizations, StartupMetric, MemoryMetric}};
+use crate::{ChangeMonitor, ChangeAnalyzer, StatePreservor, error_recovery::{ErrorRecoveryManager, ErrorContext, Operation}, error_reporting::{ErrorReporter, ErrorReportContext, ErrorOperation}, performance::{PerformanceMonitor, PerformanceTargets}, performance_optimization::{LazyOptimizations, StartupMetric}};
 
 // Production-compatible stub types
 #[cfg(not(feature = "dev-ui"))]

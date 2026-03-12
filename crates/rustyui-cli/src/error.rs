@@ -23,12 +23,6 @@ pub enum CliError {
     #[error("Project error: {0}")]
     Project(String),
     
-    #[error("Framework error: {0}")]
-    Framework(String),
-    
-    #[error("Template error: {0}")]
-    Template(String),
-    
     #[error("Command execution failed: {0}")]
     Command(String),
     
@@ -55,16 +49,6 @@ impl CliError {
     /// Create a new project error
     pub fn project<S: Into<String>>(msg: S) -> Self {
         Self::Project(msg.into())
-    }
-    
-    /// Create a new framework error
-    pub fn framework<S: Into<String>>(msg: S) -> Self {
-        Self::Framework(msg.into())
-    }
-    
-    /// Create a new template error
-    pub fn template<S: Into<String>>(msg: S) -> Self {
-        Self::Template(msg.into())
     }
     
     /// Create a new command error
@@ -105,25 +89,4 @@ impl CliError {
 
 /// Display user-friendly error messages
 impl CliError {
-    /// Display error with styling
-    pub fn display_styled(&self) -> String {
-        use console::style;
-        
-        match self {
-            CliError::Io(err) => format!("{} {}", style("IO Error:").red().bold(), err),
-            CliError::Config(err) => format!("{} {}", style("Config Error:").red().bold(), err),
-            CliError::Serialization(err) => format!("{} {}", style("Serialization Error:").red().bold(), err),
-            CliError::Json(err) => format!("{} {}", style("JSON Error:").red().bold(), err),
-            CliError::Project(msg) => format!("{} {}", style("Project Error:").red().bold(), msg),
-            CliError::Framework(msg) => format!("{} {}", style("Framework Error:").red().bold(), msg),
-            CliError::Template(msg) => format!("{} {}", style("Template Error:").red().bold(), msg),
-            CliError::Command(msg) => format!("{} {}", style("Command Error:").red().bold(), msg),
-            CliError::InvalidConfig(msg) => format!("{} {}", style("Invalid Config:").red().bold(), msg),
-            CliError::FileNotFound(path) => format!("{} {}", style("File Not Found:").red().bold(), path),
-            CliError::DirectoryExists(path) => format!("{} {}", style("Directory Exists:").red().bold(), path),
-            CliError::UnsupportedFramework(framework) => format!("{} {}", style("Unsupported Framework:").red().bold(), framework),
-            CliError::DevMode(msg) => format!("{} {}", style("Dev Mode Error:").red().bold(), msg),
-            CliError::Build(msg) => format!("{} {}", style("Build Error:").red().bold(), msg),
-        }
-    }
 }

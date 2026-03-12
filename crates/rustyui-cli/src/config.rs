@@ -3,7 +3,7 @@
 use crate::error::{CliError, CliResult};
 use console::style;
 use rustyui_core::{DualModeConfig, config::UIFramework};
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// Configuration file name
 pub const CONFIG_FILE_NAME: &str = "rustyui.toml";
@@ -596,18 +596,6 @@ members = [{}]
         Ok(watch_paths)
     }
     
-    /// Update configuration with new settings
-    pub fn update_config<F>(&self, updater: F) -> CliResult<()>
-    where
-        F: FnOnce(&mut DualModeConfig) -> CliResult<()>,
-    {
-        let mut config = self.load_config()?;
-        updater(&mut config)?;
-        self.save_config(&config)?;
-        
-        Ok(())
-    }
-    
     /// Validate configuration
     pub fn validate_config(&self, config: &DualModeConfig) -> CliResult<()> {
         // Validate watch paths exist
@@ -703,15 +691,5 @@ members = [{}]
         }
         
         Ok(())
-    }
-    
-    /// Get project path
-    pub fn project_path(&self) -> &Path {
-        &self.project_path
-    }
-    
-    /// Get config file path
-    pub fn config_path(&self) -> &Path {
-        &self.config_path
     }
 }

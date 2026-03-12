@@ -2,11 +2,11 @@
 
 use crate::traits::{
     UIFrameworkAdapter, RenderContext, FrameworkConfig, FrameworkState, UIComponent,
-    AdapterResult, AdapterError, ComponentStyle, Rect, RenderFeature
+    AdapterResult, ComponentStyle, Rect, RenderFeature
 };
 
 #[cfg(feature = "dev-ui")]
-use crate::traits::{RuntimeUpdate, UpdateType};
+use crate::traits::RuntimeUpdate;
 
 /// Adapter for the slint native GUI framework
 pub struct SlintAdapter {
