@@ -12,6 +12,9 @@ pub mod ast_interpreter;
 #[cfg(feature = "dev-ui")]
 pub mod jit_compiler;
 
+#[cfg(feature = "dev-ui")]
+pub mod tiered_compilation;
+
 pub mod error;
 
 #[cfg(test)]
@@ -31,6 +34,12 @@ pub use ast_interpreter::ASTInterpreter;
 #[cfg(feature = "dev-ui")]
 pub use jit_compiler::JITCompiler;
 
+#[cfg(feature = "dev-ui")]
+pub use tiered_compilation::{
+    CompilationTier, TieredCompilationConfig, TieredCompilationManager,
+    FunctionMetadata, TierStatistics,
+};
+
 /// Runtime interpreter that handles code changes without compilation
 #[cfg(feature = "dev-ui")]
 pub struct RuntimeInterpreter {
@@ -42,6 +51,9 @@ pub struct RuntimeInterpreter {
     
     /// JIT compiler for performance-critical code
     jit_compiler: JITCompiler,
+    
+    /// Tiered compilation manager
+    tiered_compilation: TieredCompilationManager,
     
     /// Interpretation cache (now using optimized memory pools)
     interpretation_cache: std::collections::HashMap<String, InterpretedCode>,
@@ -55,6 +67,7 @@ impl RuntimeInterpreter {
             rhai_interpreter: RhaiInterpreter::new()?,
             ast_interpreter: ASTInterpreter::new()?,
             jit_compiler: JITCompiler::new()?,
+            tiered_compilation: TieredCompilationManager::new(TieredCompilationConfig::default()),
             interpretation_cache: std::collections::HashMap::new(),
         })
     }
