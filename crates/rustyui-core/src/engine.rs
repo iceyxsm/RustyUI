@@ -160,7 +160,7 @@ impl DualModeEngine {
     
     /// Initialize the dual-mode engine with platform-specific optimizations
     pub fn initialize(&mut self) -> Result<()> {
-        let _startup_start = Instant::now();
+        let startup_start = Instant::now();
         
         #[cfg(feature = "dev-ui")]
         {
