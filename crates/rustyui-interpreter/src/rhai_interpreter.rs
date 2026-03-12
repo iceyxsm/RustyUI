@@ -920,30 +920,21 @@ mod tests {
     }
 
     /// Test concurrent script execution safety
+    /// Note: Rhai Engine is not Send+Sync, so we test sequential execution instead
     #[test]
-    fn test_concurrent_execution_safety() {
-        use std::sync::{Arc, Mutex};
-        use std::thread;
+    fn test_sequential_execution_safety() {
+        let mut interpreter = RhaiInterpreter::new().unwrap();
         
-        let interpreter = Arc::new(Mutex::new(RhaiInterpreter::new().unwrap()));
-        let mut handles = vec![];
-        
-        // Spawn multiple threads executing scripts concurrently
+        // Execute multiple scripts sequentially to test stability
         for i in 0..5 {
-            let interpreter_clone = Arc::clone(&interpreter);
-            let handle = thread::spawn(move || {
-                let script = format!("let x = {}; x * x", i);
-                let mut interp = interpreter_clone.lock().unwrap();
-                interp.interpret(&script)
-            });
-            handles.push(handle);
+            let script = format!("let x = {}; x * x", i);
+            let result = interpreter.interpret(&script);
+            assert!(result.is_ok(), "Sequential execution {} should succeed", i);
         }
         
-        // Wait for all threads to complete
-        for handle in handles {
-            let result = handle.join().unwrap();
-            assert!(result.is_ok(), "Concurrent execution should succeed");
-        }
+        // Test that interpreter remains stable after multiple executions
+        let final_result = interpreter.interpret("let final = 42; final");
+        assert!(final_result.is_ok(), "Final execution should succeed");
     }
 
     /// Test error recovery and resilience

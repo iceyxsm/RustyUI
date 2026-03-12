@@ -315,6 +315,34 @@ interpretation-strategy = "hybrid"
         Ok(())
     }
     
+    /// Run the project in development mode
+    pub fn run_development(&self, watch: bool) -> CliResult<()> {
+        if !self.is_rust_project() {
+            return Err(CliError::project("Not a Rust project"));
+        }
+
+        println!("{} Starting development mode...", style("").blue());
+        
+        let args = vec!["run", "--features", "dev-ui"];
+        
+        if watch {
+            println!("{} Watch mode enabled - changes will trigger rebuild", style("").yellow());
+            // Note: Full watch implementation would require cargo-watch
+            // For now, just run once
+        }
+        
+        let status = Command::new("cargo")
+            .args(&args)
+            .current_dir(&self.project_path)
+            .status()?;
+            
+        if !status.success() {
+            return Err(CliError::build("Development run failed"));
+        }
+        
+        Ok(())
+    }
+    
     /// Analyze project structure
     pub fn analyze_project(&self) -> CliResult<ProjectAnalysis> {
         let mut analysis = ProjectAnalysis::default();

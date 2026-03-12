@@ -17,6 +17,9 @@ pub mod error;
 #[cfg(test)]
 mod property_tests;
 
+#[cfg(test)]
+mod test_jit;
+
 pub use error::{InterpreterError, Result};
 
 #[cfg(feature = "dev-ui")]

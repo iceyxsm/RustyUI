@@ -65,7 +65,7 @@ impl WorkflowManager {
     fn optimize_configuration(
         &self,
         config: &mut DualModeConfig,
-        platform_config: &PlatformConfig,
+        _platform_config: &PlatformConfig,
         analysis: &crate::project::ProjectAnalysis,
     ) -> CliResult<()> {
         #[cfg(feature = "dev-ui")]
@@ -165,6 +165,7 @@ impl WorkflowManager {
     }
     
     /// Get available system memory in GB (rough estimate)
+    #[allow(dead_code)]
     fn get_available_memory_gb(&self) -> f64 {
         // This is a simplified implementation
         // In a real system, you'd use platform-specific APIs
@@ -276,7 +277,7 @@ impl WorkflowManager {
     /// Validate development mode requirements
     fn validate_development_requirements(&self, config: &DualModeConfig) -> CliResult<()> {
         // Check platform compatibility
-        let platform = Platform::current();
+        let _platform = Platform::current();
         let platform_config = PlatformConfig::auto_detect();
         
         // Validate file watcher backend

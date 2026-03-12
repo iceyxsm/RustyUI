@@ -67,6 +67,21 @@ name = "performance_optimization_demo"
 path = "performance_optimization_demo.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "test_implementations"
+path = "test_implementations.rs"
+required-features = ["dev-ui", "egui-adapter"]
+
+[[example]]
+name = "simple_test"
+path = "simple_test.rs"
+required-features = ["dev-ui", "egui-adapter"]
+
+[[example]]
+name = "rhai_only_test"
+path = "rhai_only_test.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 rustyui-adapters = { path = "../crates/rustyui-adapters" }

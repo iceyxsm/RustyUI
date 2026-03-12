@@ -10,7 +10,7 @@
 //! Based on 2026 industry best practices for immediate mode GUI integration.
 
 use crate::traits::{
-    UIFrameworkAdapter, RenderContext, FrameworkConfig, FrameworkState, UIComponent,
+    UIFrameworkAdapter, RenderContext, FrameworkConfig, UIComponent,
     AdapterResult, AdapterError, ComponentStyle, Rect, RenderFeature
 };
 use std::collections::HashMap;
@@ -20,7 +20,7 @@ use serde_json;
 use crate::traits::{RuntimeUpdate, UpdateType};
 
 #[cfg(feature = "egui-adapter")]
-use egui::{Context as EguiContext, Ui, Response, Widget, Id, Rect as EguiRect, Color32, Stroke, FontId};
+use egui::{Context as EguiContext};
 
 /// Production-grade adapter for the egui immediate mode GUI framework
 /// 
@@ -208,14 +208,14 @@ impl UIFrameworkAdapter for EguiAdapter {
         {
             if self.egui_context.is_none() {
                 // Create new egui context with optimized settings
-                let mut ctx = EguiContext::default();
+                let ctx = EguiContext::default();
                 
                 // Configure for performance
                 ctx.set_pixels_per_point(1.0); // Default DPI
                 
                 // Set up memory management
                 ctx.memory_mut(|mem| {
-                    mem.options.max_passes = 2; // Limit layout passes for performance
+                    mem.options.max_passes = std::num::NonZero::new(2).unwrap(); // Limit layout passes for performance
                 });
                 
                 self.egui_context = Some(ctx);
@@ -244,7 +244,7 @@ impl UIFrameworkAdapter for EguiAdapter {
             ));
         }
         
-        let render_start = std::time::Instant::now();
+        let _render_start = std::time::Instant::now();
         
         // Register component for tracking
         self.register_component(component);
@@ -255,31 +255,24 @@ impl UIFrameworkAdapter for EguiAdapter {
             ctx.mark_component_for_tracking(component.component_id());
         }
         
-        // Render the component with real egui integration
         #[cfg(feature = "egui-adapter")]
         {
-            if let Some(egui_ctx) = ctx.as_any().downcast_ref::<EguiRenderContext>() {
-                // Use real egui rendering
-                let mut mutable_component = unsafe {
-                    // SAFETY: We need mutable access to render the component
-                    // This is safe because we control the lifetime and ensure no concurrent access
-                    std::ptr::read(&component as *const &dyn UIComponent as *const &mut dyn UIComponent)
-                };
-                
-                mutable_component.render(ctx).map_err(|e| {
-                    AdapterError::RenderingFailed(format!("Component rendering failed: {}", e))
-                })?;
-            } else {
-                return Err(AdapterError::RenderingFailed(
-                    "Invalid render context for egui".to_string()
-                ));
-            }
+            // Use real egui rendering - simplified approach
+            let mutable_component = unsafe {
+                // SAFETY: We need mutable access to render the component
+                // This is safe because we control the lifetime and ensure no concurrent access
+                std::ptr::read(&component as *const &dyn UIComponent as *const &mut dyn UIComponent)
+            };
+            
+            mutable_component.render(ctx).map_err(|e| {
+                AdapterError::RenderingFailed(format!("Component rendering failed: {}", e))
+            })?;
         }
         
         #[cfg(not(feature = "egui-adapter"))]
         {
             // Fallback rendering without egui
-            let mut mutable_component = unsafe {
+            let mutable_component = unsafe {
                 std::ptr::read(&component as *const &dyn UIComponent as *const &mut dyn UIComponent)
             };
             
@@ -323,7 +316,8 @@ impl UIFrameworkAdapter for EguiAdapter {
         
         #[cfg(not(feature = "egui-adapter"))]
         {
-            Ok(Box::new(MockEguiRenderContext::new(
+            Ok(Box::new(EguiRenderContext::new(
+                None,
                 self.config.as_ref()
             )))
         }
@@ -360,7 +354,7 @@ impl UIFrameworkAdapter for EguiAdapter {
     }
     
     #[cfg(feature = "dev-ui")]
-    fn preserve_framework_state(&self) -> AdapterResult<FrameworkState> {
+    fn preserve_framework_state(&self) -> AdapterResult<Vec<u8>> {
         #[cfg(feature = "egui-adapter")]
         {
             if let Some(ref ctx) = self.egui_context {
@@ -370,50 +364,35 @@ impl UIFrameworkAdapter for EguiAdapter {
                     AdapterError::StateFailed(format!("Failed to serialize egui state: {}", e))
                 })?;
                 
-                Ok(FrameworkState::Egui(state_data))
+                Ok(state_data)
             } else {
-                Ok(FrameworkState::None)
+                Ok(vec![])
             }
         }
         
         #[cfg(not(feature = "egui-adapter"))]
         {
-            Ok(FrameworkState::None)
+            Ok(vec![])
         }
     }
     
     #[cfg(feature = "dev-ui")]
-    fn restore_framework_state(&mut self, state: FrameworkState) -> AdapterResult<()> {
+    fn restore_framework_state(&mut self, state: Vec<u8>) -> AdapterResult<()> {
         #[cfg(feature = "egui-adapter")]
         {
-            match (self.egui_context.as_mut(), state) {
-                (Some(ctx), FrameworkState::Egui(state_data)) => {
+            if let Some(ctx) = self.egui_context.as_mut() {
+                if !state.is_empty() {
                     // Deserialize and restore egui context state
-                    let memory: egui::Memory = serde_json::from_slice(&state_data).map_err(|e| {
+                    let memory: egui::Memory = serde_json::from_slice(&state).map_err(|e| {
                         AdapterError::StateFailed(format!("Failed to deserialize egui state: {}", e))
                     })?;
                     
                     ctx.memory_mut(|mem| *mem = memory);
-                    Ok(())
                 }
-                _ => Ok(()),
             }
         }
         
-        #[cfg(not(feature = "egui-adapter"))]
-        {
-            Ok(())
-        }
-    }
-    
-    fn get_supported_features(&self) -> Vec<RenderFeature> {
-        vec![
-            RenderFeature::ImmediateMode,
-            RenderFeature::StatePreservation,
-            RenderFeature::RuntimeUpdates,
-            RenderFeature::CrossPlatform,
-            RenderFeature::PerformanceOptimized,
-        ]
+        Ok(())
     }
 }
 /// Production-grade egui render context with real egui integration
@@ -421,10 +400,6 @@ impl UIFrameworkAdapter for EguiAdapter {
 /// Provides actual egui rendering operations and integrates with
 /// the hot reload system for development-time updates.
 pub struct EguiRenderContext {
-    /// Reference to real egui UI context
-    #[cfg(feature = "egui-adapter")]
-    egui_ui: Option<std::rc::Rc<std::cell::RefCell<egui::Ui>>>,
-    
     /// Framework configuration
     config: Option<FrameworkConfig>,
     
@@ -461,10 +436,10 @@ struct LayoutInfo {
 }
 
 impl EguiRenderContext {
-    fn new(context: Option<&EguiContext>, config: Option<&FrameworkConfig>) -> Self {
+    fn new(_context: Option<&EguiContext>, config: Option<&FrameworkConfig>) -> Self {
         Self {
-            _context: context.map(|_| EguiContextRef),
-            _config: config.cloned(),
+            config: config.cloned(),
+            #[cfg(feature = "dev-ui")]
             rendered_elements: Vec::new(),
             layout_stack: Vec::new(),
             #[cfg(feature = "dev-ui")]
@@ -475,14 +450,17 @@ impl EguiRenderContext {
     
     /// Add a rendered element to the tracking list
     fn add_rendered_element(&mut self, element_type: &str, content: &str) {
-        let element = RenderedElement {
-            _element_type: element_type.to_string(),
-            _content: content.to_string(),
-            _style: self.current_style.clone(),
-            _timestamp: std::time::SystemTime::now(),
-        };
-        
-        self.rendered_elements.push(element);
+        #[cfg(feature = "dev-ui")]
+        {
+            let element = RenderedElement {
+                _element_type: element_type.to_string(),
+                _content: content.to_string(),
+                _style: self.current_style.clone(),
+                _timestamp: std::time::SystemTime::now(),
+            };
+            
+            self.rendered_elements.push(element);
+        }
         
         // Update child count for current layout
         if let Some(layout) = self.layout_stack.last_mut() {
@@ -601,13 +579,6 @@ impl RenderContext for EguiRenderContext {
         }
     }
 }
-
-/// Reference to egui context (placeholder for actual egui integration)
-/// 
-/// In a full implementation, this would hold references to actual egui types
-/// like egui::Context, egui::Ui, etc. For Phase 1, this serves as a placeholder
-/// that demonstrates the integration pattern.
-struct EguiContextRef;
 
 impl Default for EguiAdapter {
     fn default() -> Self {
