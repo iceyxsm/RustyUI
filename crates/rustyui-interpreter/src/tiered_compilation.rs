@@ -79,6 +79,9 @@ pub struct TieredCompilationConfig {
     
     /// Enable tier statistics collection
     pub collect_statistics: bool,
+    
+    /// Profiling configuration
+    pub profiling: crate::profiling::ProfilingConfig,
 }
 
 impl Default for TieredCompilationConfig {
@@ -90,6 +93,7 @@ impl Default for TieredCompilationConfig {
             background_recompilation: true,
             max_concurrent_recompilations: 4,
             collect_statistics: true,
+            profiling: crate::profiling::ProfilingConfig::default(),
         }
     }
 }

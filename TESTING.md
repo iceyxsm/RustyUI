@@ -131,15 +131,15 @@ jobs:
 ## Test Coverage
 
 Current test coverage:
-- ✅ Dual-mode engine operation
-- ✅ Runtime interpretation (Rhai, AST, JIT)
-- ✅ State preservation
-- ✅ File change detection
-- ✅ Error recovery
-- ✅ Cross-platform compatibility
-- ✅ Performance bounds
-- ✅ Zero-overhead production builds
-- ✅ Framework adapters (egui, iced, slint, tauri)
+-  Dual-mode engine operation
+-  Runtime interpretation (Rhai, AST, JIT)
+-  State preservation
+-  File change detection
+-  Error recovery
+-  Cross-platform compatibility
+-  Performance bounds
+-  Zero-overhead production builds
+-  Framework adapters (egui, iced, slint, tauri)
 
 ## Next Steps
 

@@ -15,6 +15,9 @@ pub mod jit_compiler;
 #[cfg(feature = "dev-ui")]
 pub mod tiered_compilation;
 
+#[cfg(feature = "dev-ui")]
+pub mod profiling;
+
 pub mod error;
 
 #[cfg(test)]
@@ -40,6 +43,12 @@ pub use tiered_compilation::{
     FunctionMetadata, TierStatistics,
 };
 
+#[cfg(feature = "dev-ui")]
+pub use profiling::{
+    ProfileData, ProfilingInfrastructure, ProfilingConfig, OverheadTracker,
+    BranchStatistics, LoopStatistics, CallSiteStatistics, TypeFeedback,
+};
+
 /// Runtime interpreter that handles code changes without compilation
 #[cfg(feature = "dev-ui")]
 pub struct RuntimeInterpreter {
@@ -55,6 +64,9 @@ pub struct RuntimeInterpreter {
     /// Tiered compilation manager
     tiered_compilation: TieredCompilationManager,
     
+    /// Profiling infrastructure for PGO
+    profiling: std::sync::Arc<ProfilingInfrastructure>,
+    
     /// Interpretation cache (now using optimized memory pools)
     interpretation_cache: std::collections::HashMap<String, InterpretedCode>,
 }
@@ -63,23 +75,51 @@ pub struct RuntimeInterpreter {
 impl RuntimeInterpreter {
     /// Create a new runtime interpreter with performance optimizations
     pub fn new() -> Result<Self> {
+        let config = TieredCompilationConfig::default();
+        let profiling = std::sync::Arc::new(ProfilingInfrastructure::new(config.profiling.clone()));
+        
         Ok(Self {
             rhai_interpreter: RhaiInterpreter::new()?,
             ast_interpreter: ASTInterpreter::new()?,
             jit_compiler: JITCompiler::new()?,
-            tiered_compilation: TieredCompilationManager::new(TieredCompilationConfig::default()),
+            tiered_compilation: TieredCompilationManager::new(config),
+            profiling,
+            interpretation_cache: std::collections::HashMap::new(),
+        })
+    }
+    
+    /// Create a new runtime interpreter with custom configuration
+    pub fn with_config(config: TieredCompilationConfig) -> Result<Self> {
+        let profiling = std::sync::Arc::new(ProfilingInfrastructure::new(config.profiling.clone()));
+        
+        Ok(Self {
+            rhai_interpreter: RhaiInterpreter::new()?,
+            ast_interpreter: ASTInterpreter::new()?,
+            jit_compiler: JITCompiler::new()?,
+            tiered_compilation: TieredCompilationManager::new(config),
+            profiling,
             interpretation_cache: std::collections::HashMap::new(),
         })
     }
     
     /// Interpret a UI code change with error recovery and performance optimization
     pub fn interpret_change(&mut self, change: &UIChange) -> Result<InterpretationResult> {
-        let _start_time = std::time::Instant::now();
+        let start_time = std::time::Instant::now();
+        
+        // Generate function ID for profiling
+        let function_id = self.calculate_function_id(&change.content);
         
         // Choose interpretation strategy based on code complexity and configuration
         let strategy = self.choose_strategy(change);
         
         let result = self.try_interpret_with_fallback(change, strategy);
+        
+        // Record execution in profiling infrastructure
+        let execution_time = start_time.elapsed();
+        self.profiling.record_execution(&function_id, execution_time);
+        
+        // Record execution in tiered compilation manager
+        self.tiered_compilation.record_execution(&function_id, execution_time);
         
         // Cache successful interpretations
         if let Ok(ref interpretation_result) = result {
@@ -207,6 +247,16 @@ impl RuntimeInterpreter {
             .iter()
             .map(|(key, value)| key.len() + value.source.len() + value.result.len())
             .sum()
+    }
+    
+    /// Calculate function ID for profiling (simple hash)
+    fn calculate_function_id(&self, code: &str) -> String {
+        use std::collections::hash_map::DefaultHasher;
+        use std::hash::{Hash, Hasher};
+        
+        let mut hasher = DefaultHasher::new();
+        code.hash(&mut hasher);
+        format!("fn_{:x}", hasher.finish())
     }
 }
 
@@ -467,6 +517,36 @@ impl RuntimeInterpreter {
             total_interpretations: self.interpretation_cache.len(),
             memory_usage: self.estimate_cache_memory(),
         }
+    }
+    
+    /// Get profiling infrastructure
+    pub fn get_profiling(&self) -> std::sync::Arc<ProfilingInfrastructure> {
+        self.profiling.clone()
+    }
+    
+    /// Get profiling overhead percentage
+    pub fn get_profiling_overhead(&self) -> f64 {
+        self.profiling.get_overhead_percentage()
+    }
+    
+    /// Record branch outcome for profiling
+    pub fn record_branch(&self, function_id: &str, branch_id: u32, taken: bool) {
+        self.profiling.record_branch(function_id, branch_id, taken);
+    }
+    
+    /// Record loop iteration count for profiling
+    pub fn record_loop(&self, function_id: &str, loop_id: u32, iterations: u64) {
+        self.profiling.record_loop(function_id, loop_id, iterations);
+    }
+    
+    /// Record call site invocation for profiling
+    pub fn record_call_site(&self, function_id: &str, call_site_id: u32, target: &str) {
+        self.profiling.record_call_site(function_id, call_site_id, target);
+    }
+    
+    /// Record type observation for profiling
+    pub fn record_type(&self, function_id: &str, operation_id: u32, type_name: &str) {
+        self.profiling.record_type(function_id, operation_id, type_name);
     }
     
     /// Calculate cache hit rate (simplified for Phase 1)
