@@ -21,6 +21,18 @@ pub mod profiling;
 #[cfg(feature = "dev-ui")]
 pub mod hot_path_detector;
 
+#[cfg(feature = "dev-ui")]
+pub mod recompilation_scheduler;
+
+#[cfg(feature = "dev-ui")]
+pub mod optimization_engine;
+
+#[cfg(feature = "dev-ui")]
+pub mod performance_tuning;
+
+#[cfg(feature = "dev-ui")]
+pub mod benchmarks;
+
 pub mod error;
 
 #[cfg(test)]
@@ -28,6 +40,9 @@ mod property_tests;
 
 #[cfg(test)]
 mod test_jit;
+
+#[cfg(test)]
+mod integration_tests;
 
 pub use error::{InterpreterError, Result};
 
@@ -47,6 +62,11 @@ pub use tiered_compilation::{
 };
 
 #[cfg(feature = "dev-ui")]
+pub use optimization_engine::{
+    OptimizationEngine, CompiledCode, InliningConfig, DeoptimizationInfo,
+};
+
+#[cfg(feature = "dev-ui")]
 pub use profiling::{
     ProfileData, ProfilingInfrastructure, ProfilingConfig, OverheadTracker,
     BranchStatistics, LoopStatistics, CallSiteStatistics, TypeFeedback,
@@ -56,6 +76,13 @@ pub use profiling::{
 pub use hot_path_detector::{
     HotPathDetector, HotPathConfig, HotFunction, HotLoop, HotCallSite,
     LoopOptimization,
+};
+
+#[cfg(feature = "dev-ui")]
+pub use recompilation_scheduler::{
+    RecompilationScheduler, RecompilationTask, RecompilationStatus, RecompilationConfig,
+    CodeVersionManager, BudgetLimiter, QueueStatistics, ReplacementStatistics, GCResult,
+    BudgetStatistics, AdaptiveBudgetConfig, SchedulerStatus,
 };
 
 /// Runtime interpreter that handles code changes without compilation

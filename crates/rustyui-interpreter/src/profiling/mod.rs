@@ -479,6 +479,65 @@ impl Default for ProfilingConfig {
     }
 }
 
+impl ProfilingConfig {
+    /// Validate configuration parameters
+    pub fn validate(&self) -> Result<(), String> {
+        // Check sampling rate is reasonable
+        if self.sampling_rate == 0 {
+            return Err("sampling_rate must be greater than 0".to_string());
+        }
+        
+        if self.sampling_rate > 1000 {
+            return Err("sampling_rate should not exceed 1000 (would disable profiling)".to_string());
+        }
+        
+        // Check memory limit is reasonable
+        if self.max_memory < 1024 * 1024 {
+            return Err("max_memory should be at least 1MB".to_string());
+        }
+        
+        if self.max_memory > 1024 * 1024 * 1024 {
+            return Err("max_memory should not exceed 1GB".to_string());
+        }
+        
+        // Check retention period is reasonable
+        if self.retention_period.as_secs() < 60 {
+            return Err("retention_period should be at least 1 minute".to_string());
+        }
+        
+        // Check export interval is reasonable if auto_export is enabled
+        if self.auto_export && self.export_interval.as_secs() < 10 {
+            return Err("export_interval should be at least 10 seconds when auto_export is enabled".to_string());
+        }
+        
+        Ok(())
+    }
+    
+    /// Update configuration at runtime (where safe)
+    pub fn update_runtime_safe(&mut self, new_config: &ProfilingConfig) -> Result<(), String> {
+        // Validate new configuration first
+        new_config.validate()?;
+        
+        // Update safe-to-change fields
+        self.auto_export = new_config.auto_export;
+        self.export_interval = new_config.export_interval;
+        self.retention_period = new_config.retention_period;
+        
+        // Sampling rate can be updated but requires care
+        self.sampling_rate = new_config.sampling_rate;
+        
+        // Memory limit can be increased but not decreased (to avoid data loss)
+        if new_config.max_memory >= self.max_memory {
+            self.max_memory = new_config.max_memory;
+        }
+        
+        // Enabling/disabling profiling requires restart for safety
+        // Don't update the enabled field here
+        
+        Ok(())
+    }
+}
+
 /// Overhead tracker for monitoring profiling impact
 #[derive(Debug)]
 pub struct OverheadTracker {
@@ -850,15 +909,51 @@ impl ProfilingInfrastructure {
     
     /// Calculate checksum for profile data validation
     fn calculate_checksum(&self, profiles: &serde_json::Value) -> String {
-        use std::collections::hash_map::DefaultHasher;
-        use std::hash::{Hash, Hasher};
-        
-        let mut hasher = DefaultHasher::new();
-        profiles.to_string().hash(&mut hasher);
-        format!("{:x}", hasher.finish())
-    }
+            use std::collections::hash_map::DefaultHasher;
+            use std::hash::{Hash, Hasher};
+
+            let mut hasher = DefaultHasher::new();
+
+            // Create a deterministic representation by sorting keys
+            if let Some(profiles_array) = profiles.as_array() {
+                let mut sorted_profiles: Vec<_> = profiles_array.iter().collect();
+                sorted_profiles.sort_by(|a, b| {
+                    let id_a = a.get("function_id").and_then(|v| v.as_str()).unwrap_or("");
+                    let id_b = b.get("function_id").and_then(|v| v.as_str()).unwrap_or("");
+                    id_a.cmp(id_b)
+                });
+
+                for profile in sorted_profiles {
+                    // Hash function_id
+                    if let Some(function_id) = profile.get("function_id").and_then(|v| v.as_str()) {
+                        function_id.hash(&mut hasher);
+                    }
+
+                    // Hash execution_count
+                    if let Some(execution_count) = profile.get("execution_count").and_then(|v| v.as_u64()) {
+                        execution_count.hash(&mut hasher);
+                    }
+
+                    // Hash average_execution_time_ns
+                    if let Some(avg_time) = profile.get("average_execution_time_ns").and_then(|v| v.as_u64()) {
+                        avg_time.hash(&mut hasher);
+                    }
+
+                    // Hash last_updated
+                    if let Some(last_updated) = profile.get("last_updated").and_then(|v| v.as_u64()) {
+                        last_updated.hash(&mut hasher);
+                    }
+                }
+            }
+
+            format!("{:x}", hasher.finish())
+        }
+
 }
 
 // Re-export Arc for convenience
 use std::sync::Arc;
 use std::time::Instant;
+
+#[cfg(test)]
+mod property_tests;

@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 4a6b1005e53799c5393f0b4cdb873c0c782473c8ba8cbf70e8c1bd1e536b6757 # shrinks to hot_type_percentage = 80, total_invocations = 121
+cc de5e92770403064d1b2a678ee93b039a498762d8789952a99481f5c14eec2e52 # shrinks to function_code = "fn simple() { return 42; }", tier = QuickJIT, profile_data = ProfileData { function_id: "", execution_count: 0, branch_stats: {}, loop_stats: {}, call_site_stats: {}, type_feedback: {}, execution_times: RwLock { data: ExecutionTimeHistogram { sample_count: 0, sum_nanos: 0, min_nanos: 18446744073709551615, max_nanos: 0 }, poisoned: false, .. }, last_updated: 1773404813 }

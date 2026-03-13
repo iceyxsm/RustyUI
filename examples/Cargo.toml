@@ -82,6 +82,11 @@ name = "rhai_only_test"
 path = "rhai_only_test.rs"
 required-features = ["dev-ui"]
 
+[[example]]
+name = "pgo_integration_demo"
+path = "pgo_integration_demo.rs"
+required-features = ["dev-ui"]
+
 [dependencies]
 rustyui-core = { path = "../crates/rustyui-core" }
 rustyui-adapters = { path = "../crates/rustyui-adapters" }

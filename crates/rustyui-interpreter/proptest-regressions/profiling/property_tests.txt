@@ -1,0 +1,11 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc b2098cdabb270ae19a119c69633a7668c23638fc1c38c3cfc2c0dc86215410ac # shrinks to function_id = "a", branches_data = [(55, 1, 1), (55, 1, 1)]
+cc b0c36834ea3bc8e6ffe338fabd52d2518e0c18bb6d6e5ff0717128b272e62361 # shrinks to function_id = "_", loop_id = 0, base_iterations = 100, is_predictable_pattern = true
+cc b42b4f92db1d217ca947437b4f11d4c1b1c9581b4637ea4e03ca946fd79bb61c # shrinks to function_id = "_", loop_id = 0, base_iterations = 20, is_predictable_pattern = true
+cc b7003dd803075ca5ef3c5da7ff48735b05014250b85dedb8f44640ae1e18ad5b # shrinks to function_id = "_m", operation_id = 99, dominant_type = "bool", minority_type = "Vec<i32>", dominant_percentage = 0.5037425292777886
+cc 63d8643d1bae5763c4f223c70cf3055d92322a398e7d5d8840e4673c81e5449e # shrinks to function_id = "_", operation_id = 0, dominant_type = "Option<String>", minority_type = "String", dominant_percentage = 0.8049401231785013

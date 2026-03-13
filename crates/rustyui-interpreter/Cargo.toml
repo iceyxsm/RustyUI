@@ -33,6 +33,10 @@ regex = { version = "1.10", optional = true }
 quote = { version = "1.0", optional = true }
 dashmap = { version = "6.0", optional = true }
 
+# Concurrency and threading dependencies
+crossbeam = { version = "0.8", optional = true }
+num_cpus = { version = "1.16", optional = true }
+
 # Cross-platform system dependencies for JIT compilation
 [target.'cfg(windows)'.dependencies]
 winapi = { version = "0.3", features = ["memoryapi", "processthreadsapi"], optional = true }
@@ -55,7 +59,9 @@ dev-ui = [
     "wasmtime",
     "regex",
     "quote",
-    "dashmap"
+    "dashmap",
+    "crossbeam",
+    "num_cpus"
 ]
 
 # Platform-specific features for JIT compilation

@@ -65,7 +65,7 @@ impl WorkflowManager {
     fn optimize_configuration(
         &self,
         config: &mut DualModeConfig,
-        _platform_config: &PlatformConfig,
+        platform_config: &PlatformConfig,
         analysis: &crate::project::ProjectAnalysis,
     ) -> CliResult<()> {
         #[cfg(feature = "dev-ui")]
@@ -277,7 +277,7 @@ impl WorkflowManager {
     /// Validate development mode requirements
     fn validate_development_requirements(&self, config: &DualModeConfig) -> CliResult<()> {
         // Check platform compatibility
-        let _platform = Platform::current();
+        let platform = Platform::current();
         let platform_config = PlatformConfig::auto_detect();
         
         // Validate file watcher backend

@@ -109,7 +109,7 @@ impl DevCommand {
     }
     
     /// Start development mode with dual-mode engine integration
-    fn start_development_mode_with_engine(&self, _config: &rustyui_core::DualModeConfig) -> CliResult<()> {
+    fn start_development_mode_with_engine(&self, config: &rustyui_core::DualModeConfig) -> CliResult<()> {
         println!("\n{} Initializing dual-mode engine...", style("⚙️").blue());
         
         #[cfg(feature = "dev-ui")]

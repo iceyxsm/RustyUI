@@ -1,0 +1,8 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 7676efe523a7d53065413400ca5327c9994659bddb7f822568917a102e278bba # shrinks to budget_limit = 7, num_threads = 5
+cc 10d7721937b17188ec571267769efaf26c92d9a911cb0bb180235acb529f714c # shrinks to config = RecompilationConfig { thread_pool_size: 1, max_concurrent: 1, budget_per_second: 1, gc_grace_period: 100ms, gc_interval: 1s, max_queue_size: 100, task_timeout: 1s }, codes = [CompiledCode { function_id: "a", tier: Interpreter, version: 1506, code_size: 1, compiled_at: Instant { t: 1845.6109566s }, compilation_time: 1ms, profile_snapshot: ProfileData { function_id: "a", execution_count: 0, branch_stats: {}, loop_stats: {}, call_site_stats: {}, type_feedback: {}, execution_times: RwLock { data: ExecutionTimeHistogram { sample_count: 0, sum_nanos: 0, min_nanos: 18446744073709551615, max_nanos: 0 }, poisoned: false, .. }, last_updated: 1773401853 }, ref_count: 1 }, CompiledCode { function_id: "A", tier: Interpreter, version: 1507, code_size: 1, compiled_at: Instant { t: 1845.6109909s }, compilation_time: 1ms, profile_snapshot: ProfileData { function_id: "A", execution_count: 0, branch_stats: {}, loop_stats: {}, call_site_stats: {}, type_feedback: {}, execution_times: RwLock { data: ExecutionTimeHistogram { sample_count: 0, sum_nanos: 0, min_nanos: 18446744073709551615, max_nanos: 0 }, poisoned: false, .. }, last_updated: 1773401853 }, ref_count: 1 }]

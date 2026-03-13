@@ -9,6 +9,9 @@
 //! - Circuit breaker pattern for error isolation
 
 use crate::{InterpreterError, Result};
+use crate::tiered_compilation::CompilationTier;
+use crate::profiling::ProfileData;
+use crate::optimization_engine::{OptimizationEngine, CompiledCode, OptimizationError};
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
@@ -50,6 +53,10 @@ pub struct JITCompiler {
     /// Memory pool for zero-allocation caching
     #[cfg(feature = "dev-ui")]
     memory_pool: MemoryPool,
+    
+    /// Optimization engine for tier-specific compilation
+    #[cfg(feature = "dev-ui")]
+    optimization_engine: Option<OptimizationEngine>,
 }
 
 impl JITCompiler {
@@ -67,6 +74,8 @@ impl JITCompiler {
             profile_data: ProfileGuidedOptimizer::new(),
             #[cfg(feature = "dev-ui")]
             memory_pool: MemoryPool::new(),
+            #[cfg(feature = "dev-ui")]
+            optimization_engine: None,
         })
     }
     
@@ -80,6 +89,10 @@ impl JITCompiler {
         // Create JIT module
         self.jit_module = Some(JITModule::new(builder));
         self.builder_context = Some(FunctionBuilderContext::new());
+        
+        // Initialize optimization engine
+        self.optimization_engine = Some(OptimizationEngine::new()
+            .map_err(|e| InterpreterError::initialization(format!("Failed to create optimization engine: {}", e)))?);
         
         println!("Cranelift JIT compiler initialized successfully");
         Ok(())
@@ -427,6 +440,87 @@ impl JITCompiler {
         } else {
             self.stats.cache_hits as f64 / total as f64
         }
+    }
+    
+    /// Compile function at specified tier with profile data
+    #[cfg(feature = "dev-ui")]
+    pub fn compile_with_tier(
+        &mut self,
+        code: &str,
+        tier: CompilationTier,
+        profile_data: &ProfileData,
+    ) -> Result<CompiledCode> {
+        let start_time = Instant::now();
+        
+        // Get optimization engine
+        let optimization_engine = self.optimization_engine.as_mut()
+            .ok_or_else(|| InterpreterError::compilation("Optimization engine not initialized".to_string()))?;
+        
+        // Compile with profile-guided optimizations
+        let compiled_code = optimization_engine.compile_with_profile(code, tier, profile_data)
+            .map_err(|e| InterpreterError::compilation(format!("Optimization engine compilation failed: {}", e)))?;
+        
+        let compilation_time = start_time.elapsed();
+        
+        // Verify compilation time budget
+        let budget = tier.compilation_time_budget();
+        if compilation_time > budget {
+            return Err(InterpreterError::compilation(format!(
+                "Compilation time budget exceeded for tier {:?}: {:?} > {:?}",
+                tier, compilation_time, budget
+            )));
+        }
+        
+        // Update statistics
+        self.stats.total_compilations += 1;
+        
+        Ok(compiled_code)
+    }
+    
+    /// Compile function at specified tier (no-op in production builds)
+    #[cfg(not(feature = "dev-ui"))]
+    pub fn compile_with_tier(
+        &mut self,
+        _code: &str,
+        _tier: CompilationTier,
+        _profile_data: &ProfileData,
+    ) -> Result<CompiledCode> {
+        Err(InterpreterError::compilation("JIT compilation not available in production builds".to_string()))
+    }
+    
+    /// Apply tier-specific Cranelift optimization settings
+    #[cfg(feature = "dev-ui")]
+    fn configure_cranelift_for_tier(&mut self, tier: CompilationTier) -> Result<()> {
+        let jit_module = self.jit_module.as_mut()
+            .ok_or_else(|| InterpreterError::compilation("JIT module not initialized".to_string()))?;
+        
+        // Configure optimization level based on tier
+        let opt_level = tier.cranelift_opt_level();
+        
+        // Apply tier-specific settings
+        match tier {
+            CompilationTier::Interpreter => {
+                // No JIT compilation for interpreter tier
+                return Err(InterpreterError::compilation("Cannot configure Cranelift for interpreter tier".to_string()));
+            }
+            CompilationTier::QuickJIT => {
+                // Tier 1: OptLevel::Speed, no inlining, target <5ms
+                // Minimal optimizations for fast compilation
+                // TODO: Configure Cranelift settings for quick compilation
+            }
+            CompilationTier::OptimizedJIT => {
+                // Tier 2: OptLevel::Speed, limited inlining, target <20ms
+                // Moderate optimizations with profile guidance
+                // TODO: Configure Cranelift settings for optimized compilation
+            }
+            CompilationTier::AggressiveJIT => {
+                // Tier 3: OptLevel::SpeedAndSize, aggressive inlining, target <100ms
+                // Full optimizations with speculative optimizations
+                // TODO: Configure Cranelift settings for aggressive compilation
+            }
+        }
+        
+        Ok(())
     }
 }
 

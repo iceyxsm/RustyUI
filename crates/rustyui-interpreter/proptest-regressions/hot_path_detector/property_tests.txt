@@ -1,0 +1,7 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc fe771760e7c273a0df4c7e16ce1fe147bd7b101439bd59d9d534bab41c327bb1 # shrinks to config = HotPathConfig { min_execution_count: 1, min_priority_score: 1.0, cache_ttl: 1s, reanalysis_interval: 1s, loop_hot_threshold: 1, call_site_hot_threshold: 1, min_inline_benefit_score: 1.0 }, function_data = [(("a", 13, 770µs), Interpreter)]

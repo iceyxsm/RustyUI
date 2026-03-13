@@ -6,7 +6,7 @@
 //! - Cached analysis results with TTL
 //! - Loop and call site detection algorithms
 
-use crate::profiling::{ProfilingInfrastructure, ProfileData};
+use crate::profiling::ProfilingInfrastructure;
 use crate::tiered_compilation::CompilationTier;
 use std::sync::{Arc, RwLock};
 use std::time::{Duration, Instant};
@@ -405,12 +405,17 @@ impl HotPathDetector {
     
     /// Recommend compilation tier based on execution patterns
     fn recommend_tier(&self, execution_count: u64, priority_score: f64) -> CompilationTier {
-        if execution_count >= 1000 && priority_score >= 1000.0 {
-            CompilationTier::AggressiveJIT
-        } else if execution_count >= 100 && priority_score >= 500.0 {
-            CompilationTier::OptimizedJIT
-        } else if execution_count >= 10 && priority_score >= 100.0 {
-            CompilationTier::QuickJIT
+        // Use configurable thresholds instead of hardcoded values
+        // If function meets hot criteria, recommend at least QuickJIT
+        if execution_count >= self.config.min_execution_count && priority_score >= self.config.min_priority_score {
+            // Use execution count to determine tier level
+            if execution_count >= 1000 {
+                CompilationTier::AggressiveJIT
+            } else if execution_count >= 100 {
+                CompilationTier::OptimizedJIT
+            } else {
+                CompilationTier::QuickJIT
+            }
         } else {
             CompilationTier::Interpreter
         }
@@ -468,3 +473,6 @@ impl HotPathDetector {
         *cache = HotPathCache::new();
     }
 }
+
+#[cfg(test)]
+mod property_tests;
