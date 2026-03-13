@@ -187,6 +187,10 @@ pub struct TieredCompilationManager {
     
     /// Tier statistics
     stats: Arc<Mutex<TierStatistics>>,
+    
+    /// Hot path detector for optimization candidates
+    #[cfg(feature = "dev-ui")]
+    hot_path_detector: Option<Arc<crate::hot_path_detector::HotPathDetector>>,
 }
 
 impl TieredCompilationManager {
@@ -196,6 +200,25 @@ impl TieredCompilationManager {
             config,
             functions: Arc::new(Mutex::new(HashMap::new())),
             stats: Arc::new(Mutex::new(TierStatistics::new())),
+            #[cfg(feature = "dev-ui")]
+            hot_path_detector: None,
+        }
+    }
+    
+    /// Create with hot path detector
+    #[cfg(feature = "dev-ui")]
+    pub fn with_hot_path_detector(
+        config: TieredCompilationConfig,
+        profiling: Arc<crate::profiling::ProfilingInfrastructure>,
+    ) -> Self {
+        let hot_path_config = crate::hot_path_detector::HotPathConfig::default();
+        let hot_path_detector = Arc::new(crate::hot_path_detector::HotPathDetector::new(profiling, hot_path_config));
+        
+        Self {
+            config,
+            functions: Arc::new(Mutex::new(HashMap::new())),
+            stats: Arc::new(Mutex::new(TierStatistics::new())),
+            hot_path_detector: Some(hot_path_detector),
         }
     }
     
@@ -215,13 +238,22 @@ impl TieredCompilationManager {
         }
     }
     
-    /// Check if function should be recompiled
+    /// Check if function should be recompiled (enhanced with hot path detection)
     pub fn should_recompile(&self, function_id: &str) -> Option<CompilationTier> {
         let functions = self.functions.lock().unwrap();
         
         if let Some(metadata) = functions.get(function_id) {
+            // First check traditional tier promotion
             if metadata.should_promote(&self.config) {
                 return metadata.current_tier.next_tier();
+            }
+            
+            // Then check hot path detector if available
+            #[cfg(feature = "dev-ui")]
+            if let Some(ref detector) = self.hot_path_detector {
+                if detector.is_optimization_candidate(function_id, metadata.current_tier) {
+                    return metadata.current_tier.next_tier();
+                }
             }
         }
         
@@ -285,6 +317,50 @@ impl TieredCompilationManager {
             })
             .collect()
     }
+    
+    /// Get optimization recommendations from hot path detector
+    #[cfg(feature = "dev-ui")]
+    pub fn get_optimization_recommendations(&self) -> Vec<OptimizationRecommendation> {
+        let mut recommendations = Vec::new();
+        
+        if let Some(ref detector) = self.hot_path_detector {
+            // Get hot functions
+            let hot_functions = detector.detect_hot_functions();
+            
+            for hot_function in hot_functions {
+                let recommendation = OptimizationRecommendation {
+                    function_id: hot_function.function_id.clone(),
+                    current_tier: hot_function.current_tier,
+                    recommended_tier: hot_function.recommended_tier,
+                    priority_score: hot_function.priority_score,
+                    optimization_type: OptimizationType::TierPromotion,
+                    estimated_benefit: self.estimate_optimization_benefit(&hot_function),
+                };
+                
+                recommendations.push(recommendation);
+            }
+        }
+        
+        // Sort by priority score (highest first)
+        recommendations.sort_by(|a, b| b.priority_score.partial_cmp(&a.priority_score).unwrap_or(std::cmp::Ordering::Equal));
+        
+        recommendations
+    }
+    
+    /// Get hot path detector reference
+    #[cfg(feature = "dev-ui")]
+    pub fn get_hot_path_detector(&self) -> Option<Arc<crate::hot_path_detector::HotPathDetector>> {
+        self.hot_path_detector.clone()
+    }
+    
+    /// Estimate optimization benefit
+    #[cfg(feature = "dev-ui")]
+    fn estimate_optimization_benefit(&self, hot_function: &crate::hot_path_detector::HotFunction) -> f64 {
+        // Simple heuristic: benefit is proportional to execution count and time
+        let execution_factor = (hot_function.execution_count as f64).log10().max(1.0);
+        let time_factor = hot_function.total_time.as_millis() as f64;
+        execution_factor * time_factor / 1000.0 // Normalize to reasonable range
+    }
 }
 
 /// Statistics for tiered compilation
@@ -337,4 +413,44 @@ impl TierStatistics {
     pub fn record_tier_promotion(&mut self, new_tier: CompilationTier) {
         *self.functions_per_tier.entry(new_tier).or_insert(0) += 1;
     }
+}
+
+/// Optimization recommendation from hot path analysis
+#[cfg(feature = "dev-ui")]
+#[derive(Debug, Clone)]
+pub struct OptimizationRecommendation {
+    /// Function identifier
+    pub function_id: String,
+    
+    /// Current compilation tier
+    pub current_tier: CompilationTier,
+    
+    /// Recommended tier
+    pub recommended_tier: CompilationTier,
+    
+    /// Priority score
+    pub priority_score: f64,
+    
+    /// Type of optimization
+    pub optimization_type: OptimizationType,
+    
+    /// Estimated benefit score
+    pub estimated_benefit: f64,
+}
+
+/// Types of optimizations
+#[cfg(feature = "dev-ui")]
+#[derive(Debug, Clone)]
+pub enum OptimizationType {
+    /// Promote to higher tier
+    TierPromotion,
+    
+    /// Inline hot call sites
+    Inlining,
+    
+    /// Unroll hot loops
+    LoopUnrolling,
+    
+    /// Apply speculative optimizations
+    SpeculativeOptimization,
 }

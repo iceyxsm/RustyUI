@@ -18,6 +18,9 @@ pub mod tiered_compilation;
 #[cfg(feature = "dev-ui")]
 pub mod profiling;
 
+#[cfg(feature = "dev-ui")]
+pub mod hot_path_detector;
+
 pub mod error;
 
 #[cfg(test)]
@@ -49,6 +52,12 @@ pub use profiling::{
     BranchStatistics, LoopStatistics, CallSiteStatistics, TypeFeedback,
 };
 
+#[cfg(feature = "dev-ui")]
+pub use hot_path_detector::{
+    HotPathDetector, HotPathConfig, HotFunction, HotLoop, HotCallSite,
+    LoopOptimization,
+};
+
 /// Runtime interpreter that handles code changes without compilation
 #[cfg(feature = "dev-ui")]
 pub struct RuntimeInterpreter {
@@ -77,12 +86,13 @@ impl RuntimeInterpreter {
     pub fn new() -> Result<Self> {
         let config = TieredCompilationConfig::default();
         let profiling = std::sync::Arc::new(ProfilingInfrastructure::new(config.profiling.clone()));
+        let tiered_compilation = TieredCompilationManager::with_hot_path_detector(config, profiling.clone());
         
         Ok(Self {
             rhai_interpreter: RhaiInterpreter::new()?,
             ast_interpreter: ASTInterpreter::new()?,
             jit_compiler: JITCompiler::new()?,
-            tiered_compilation: TieredCompilationManager::new(config),
+            tiered_compilation,
             profiling,
             interpretation_cache: std::collections::HashMap::new(),
         })
@@ -91,12 +101,13 @@ impl RuntimeInterpreter {
     /// Create a new runtime interpreter with custom configuration
     pub fn with_config(config: TieredCompilationConfig) -> Result<Self> {
         let profiling = std::sync::Arc::new(ProfilingInfrastructure::new(config.profiling.clone()));
+        let tiered_compilation = TieredCompilationManager::with_hot_path_detector(config, profiling.clone());
         
         Ok(Self {
             rhai_interpreter: RhaiInterpreter::new()?,
             ast_interpreter: ASTInterpreter::new()?,
             jit_compiler: JITCompiler::new()?,
-            tiered_compilation: TieredCompilationManager::new(config),
+            tiered_compilation,
             profiling,
             interpretation_cache: std::collections::HashMap::new(),
         })
@@ -547,6 +558,16 @@ impl RuntimeInterpreter {
     /// Record type observation for profiling
     pub fn record_type(&self, function_id: &str, operation_id: u32, type_name: &str) {
         self.profiling.record_type(function_id, operation_id, type_name);
+    }
+    
+    /// Get optimization recommendations
+    pub fn get_optimization_recommendations(&self) -> Vec<crate::tiered_compilation::OptimizationRecommendation> {
+        self.tiered_compilation.get_optimization_recommendations()
+    }
+    
+    /// Get hot path detector
+    pub fn get_hot_path_detector(&self) -> Option<std::sync::Arc<HotPathDetector>> {
+        self.tiered_compilation.get_hot_path_detector()
     }
     
     /// Calculate cache hit rate (simplified for Phase 1)
